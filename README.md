@@ -5,27 +5,42 @@ Importez l'historique de vos plateformes, obtenez les montants à reporter, cess
 
 **Démo :** https://crypto-plusvalue.vercel.app
 
-> Projet en cours de construction. CryptoPlusValue est un outil indépendant, sans lien avec
-> l'administration fiscale : ses résultats sont indicatifs et ne remplacent pas un conseil fiscal.
+> CryptoPlusValue est un outil indépendant, sans lien avec l'administration fiscale : ses
+> résultats sont indicatifs et ne remplacent pas un conseil fiscal.
+
+## Fonctionnalités
+
+- **Import des historiques** Trade Republic et Coinbase, reconnus automatiquement : seules les
+  opérations crypto sont lues, le reste (espèces, actions, fonds) est ignoré.
+- **Reconstitution du portefeuille** à chaque vente, avec une alerte quand l'historique est
+  incomplet (achats faits sur une autre plateforme).
+- **Cours historiques à la minute** pour la valeur globale du portefeuille, avec leur source
+  ([`docs/prix.md`](docs/prix.md)), et saisie manuelle quand aucune source ne connaît l'actif.
+- **Le formulaire 2086 colonne par colonne**, les cases 3AN / 3BN de la 2042 C et le seuil de
+  305 €.
+- **Un exemple fictif** pour essayer sans fichier.
 
 ## Principes
 
 - **Vos transactions restent dans votre navigateur.** Le serveur ne sert qu'à obtenir des cours
-  historiques ([`docs/prix.md`](docs/prix.md)) : il ne reçoit jamais vos montants.
-- **Le calcul officiel, ligne par ligne**, tel que le formulaire 2086 le présente, testé sur les
-  exemples chiffrés de la doctrine fiscale (BOFiP). Les règles et leurs sources sont détaillées
-  dans [`docs/regles-fiscales.md`](docs/regles-fiscales.md).
-- **Imports** : Trade Republic (vérifié sur deux exports réels) et Coinbase (vérifié sur des
-  exemples publics). Formats et limites dans [`docs/imports.md`](docs/imports.md).
+  historiques : il reçoit un symbole et une minute, jamais vos montants.
+- **Le calcul officiel, ligne par ligne**, testé sur les exemples chiffrés de la doctrine
+  fiscale (BOFiP). Les règles et leurs sources sont détaillées dans
+  [`docs/regles-fiscales.md`](docs/regles-fiscales.md).
+- **Imports vérifiés sur de vrais fichiers** : Trade Republic sur deux exports réels, Coinbase sur
+  des exemples publics. Formats et limites dans [`docs/imports.md`](docs/imports.md).
+- **Design sobre et accessible** : [`docs/design.md`](docs/design.md).
 
 ## Stack
 
-| Domaine   | Outils                                                       |
-| --------- | ------------------------------------------------------------ |
-| Framework | Nuxt 4, Vue 3, TypeScript strict, Pinia                      |
-| Interface | Tailwind CSS 4, IBM Plex Sans et Mono                        |
-| Calcul    | decimal.js (décimal exact, aucun nombre à virgule flottante) |
-| Qualité   | Vitest, ESLint, Prettier, GitHub Actions                     |
+| Domaine     | Outils                                                       |
+| ----------- | ------------------------------------------------------------ |
+| Framework   | Nuxt 4, Vue 3, TypeScript strict, Pinia                      |
+| Interface   | Tailwind CSS 4, IBM Plex Sans et Mono                        |
+| Calcul      | decimal.js (décimal exact, aucun nombre à virgule flottante) |
+| Serveur     | Routes Nitro : cours Binance et Coinbase Exchange, cache CDN |
+| Hébergement | Vercel (région Paris-Francfort)                              |
+| Qualité     | Vitest, ESLint, Prettier, GitHub Actions                     |
 
 ## Lancer le projet
 

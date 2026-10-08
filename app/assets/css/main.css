@@ -1,10 +1,40 @@
 @import 'tailwindcss';
 
+/*
+ * Fintech sobre et claire : un fond blanc cassé, une seule couleur d'accent (vert sapin) pour ce
+ * qui est interactif, le vert et le rouge réservés aux plus et moins-values, toujours avec leur
+ * signe. Contrastes vérifiés : chaque couleur de texte dépasse 5,5:1 sur le fond le plus clair.
+ * Choix détaillés dans docs/design.md.
+ */
 @theme {
   --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  --color-canvas: #f6f6f3;
+  --color-surface: #ffffff;
+  --color-line: #e2e2dc;
+  --color-ink: #16181d;
+  --color-muted: #595e66;
+  --color-accent: #0b5d4b;
+  --color-accent-strong: #084536;
+  --color-accent-soft: #e6f1ed;
+  --color-gain: #0b6b3a;
+  --color-loss: #b42318;
+  --color-warning: #8a4b00;
+  --color-warning-soft: #fdf3e2;
 }
 
-body {
-  @apply bg-white font-sans text-neutral-900 antialiased;
+@layer base {
+  body {
+    @apply bg-canvas font-sans text-ink antialiased;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-accent;
+  }
+}
+
+@utility numeric {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
 }

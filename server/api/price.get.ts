@@ -19,14 +19,20 @@ export default defineEventHandler(async (event) => {
   if (at.getTime() > Date.now() - 2 * 60_000) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Cours disponible après la minute écoulée',
+      statusMessage: 'Bad Request',
+      message: 'Cours disponible après la minute écoulée',
     })
   }
 
   const quote = await resolvePriceEur(asset, at, fetchJson)
+  // Le statut HTTP n'accepte que l'ASCII : le message en français va dans `message`.
   // Une erreur n'est jamais mise en cache : une source peut n'être que momentanément muette.
   if (!quote) {
-    throw createError({ statusCode: 404, statusMessage: `Aucun cours trouvé pour ${asset}` })
+    throw createError({
+      statusCode: 404,
+      statusMessage: 'Not Found',
+      message: `Aucun cours trouvé pour ${asset}`,
+    })
   }
 
   setResponseHeader(event, 'Cache-Control', 'public, s-maxage=31536000, immutable')
@@ -43,7 +49,8 @@ async function fetchJson(url: string): Promise<unknown> {
   if (!response.ok) {
     throw createError({
       statusCode: 502,
-      statusMessage: `Source de prix indisponible (${response.status})`,
+      statusMessage: 'Bad Gateway',
+      message: `Source de prix indisponible (${response.status})`,
     })
   }
   return response.json()
