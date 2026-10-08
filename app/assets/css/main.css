@@ -31,6 +31,38 @@
   }
 }
 
+/* Curseur : piste fine remplie à l'encre jusqu'à la valeur (--fill), poignée blanche cerclée. */
+@layer components {
+  .range-ink {
+    appearance: none;
+    height: 0.375rem;
+    border-radius: 999px;
+    background: linear-gradient(
+      to right,
+      var(--color-ink) 0 var(--fill, 0%),
+      var(--color-rule) var(--fill, 0%) 100%
+    );
+    cursor: pointer;
+  }
+
+  .range-ink::-webkit-slider-thumb {
+    appearance: none;
+    width: 1.375rem;
+    height: 1.375rem;
+    border: 2px solid var(--color-ink);
+    border-radius: 999px;
+    background: var(--color-paper);
+  }
+
+  .range-ink::-moz-range-thumb {
+    width: 1.375rem;
+    height: 1.375rem;
+    border: 2px solid var(--color-ink);
+    border-radius: 999px;
+    background: var(--color-paper);
+  }
+}
+
 /* Titres : Archivo élargie et grasse. */
 @utility display {
   font-weight: 700;
