@@ -59,7 +59,7 @@ function toTransaction(row: CsvRow): Transaction | 'ignored' | undefined {
     date: isoDate(row, 'datetime'),
     label: cell(row, 'description'),
   }
-  const crypto = { asset: cell(row, 'symbol').toUpperCase(), quantity: amount(row, 'shares') }
+  const crypto = { asset: ticker(cell(row, 'symbol')), quantity: amount(row, 'shares') }
 
   // `amount` est le montant brut (quantité × prix), `fee` les frais d'ordre, tous deux signés.
   switch (`${cell(row, 'category')}/${cell(row, 'type')}`) {
@@ -79,9 +79,17 @@ function toTransaction(row: CsvRow): Transaction | 'ignored' | undefined {
         amountEur: amount(row, 'amount'),
         feeEur: amount(row, 'fee'),
       }
-    // Réception et envoi depuis ou vers un portefeuille externe.
+    // Récompenses de staking, versées régulièrement en petites quantités, avec le cours du jour.
+    // Une réception depuis un portefeuille externe porte le même type : à requalifier.
     case 'DELIVERY/FREE_RECEIPT':
-      return { ...base, type: 'transfer-in', received: crypto }
+      return {
+        ...base,
+        type: 'reward',
+        received: crypto,
+        valueEur:
+          cell(row, 'price') === '' ? undefined : crypto.quantity.times(amount(row, 'price')),
+      }
+    // Envoi vers un portefeuille externe.
     case 'DELIVERY/FREE_DELIVERY':
       return { ...base, type: 'transfer-out', sent: crypto }
     // Migration interne : des paires −x / +x sans effet sur les avoirs.
@@ -90,4 +98,13 @@ function toTransaction(row: CsvRow): Transaction | 'ignored' | undefined {
     default:
       return undefined
   }
+}
+
+/**
+ * Symbole de l'actif. Trade Republic donne le plus souvent le symbole (`BTC`), mais parfois un
+ * pseudo-ISIN de 12 caractères quand le symbole est long : `XF0RENDER015` pour RENDER.
+ */
+function ticker(symbol: string): string {
+  const pseudoIsin = /^XF0*([A-Z]+)\d+$/.exec(symbol.toUpperCase())
+  return symbol.length === 12 && pseudoIsin?.[1] ? pseudoIsin[1] : symbol.toUpperCase()
 }

@@ -3,6 +3,8 @@
 Calcul des plus-values sur cryptomonnaies pour la déclaration d'impôts française (**formulaire 2086**).
 Importez l'historique de vos plateformes, obtenez les montants à reporter, cession par cession.
 
+**Démo :** https://crypto-plusvalue.vercel.app
+
 > Projet en cours de construction. CryptoPlusValue est un outil indépendant, sans lien avec
 > l'administration fiscale : ses résultats sont indicatifs et ne remplacent pas un conseil fiscal.
 
@@ -13,7 +15,7 @@ Importez l'historique de vos plateformes, obtenez les montants à reporter, cess
 - **Le calcul officiel, ligne par ligne**, tel que le formulaire 2086 le présente, testé sur les
   exemples chiffrés de la doctrine fiscale (BOFiP). Les règles et leurs sources sont détaillées
   dans [`docs/regles-fiscales.md`](docs/regles-fiscales.md).
-- **Imports** : Trade Republic (vérifié sur un export réel), Coinbase à venir. Formats et limites
+- **Imports** : Trade Republic (vérifié sur deux exports réels), Coinbase à venir. Formats et limites
   dans [`docs/imports.md`](docs/imports.md).
 
 ## Stack
