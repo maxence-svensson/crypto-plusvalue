@@ -78,6 +78,18 @@ actifs cédés compris, sur toutes les plateformes, y compris étrangères, et d
 portefeuilles personnels ([BOFiP 30-20][b20] §140). Les cotations moyennes publiées par des sites
 spécialisés sont admises (§150).
 
+L'application la calcule ainsi (`shared/portfolio/`) :
+
+1. elle rejoue tout l'historique importé pour connaître les actifs détenus juste avant la cession ;
+2. elle compte les actifs cédés pour leur **prix de cession**, connu exactement : la valeur globale
+   ne peut donc jamais être inférieure au prix obtenu ;
+3. elle valorise les autres actifs au cours du marché au même moment.
+
+Un transfert entre deux portefeuilles du foyer ne change pas ce que le foyer possède : il n'a
+aucun effet, sauf ses frais de réseau, qui sortent du portefeuille. Si une vente porte sur plus
+d'actifs que l'historique n'en contient, il manque des achats (une autre plateforme, un
+portefeuille personnel) : l'application le signale au lieu de calculer sur des données fausses.
+
 ## Seuil de 305 €
 
 Si la somme des prix de cession de l'année n'excède pas **305 €** pour tout le foyer, les cessions
@@ -99,14 +111,16 @@ prélèvements sociaux depuis la LFSS 2026), ou option pour le barème progressi
 
 ## Choix de l'application sur les points incertains
 
-| Question                         | Choix retenu                                              | Pourquoi                                                                                                      |
-| -------------------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| Frais d'achat                    | inclus dans le prix d'acquisition                         | Le texte retient les « prix effectivement acquittés » ; les logiciels du marché font de même.                 |
-| Récompenses de staking, airdrops | valeur d'acquisition nulle par défaut                     | Aucune doctrine ne fixe leur valeur d'entrée ; 0 € est le choix prudent.                                      |
-| Échange avec soulte **versée**   | actifs reçus ajoutés pour la valeur remise plus la soulte | Seul le cas de la soulte reçue a un exemple officiel ; le §70 inclut les soultes versées.                     |
-| Stablecoins (USDT, USDC, EURC…)  | échange crypto contre stablecoin en sursis                | Ce sont des actifs numériques ; seul le cas des jetons de monnaie électronique au sens de MiCA reste discuté. |
-| Arrondis                         | pleine précision, cases arrondies à l'euro                | Aucune règle trouvée ; les fractions cumulées doivent rester exactes.                                         |
-| Seuil de 305 €                   | comparé aux prix nets (ligne 218)                         | C'est le calcul du formulaire ; la FAQ parle de montant « brut ».                                             |
+| Question                              | Choix retenu                                                 | Pourquoi                                                                                                      |
+| ------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| Frais d'achat                         | inclus dans le prix d'acquisition                            | Le texte retient les « prix effectivement acquittés » ; les logiciels du marché font de même.                 |
+| Récompenses de staking, airdrops      | valeur d'acquisition nulle par défaut                        | Aucune doctrine ne fixe leur valeur d'entrée ; 0 € est le choix prudent.                                      |
+| Échange avec soulte **versée**        | actifs reçus ajoutés pour la valeur remise plus la soulte    | Seul le cas de la soulte reçue a un exemple officiel ; le §70 inclut les soultes versées.                     |
+| Stablecoins (USDT, USDC, EURC…)       | échange crypto contre stablecoin en sursis                   | Ce sont des actifs numériques ; seul le cas des jetons de monnaie électronique au sens de MiCA reste discuté. |
+| Retraits vers un portefeuille externe | supposés rester dans le foyer                                | C'est le cas le plus courant ; un envoi à un tiers (paiement, don) doit être requalifié.                      |
+| Frais de réseau d'un transfert        | sortent du portefeuille, sans être traités comme une cession | Les montants sont faibles et la tolérance du BOFiP ne vise que les frais d'une cession ou d'un échange.       |
+| Arrondis                              | pleine précision, cases arrondies à l'euro                   | Aucune règle trouvée ; les fractions cumulées doivent rester exactes.                                         |
+| Seuil de 305 €                        | comparé aux prix nets (ligne 218)                            | C'est le calcul du formulaire ; la FAQ parle de montant « brut ».                                             |
 
 ## Hors du périmètre actuel
 
