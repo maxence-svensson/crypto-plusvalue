@@ -3,7 +3,10 @@
 Calcul des plus-values sur cryptomonnaies pour la déclaration d'impôts française (**formulaire 2086**).
 Importez l'historique de vos plateformes, obtenez les montants à reporter, cession par cession.
 
-**Démo :** https://crypto-plusvalue.vercel.app
+**Démo :** https://crypto-plusvalue.vercel.app, ou directement
+[le résultat de l'exemple fictif](https://crypto-plusvalue.vercel.app/?exemple).
+
+![Accueil : la case 3AN de l'exemple, remplie au surligneur](docs/captures/accueil.jpg)
 
 > CryptoPlusValue est un outil indépendant, sans lien avec l'administration fiscale : ses
 > résultats sont indicatifs et ne remplacent pas un conseil fiscal.
@@ -23,6 +26,16 @@ Importez l'historique de vos plateformes, obtenez les montants à reporter, cess
   moment, compte tenu des ventes déjà faites dans l'année et du seuil de 305 €. Fonctionne aussi
   sans fichier, à partir de trois montants.
 - **Un exemple fictif** pour essayer sans fichier.
+
+![Le résultat : case 3AN, lignes 224 et 51, puis le formulaire 2086 colonne par colonne](docs/captures/resultat.jpg)
+
+![Le formulaire 2086 officiel, rempli par le site avec l'exemple fictif](docs/captures/formulaire-2086.jpg)
+
+![Le simulateur : part de BTC à vendre au curseur, plus-value et impôt estimés](docs/captures/simulateur.jpg)
+
+<p align="center">
+  <img src="docs/captures/mobile.jpg" alt="L'accueil sur mobile" width="320">
+</p>
 
 ## Principes
 
@@ -56,11 +69,12 @@ npm install
 npm run dev
 ```
 
-| Commande            | Rôle                     |
-| ------------------- | ------------------------ |
-| `npm run dev`       | serveur de développement |
-| `npm test`          | tests unitaires (Vitest) |
-| `npm run lint`      | ESLint                   |
-| `npm run typecheck` | vérification des types   |
-| `npm run format`    | mise en forme (Prettier) |
-| `npm run build`     | build de production      |
+| Commande            | Rôle                       |
+| ------------------- | -------------------------- |
+| `npm run dev`       | serveur de développement   |
+| `npm test`          | tests unitaires (Vitest)   |
+| `npm run lint`      | ESLint                     |
+| `npm run typecheck` | vérification des types     |
+| `npm run format`    | mise en forme (Prettier)   |
+| `npm run build`     | build de production        |
+| `npm run captures`  | captures d'écran du README |
