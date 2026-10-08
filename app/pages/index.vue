@@ -74,7 +74,12 @@ async function showExample() {
               Voir un exemple
             </button>
           </div>
-          <p class="mt-6 text-sm text-ink-soft">Gratuit, sans compte, code source ouvert.</p>
+          <p class="mt-6 text-sm text-ink-soft">
+            Gratuit, sans compte, code source ouvert. Vous hésitez à vendre ?
+            <a href="#simulation" class="font-semibold text-ink underline underline-offset-4">
+              Simulez l'impôt d'une vente
+            </a>
+          </p>
         </div>
 
         <div class="rounded-md bg-field p-6 sm:p-8">
@@ -144,6 +149,24 @@ async function showExample() {
           </template>
         </div>
       </div>
+
+      <section
+        id="simulation"
+        aria-labelledby="titre-simulation"
+        class="scroll-mt-6 border-t-[1.5px] border-ink"
+      >
+        <div class="mx-auto max-w-6xl space-y-6 px-5 py-14 sm:px-8">
+          <div>
+            <h2 id="titre-simulation" class="display text-xl sm:text-2xl">
+              Et si je vendais aujourd'hui ?
+            </h2>
+            <p class="mt-2 max-w-prose text-ink-soft">
+              Estimez la plus-value et l'impôt d'une vente aux cours du moment, avant de la faire.
+            </p>
+          </div>
+          <SaleSimulator />
+        </div>
+      </section>
     </main>
 
     <footer class="bg-field">
