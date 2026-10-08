@@ -4,8 +4,9 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
-  modules: ['@nuxt/eslint', '@nuxt/fonts', '@pinia/nuxt'],
-  css: ['~/assets/css/main.css'],
+  modules: ['@nuxt/eslint', '@pinia/nuxt'],
+  // Archivo variable (graisse et largeur), hébergée par le site : aucune requête vers Google.
+  css: ['@fontsource-variable/archivo/wdth.css', '~/assets/css/main.css'],
   vite: { plugins: [tailwindcss()] },
   app: {
     head: {
@@ -19,11 +20,5 @@ export default defineNuxtConfig({
         },
       ],
     },
-  },
-  fonts: {
-    families: [
-      { name: 'IBM Plex Sans', provider: 'google', weights: [400, 500, 600] },
-      { name: 'IBM Plex Mono', provider: 'google', weights: [400, 500] },
-    ],
   },
 })

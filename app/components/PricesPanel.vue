@@ -26,21 +26,17 @@ function save(key: string) {
 </script>
 
 <template>
-  <details
-    v-if="rows.length > 0"
-    class="rounded-lg border border-line bg-surface"
-    :open="hasErrors || undefined"
-  >
-    <summary class="cursor-pointer px-4 py-3 text-sm font-medium">
-      Cours utilisés pour la valeur du portefeuille :
-      <span role="status">
+  <details v-if="rows.length > 0" class="border-b border-rule" :open="hasErrors || undefined">
+    <summary class="cursor-pointer py-3 font-semibold">
+      Les cours retenus pour chaque vente :
+      <span role="status" class="font-normal text-ink-soft">
         {{ store.fetchingPrices ? 'récupération…' : `${found} sur ${rows.length}` }}
       </span>
     </summary>
-    <div class="border-t border-line px-4 py-3 text-sm">
-      <p class="text-muted">
-        À chaque vente, le formulaire 2086 demande la valeur de toutes vos cryptos à cet instant :
-        voici les cours retenus, à la minute près. Seuls le symbole et la minute sont envoyés au
+    <div class="pb-4 text-sm">
+      <p class="max-w-prose text-ink-soft">
+        À chaque vente, le formulaire 2086 demande la valeur de toutes vos cryptos à cet instant.
+        Voici les cours retenus, à la minute près. Seuls le symbole et la minute sont envoyés au
         serveur, jamais vos montants.
       </p>
       <div class="mt-3 overflow-x-auto">
@@ -48,23 +44,23 @@ function save(key: string) {
           <caption class="sr-only">
             Cours historiques en euros utilisés pour le calcul
           </caption>
-          <thead class="text-muted">
+          <thead class="text-ink-soft">
             <tr>
-              <th scope="col" class="py-2 pr-4 font-medium">Actif</th>
-              <th scope="col" class="py-2 pr-4 font-medium">Minute</th>
-              <th scope="col" class="py-2 pr-4 text-right font-medium">Cours</th>
-              <th scope="col" class="py-2 font-medium">Source</th>
+              <th scope="col" class="py-2 pr-4 font-normal">Crypto</th>
+              <th scope="col" class="py-2 pr-4 font-normal">Minute</th>
+              <th scope="col" class="py-2 pr-4 text-right font-normal">Cours</th>
+              <th scope="col" class="py-2 font-normal">Source</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="row in rows" :key="row.key" class="border-t border-line align-top">
-              <td class="py-2 pr-4 font-medium">{{ row.asset }}</td>
+            <tr v-for="row in rows" :key="row.key" class="border-t border-rule align-top">
+              <td class="py-2 pr-4 font-semibold">{{ row.asset }}</td>
               <td class="numeric py-2 pr-4 whitespace-nowrap">{{ formatDateTime(row.minute) }}</td>
               <td class="numeric py-2 pr-4 text-right whitespace-nowrap">
                 {{ row.price ? formatEuros(row.price.priceEur) : '—' }}
               </td>
               <td class="py-2">
-                <span v-if="row.price" class="text-muted">{{ row.price.source }}</span>
+                <span v-if="row.price" class="text-ink-soft">{{ row.price.source }}</span>
                 <form
                   v-else-if="row.error"
                   class="flex flex-wrap items-center gap-2"
@@ -75,20 +71,20 @@ function save(key: string) {
                     :id="`price-${row.key}`"
                     v-model="drafts[row.key]"
                     inputmode="decimal"
-                    class="numeric w-28 rounded-md border border-line px-2 py-1"
-                    placeholder="Cours en €"
+                    class="numeric w-28 rounded-[4px] border-[1.5px] border-ink bg-field px-2 py-1"
+                    placeholder="1234,56"
                   />
                   <button
                     type="submit"
-                    class="rounded-md bg-accent px-3 py-1 font-medium text-white hover:bg-accent-strong"
+                    class="rounded-[4px] bg-ink px-3 py-1 font-semibold text-paper"
                   >
-                    Valider
+                    Valider le cours
                   </button>
                   <span v-if="draftErrors[row.key]" class="w-full text-loss">{{
                     draftErrors[row.key]
                   }}</span>
                 </form>
-                <span v-else class="text-muted">En attente…</span>
+                <span v-else class="text-ink-soft">En attente…</span>
               </td>
             </tr>
           </tbody>

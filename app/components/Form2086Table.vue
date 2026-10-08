@@ -25,56 +25,63 @@ const LINES: { line: string; label: string; value: (disposal: DisposalResult) =>
 </script>
 
 <template>
-  <div class="overflow-x-auto rounded-lg border border-line bg-surface">
-    <table class="w-full text-sm">
+  <div class="overflow-x-auto">
+    <table class="w-full border-separate border-spacing-y-1 text-sm">
       <caption class="sr-only">
         Formulaire 2086 : une colonne par cession de l'année
       </caption>
       <thead>
-        <tr class="text-muted">
-          <th scope="col" class="sticky left-0 bg-surface px-4 py-3 text-left font-medium">
-            Ligne
-          </th>
+        <tr class="text-ink-soft">
+          <th scope="col" class="sticky left-0 bg-paper py-2 pr-4 text-left font-normal">Ligne</th>
           <th
             v-for="(disposal, index) in disposals"
             :key="disposal.id"
             scope="col"
-            class="px-4 py-3 text-right font-medium whitespace-nowrap"
+            class="px-1 py-2 text-right font-semibold whitespace-nowrap text-ink"
           >
             Cession {{ index + 1 }}
           </th>
         </tr>
       </thead>
       <tbody>
-        <tr class="border-t border-line">
-          <th scope="row" class="sticky left-0 bg-surface px-4 py-2 text-left font-normal">
-            <span class="numeric mr-2 text-muted">211</span>Date de la cession
+        <tr>
+          <th scope="row" class="sticky left-0 bg-paper py-1 pr-4 text-left font-normal">
+            <span
+              class="numeric mr-2 inline-block w-11 rounded-[3px] border-[1.5px] border-ink text-center text-xs font-semibold"
+              >211</span
+            >Date de la cession
           </th>
-          <td v-for="disposal in disposals" :key="disposal.id" class="numeric px-4 py-2 text-right">
-            {{ formatDay(disposal.date) }}
+          <td v-for="disposal in disposals" :key="disposal.id" class="px-1">
+            <span
+              class="numeric block rounded-[3px] bg-field px-3 py-1.5 text-right whitespace-nowrap"
+            >
+              {{ formatDay(disposal.date) }}
+            </span>
           </td>
         </tr>
-        <tr v-for="row in LINES" :key="row.line" class="border-t border-line">
-          <th scope="row" class="sticky left-0 min-w-56 bg-surface px-4 py-2 text-left font-normal">
-            <span class="numeric mr-2 text-muted">{{ row.line }}</span
+        <tr v-for="row in LINES" :key="row.line">
+          <th scope="row" class="sticky left-0 min-w-64 bg-paper py-1 pr-4 text-left font-normal">
+            <span
+              class="numeric mr-2 inline-block w-11 rounded-[3px] border-[1.5px] border-ink text-center text-xs font-semibold"
+              >{{ row.line }}</span
             >{{ row.label }}
           </th>
-          <td
-            v-for="disposal in disposals"
-            :key="disposal.id"
-            class="numeric px-4 py-2 text-right whitespace-nowrap"
-          >
-            {{ formatEuros(row.value(disposal)) }}
+          <td v-for="disposal in disposals" :key="disposal.id" class="px-1">
+            <span
+              class="numeric block rounded-[3px] bg-field px-3 py-1.5 text-right whitespace-nowrap"
+            >
+              {{ formatEuros(row.value(disposal)) }}
+            </span>
           </td>
         </tr>
-        <tr class="border-t-2 border-line font-medium">
-          <th scope="row" class="sticky left-0 bg-surface px-4 py-3 text-left">
-            Plus ou moins-value
+        <tr>
+          <th scope="row" class="sticky left-0 bg-paper pt-3 pr-4 text-left font-semibold">
+            Plus ou moins-value de la cession
           </th>
           <td
             v-for="disposal in disposals"
             :key="disposal.id"
-            class="numeric px-4 py-3 text-right whitespace-nowrap"
+            class="numeric px-4 pt-3 text-right font-semibold whitespace-nowrap"
             :class="disposal.gain.lt(0) ? 'text-loss' : 'text-gain'"
           >
             {{ formatSignedEuros(disposal.gain) }}

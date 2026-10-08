@@ -59,6 +59,12 @@ export const usePortfolioStore = defineStore('portfolio', () => {
     await fetchPrices()
   }
 
+  /** Exemple fictif au format Trade Republic, pour essayer sans fichier. */
+  async function loadExample() {
+    const text = await $fetch<string>('/exemples/trade-republic.csv', { responseType: 'text' })
+    await importFiles([{ name: 'Exemple fictif (Trade Republic)', text: async () => text }])
+  }
+
   function reset() {
     files.value = []
     transactions.value = []
@@ -162,6 +168,7 @@ export const usePortfolioStore = defineStore('portfolio', () => {
     computation,
     years,
     importFiles,
+    loadExample,
     fetchPrices,
     setManualPrice,
     summary,

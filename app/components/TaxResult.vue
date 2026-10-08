@@ -13,11 +13,12 @@ const chosenYear = ref<number>()
 const year = computed(() => chosenYear.value ?? defaultYear.value)
 
 const summary = computed(() => (year.value === undefined ? undefined : store.summary(year.value)))
+const isLoss = computed(() => (summary.value?.box3BN ?? 0) > 0)
 </script>
 
 <template>
-  <div class="space-y-6">
-    <p v-if="store.computation.status === 'missing-prices'" class="text-muted" role="status">
+  <div class="space-y-8">
+    <p v-if="store.computation.status === 'missing-prices'" class="text-ink-soft" role="status">
       {{
         store.fetchingPrices
           ? 'Récupération des cours…'
@@ -31,17 +32,13 @@ const summary = computed(() => (year.value === undefined ? undefined : store.sum
 
     <template v-else-if="summary && year !== undefined">
       <fieldset v-if="store.years.length > 1">
-        <legend class="text-sm text-muted">Année des cessions</legend>
-        <div class="mt-2 flex flex-wrap gap-2">
+        <legend class="text-sm text-ink-soft">Année des ventes</legend>
+        <div class="mt-2 inline-flex overflow-hidden rounded-[4px] border-[1.5px] border-ink">
           <label
             v-for="option in store.years"
             :key="option"
-            class="cursor-pointer rounded-md border px-3 py-1.5 text-sm focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-accent"
-            :class="
-              option === year
-                ? 'border-accent bg-accent text-white'
-                : 'border-line bg-surface hover:border-accent'
-            "
+            class="numeric cursor-pointer border-ink px-4 py-1.5 text-sm font-semibold not-first:border-l-[1.5px] focus-within:outline-2 focus-within:-outline-offset-4 focus-within:outline-paper"
+            :class="option === year ? 'bg-ink text-paper' : 'bg-paper text-ink hover:bg-field'"
           >
             <input v-model="chosenYear" type="radio" name="year" :value="option" class="sr-only" />
             {{ option }}
@@ -49,68 +46,73 @@ const summary = computed(() => (year.value === undefined ? undefined : store.sum
         </div>
       </fieldset>
 
-      <div
-        v-if="summary.disposals.length === 0"
-        class="rounded-lg border border-line bg-surface p-5"
-      >
-        <p class="font-medium">Aucune cession imposable en {{ year }}</p>
-        <p class="mt-1 text-sm text-muted">
+      <div v-if="summary.disposals.length === 0" class="rounded-md bg-field px-6 py-5">
+        <p class="display text-lg">Rien à déclarer pour {{ year }}</p>
+        <p class="mt-2 max-w-prose text-ink-soft">
           Vous n'avez rien vendu contre des euros ni payé avec vos cryptos cette année-là : pas de
-          plus-value à déclarer, le formulaire 2086 n'est pas à remplir pour {{ year }}. Les achats,
-          les échanges entre cryptos et le staking ne sont pas des cessions.
+          plus-value, et pas de formulaire 2086 à remplir pour {{ year }}. Les achats, les échanges
+          entre cryptos et le staking ne sont pas des ventes imposables.
         </p>
       </div>
 
       <template v-else>
-        <dl class="grid gap-3 sm:grid-cols-3">
-          <div class="rounded-lg border border-line bg-surface p-4">
-            <dt class="text-sm text-muted">
-              {{ summary.box3BN > 0 ? 'Moins-value, case 3BN' : 'Plus-value imposable, case 3AN' }}
-            </dt>
-            <dd
-              class="numeric mt-1 text-2xl font-medium"
-              :class="summary.box3BN > 0 ? 'text-loss' : summary.box3AN > 0 ? 'text-gain' : ''"
-            >
-              {{ formatWholeEuros(summary.box3BN > 0 ? summary.box3BN : summary.box3AN) }}
-            </dd>
-            <dd class="mt-1 text-xs text-muted">Déclaration 2042 C, arrondi à l'euro</dd>
-          </div>
-          <div class="rounded-lg border border-line bg-surface p-4">
-            <dt class="text-sm text-muted">Plus ou moins-value nette, ligne 224</dt>
-            <dd class="numeric mt-1 text-2xl font-medium">
-              {{ formatSignedEuros(summary.netGain) }}
-            </dd>
-            <dd class="mt-1 text-xs text-muted">
-              {{ summary.disposals.length }}
-              {{ summary.disposals.length > 1 ? 'cessions' : 'cession' }}
-            </dd>
-          </div>
-          <div class="rounded-lg border border-line bg-surface p-4">
-            <dt class="text-sm text-muted">Total des cessions, ligne 51</dt>
-            <dd class="numeric mt-1 text-2xl font-medium">{{ formatEuros(summary.totalPrice) }}</dd>
-            <dd class="mt-1 text-xs text-muted">
+        <div
+          class="grid gap-6 rounded-md bg-field p-6 sm:p-8 md:grid-cols-[auto_1fr] md:items-center md:gap-12"
+        >
+          <div>
+            <p class="text-sm text-ink-soft">Déclaration 2042 C, revenus {{ year }}</p>
+            <p class="mt-1 mb-4 font-semibold">
               {{
-                summary.exempt
-                  ? `Exonéré : pas plus de ${EXEMPTION_THRESHOLD} € dans l'année`
-                  : `Imposable : plus de ${EXEMPTION_THRESHOLD} € dans l'année`
+                isLoss ? 'Moins-value sur actifs numériques' : 'Plus-value sur actifs numériques'
               }}
-            </dd>
+            </p>
+            <CombBox
+              :code="isLoss ? '3BN' : '3AN'"
+              :value="isLoss ? summary.box3BN : summary.box3AN"
+            />
+            <p v-if="summary.exempt" class="mt-3 text-sm text-ink-soft">
+              Vos ventes ne dépassent pas {{ EXEMPTION_THRESHOLD }} € : elles sont exonérées.
+            </p>
           </div>
-        </dl>
+          <dl class="divide-y divide-rule border-y border-rule text-sm">
+            <div class="flex items-baseline justify-between gap-4 py-3">
+              <dt>
+                <span class="font-semibold">Ligne 224</span>
+                <span class="text-ink-soft"> du 2086, plus ou moins-value nette</span>
+              </dt>
+              <dd class="numeric font-semibold whitespace-nowrap">
+                {{ formatSignedEuros(summary.netGain) }}
+              </dd>
+            </div>
+            <div class="flex items-baseline justify-between gap-4 py-3">
+              <dt>
+                <span class="font-semibold">Ligne 51</span>
+                <span class="text-ink-soft"> du 2086, total des ventes</span>
+              </dt>
+              <dd class="numeric font-semibold whitespace-nowrap">
+                {{ formatEuros(summary.totalPrice) }}
+              </dd>
+            </div>
+            <div class="flex items-baseline justify-between gap-4 py-3">
+              <dt class="text-ink-soft">Ventes imposables dans l'année</dt>
+              <dd class="numeric font-semibold">{{ summary.disposals.length }}</dd>
+            </div>
+          </dl>
+        </div>
 
         <div>
-          <h3 class="text-base font-semibold">Formulaire 2086, colonne par colonne</h3>
-          <p class="mt-1 text-sm text-muted">
-            Recopiez chaque colonne dans le formulaire 2086, à joindre à votre déclaration de
-            revenus. Montants en euros, calculés sans arrondi intermédiaire.
+          <h3 class="display text-lg">Le formulaire 2086, cession par cession</h3>
+          <p class="mt-1 max-w-prose text-sm text-ink-soft">
+            Recopiez chaque colonne sur le formulaire 2086, à joindre à votre déclaration. Les
+            montants sont calculés sans arrondi intermédiaire.
           </p>
-          <Form2086Table class="mt-3" :disposals="summary.disposals" />
+          <Form2086Table class="mt-4" :disposals="summary.disposals" />
         </div>
       </template>
 
-      <aside class="rounded-lg border border-line bg-accent-soft p-4 text-sm">
-        <p class="font-medium">À ne pas oublier : le formulaire 3916-bis</p>
-        <p class="mt-1 text-muted">
+      <aside class="border-t-[1.5px] border-ink pt-4 text-sm">
+        <p class="font-semibold">Pensez aussi au formulaire 3916-bis</p>
+        <p class="mt-1 max-w-prose text-ink-soft">
           Chaque compte crypto ouvert auprès d'une plateforme étrangère (Coinbase, Trade Republic,
           Binance…) se déclare chaque année, même sans vente. L'oubli coûte 750 € par compte.
         </p>
