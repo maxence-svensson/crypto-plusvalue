@@ -129,6 +129,8 @@ prélèvements sociaux depuis la LFSS 2026), ou option pour le barème progressi
 - **NFT** : depuis le 1er janvier 2026, les jetons non fongibles relèvent d'un régime distinct
   (article 150 VH ter).
 - **Activité professionnelle** (BIC ou BNC), minage et staking imposés à la réception.
+- **ETF et ETN sur la crypto** : ce sont des titres, imposés comme des valeurs mobilières
+  (formulaire 2074).
 
 ## Obligations à rappeler à l'utilisateur
 
