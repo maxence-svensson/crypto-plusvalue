@@ -10,8 +10,8 @@ Importez l'historique de vos plateformes, obtenez les montants à reporter, cess
 
 ## Principes
 
-- **Vos transactions restent dans votre navigateur.** Le serveur ne sert qu'à obtenir des prix
-  historiques : il ne reçoit jamais vos montants.
+- **Vos transactions restent dans votre navigateur.** Le serveur ne sert qu'à obtenir des cours
+  historiques ([`docs/prix.md`](docs/prix.md)) : il ne reçoit jamais vos montants.
 - **Le calcul officiel, ligne par ligne**, tel que le formulaire 2086 le présente, testé sur les
   exemples chiffrés de la doctrine fiscale (BOFiP). Les règles et leurs sources sont détaillées
   dans [`docs/regles-fiscales.md`](docs/regles-fiscales.md).
