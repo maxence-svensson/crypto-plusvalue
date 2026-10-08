@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { FORM_2086, hasForm2086 } from '#shared/cerfa/form2086'
 import { EXEMPTION_THRESHOLD, taxYear } from '#shared/tax/form2086'
 
 const store = usePortfolioStore()
@@ -14,6 +15,22 @@ const year = computed(() => chosenYear.value ?? defaultYear.value)
 
 const summary = computed(() => (year.value === undefined ? undefined : store.summary(year.value)))
 const isLoss = computed(() => (summary.value?.box3BN ?? 0) > 0)
+
+const downloading = ref(false)
+const downloadError = ref('')
+
+async function download() {
+  if (!summary.value) return
+  downloading.value = true
+  downloadError.value = ''
+  try {
+    await downloadForm2086(summary.value)
+  } catch {
+    downloadError.value = 'Le formulaire n’a pas pu être préparé. Réessayez dans un instant.'
+  } finally {
+    downloading.value = false
+  }
+}
 </script>
 
 <template>
@@ -102,9 +119,36 @@ const isLoss = computed(() => (summary.value?.box3BN ?? 0) > 0)
 
         <div>
           <h3 class="display text-lg">Le formulaire 2086, cession par cession</h3>
-          <p class="mt-1 max-w-prose text-sm text-ink-soft">
-            Recopiez chaque colonne sur le formulaire 2086, à joindre à votre déclaration. Les
-            montants sont calculés sans arrondi intermédiaire.
+          <div
+            v-if="hasForm2086(year)"
+            class="mt-3 flex flex-col gap-3 rounded-md border-[1.5px] border-ink p-5 sm:flex-row sm:items-center sm:justify-between"
+          >
+            <p class="max-w-prose text-sm text-ink-soft">
+              <span class="font-semibold text-ink">Le formulaire officiel, déjà rempli.</span>
+              Toutes les cases calculées sont complétées, en euros entiers. Il reste à ajouter vos
+              nom et adresse, à vérifier, puis à le joindre à votre déclaration.
+            </p>
+            <button
+              type="button"
+              class="shrink-0 rounded-[4px] bg-ink px-5 py-3 font-semibold text-paper hover:bg-ink/90 disabled:opacity-60"
+              :disabled="downloading"
+              @click="download"
+            >
+              {{ downloading ? 'Préparation du formulaire…' : 'Télécharger le 2086 rempli' }}
+            </button>
+          </div>
+          <p v-else class="mt-2 max-w-prose text-sm text-ink-soft">
+            {{
+              year > FORM_2086.year
+                ? `L'administration n'a pas encore publié le formulaire 2086 des revenus ${year} : recopiez les montants ci-dessous quand il sera disponible.`
+                : `Le formulaire rempli n'est proposé que pour les revenus ${FORM_2086.year} : recopiez les montants ci-dessous.`
+            }}
+          </p>
+          <p v-if="downloadError" class="mt-2 text-sm text-loss" role="alert">
+            {{ downloadError }}
+          </p>
+          <p class="mt-4 max-w-prose text-sm text-ink-soft">
+            Le détail ci-dessous est calculé sans arrondi intermédiaire.
           </p>
           <Form2086Table class="mt-4" :disposals="summary.disposals" />
         </div>
