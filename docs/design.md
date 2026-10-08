@@ -1,45 +1,67 @@
 # Design
 
-Une **fintech sobre et claire** : l'outil doit inspirer confiance et se lire comme un document,
-pas comme une application de trading. Il ne doit pas non plus ressembler au site des impôts :
-pas de police Marianne ni de charte de l'État, et la mention « outil indépendant » en pied de
-page.
+Direction « surligneur » : l'outil emprunte au **formulaire de déclaration** ses cases numérotées
+et ses champs en peigne (un chiffre par case), et au geste de celui qui le remplit son
+**surligneur fluo**. Il ne cherche pas pour autant à ressembler au site des impôts : pas de police
+Marianne ni de charte de l'État, et la mention « outil indépendant » en pied de page.
 
-## Principes
+## Pourquoi cette direction
 
-- **Un parcours en trois étapes numérotées** : importer, vérifier, déclarer. Chaque étape
-  n'apparaît que lorsque la précédente a des données.
-- **Le résultat ressemble au formulaire** : une colonne par cession, les numéros de ligne du 2086
-  en face de chaque montant, pour recopier sans se tromper.
-- **Montrer les sources** : chaque cours affiché indique d'où il vient ; les lignes ignorées et
-  celles à vérifier sont listées, jamais cachées.
-- **Pas d'icônes décoratives, pas d'ombres, pas de dégradés** : des filets fins et des fonds
-  blancs sur un fond blanc cassé.
+La première version, « fintech sobre », était propre mais anonyme. La refonte a suivi la méthode
+du skill `frontend-design` d'Anthropic : partir du sujet plutôt que d'un style à la mode, et
+écarter les choix par défaut des interfaces générées. Trois pistes ont été écartées pour cette
+raison : fond crème avec titre à empattements et accent terre cuite, fond noir avec un accent
+fluo, et le « kit SaaS » de cartes arrondies identiques avec ombres et dégradés.
+
+Le sujet, lui, a un vocabulaire visuel fort : les cases 3AN et 3BN, les lignes 211 à 224, les
+champs bleutés du formulaire papier. C'est de là que viennent les choix ci-dessous.
 
 ## Couleurs
 
-| Rôle                     | Couleur   | Contraste minimal           |
-| ------------------------ | --------- | --------------------------- |
-| Texte                    | `#16181d` | 16,4:1                      |
-| Texte secondaire         | `#595e66` | 5,7:1 (sur le vert pâle)    |
-| Accent, liens et boutons | `#0b5d4b` | 6,8:1                       |
-| Plus-value               | `#0b6b3a` | 6,6:1                       |
-| Moins-value, erreurs     | `#b42318` | 6,6:1                       |
-| Avertissements           | `#8a4b00` | 6,2:1 (sur son fond orangé) |
+| Nom         | Valeur               | Rôle                                                           |
+| ----------- | -------------------- | -------------------------------------------------------------- |
+| Encre       | `#1B2240`            | texte, boutons, filets forts                                   |
+| Encre pâle  | `#4A5578`            | texte secondaire (7,3:1 sur blanc, 6,5:1 sur champ)            |
+| Papier      | `#FFFFFF`            | fond                                                           |
+| Champ       | `#EEF2F8`            | zones de saisie et de résultat, comme les champs du formulaire |
+| Trait       | `#C9D2E3`            | séparateurs                                                    |
+| Surligneur  | `#FFE94D`            | **uniquement** derrière les montants à recopier                |
+| Gain, perte | `#0C6E42`, `#B02C16` | montants signés (au moins 5,6:1 sur champ)                     |
 
-Chaque paire texte / fond dépasse 5,5:1 (WCAG AA demande 4,5:1). Le vert et le rouge ne portent
-jamais seuls l'information : les montants gardent leur signe (+336,87 €, −5,52 €).
+Le jaune n'apparaît qu'à un endroit à la fois : là où il y a quelque chose à recopier. C'est le
+seul élément audacieux de la page ; tout le reste est à l'encre. Chaque texte dépasse 5,5:1 de
+contraste (WCAG AA demande 4,5:1), et le vert et le rouge ne portent jamais seuls l'information :
+les montants gardent leur signe.
 
 ## Typographie
 
-- **IBM Plex Sans** pour le texte, **IBM Plex Mono** à chiffres tabulaires pour les montants,
-  quantités et dates : les colonnes de chiffres s'alignent.
-- Format français partout : `1 799,20 €`, dates à l'heure de Paris.
+Une seule famille, **Archivo** (variable en graisse et en largeur), hébergée par le site : aucune
+requête vers un service de polices.
+
+- Titres : graisse 700, largeur 118 %, interlignage serré. La largeur donne la personnalité.
+- Texte : largeur normale, lignes de moins de 80 caractères.
+- Montants : chiffres tabulaires (`font-variant-numeric: tabular-nums`) pour aligner les colonnes,
+  sans police à chasse fixe.
+
+## Composants
+
+- **Case en peigne** (`CombBox.vue`) : le code de la case sur fond d'encre, puis un chiffre par
+  cellule. Les lecteurs d'écran lisent « Case 3AN : 331 € ».
+- **Lignes du 2086** : le numéro de ligne dans un petit cadre, la valeur dans un champ bleuté,
+  une colonne par cession comme sur le formulaire.
+- **Étapes numérotées** : importer, vérifier, recopier. Les numéros sont justifiés : c'est une
+  vraie suite d'actions.
+
+## Mouvement
+
+Un seul moment animé : le surligneur passe sur la case, puis les chiffres s'y inscrivent un par
+un. Il joue dans l'accroche et sur le résultat de l'utilisateur, et il est désactivé si le système
+demande de réduire les animations (`prefers-reduced-motion`). Aucune autre animation d'entrée.
 
 ## Accessibilité
 
-- Lien d'évitement vers le contenu, focus visible sur tout élément interactif.
-- La zone de dépôt est un `<label>` autour d'un `<input type="file">` : utilisable au clavier.
+- Lien d'évitement, focus visible à l'encre sur tout élément interactif.
+- La zone de dépôt est un `<label>` autour d'un `<input type="file">`, utilisable au clavier ; le
+  bouton « Importer mon export » ouvre le même sélecteur.
 - Tableaux avec `<caption>` et en-têtes `scope`, messages d'état dans des zones `aria-live`.
-- Vérifié de 375 px à 1 440 px de large ; le tableau du 2086 défile horizontalement en gardant
-  les intitulés des lignes visibles.
+- Vérifié à 375, 800 et 1 280 px de large, sans défilement horizontal de la page.

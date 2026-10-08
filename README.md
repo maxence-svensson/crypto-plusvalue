@@ -29,14 +29,14 @@ Importez l'historique de vos plateformes, obtenez les montants à reporter, cess
   [`docs/regles-fiscales.md`](docs/regles-fiscales.md).
 - **Imports vérifiés sur de vrais fichiers** : Trade Republic sur deux exports réels, Coinbase sur
   des exemples publics. Formats et limites dans [`docs/imports.md`](docs/imports.md).
-- **Design sobre et accessible** : [`docs/design.md`](docs/design.md).
+- **Un design tiré du formulaire lui-même** : cases en peigne, champs bleutés et surligneur ; choix et contrastes dans [`docs/design.md`](docs/design.md).
 
 ## Stack
 
 | Domaine     | Outils                                                       |
 | ----------- | ------------------------------------------------------------ |
 | Framework   | Nuxt 4, Vue 3, TypeScript strict, Pinia                      |
-| Interface   | Tailwind CSS 4, IBM Plex Sans et Mono                        |
+| Interface   | Tailwind CSS 4, Archivo variable (hébergée par le site)      |
 | Calcul      | decimal.js (décimal exact, aucun nombre à virgule flottante) |
 | Serveur     | Routes Nitro : cours Binance et Coinbase Exchange, cache CDN |
 | Hébergement | Vercel (région Paris-Francfort)                              |
