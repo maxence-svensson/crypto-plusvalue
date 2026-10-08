@@ -64,3 +64,52 @@ le symbole.
 - les envois vers un portefeuille externe (`FREE_DELIVERY`) ;
 - le paiement par carte en crypto et le Crypto Saveback : leurs lignes sont listées comme « à
   vérifier ».
+
+## Coinbase
+
+**Export :** Relevés → Générer un relevé personnalisé → CSV, toutes les opérations depuis
+l'ouverture du compte.
+
+**Format :** quelques lignes d'information précèdent l'en-tête (« Transactions », puis le nom de
+l'utilisateur ; les relevés de 2023 commencent aussi par un avertissement). L'import cherche la
+première ligne qui commence par `ID,Timestamp` ou `Timestamp,` et ignore ce qui précède, sans le
+conserver.
+
+```
+ID,Timestamp,Transaction Type,Asset,Quantity Transacted,Price Currency,Price at Transaction,Subtotal,Total (inclusive of fees and/or spread),Fees and/or Spread,Notes
+```
+
+Les anciens relevés n'ont pas de colonne `ID` (l'identifiant est alors construit à partir de la
+date et du numéro de ligne), datent les opérations au format ISO (`2023-07-14T10:40:14Z`) plutôt
+qu'en `2024-12-05 06:33:40 UTC`, et nomment certaines colonnes `Spot Price Currency`,
+`Total (inclusive of fees)` ou `Fees`. Les montants s'écrivent à l'anglaise, avec le symbole de la
+devise : `-€1,234.56`. Les opérations vont de la plus récente à la plus ancienne.
+
+| `Transaction Type`                                            | Transaction                | Montants                                                         |
+| ------------------------------------------------------------- | -------------------------- | ---------------------------------------------------------------- |
+| `Buy`, `Advanced Trade Buy`                                   | achat                      | `Subtotal` hors frais, `Fees and/or Spread`                      |
+| `Sell`, `Advanced Trade Sell`, `Retail Simple Dust`           | vente                      | `Subtotal` brut, `Fees and/or Spread`                            |
+| `Convert`                                                     | échange entre cryptos      | actif reçu lu dans `Notes` : « Converted 0.002 BTC to 0.05 ETH » |
+| `Staking Income`, `Rewards Income`, `Coinbase Earn`…          | récompense                 | valeur `Subtotal`                                                |
+| `Receive` avec « Coinbase Earn », « Rewards » ou « Referral » | récompense                 | valeur `Subtotal`                                                |
+| `Card Spend`, `Subscription`                                  | paiement en crypto         | `Subtotal`, `Fees and/or Spread`                                 |
+| `Receive`, `Send`                                             | transfert entrant, sortant | quantité seulement                                               |
+| `Pro Deposit`, `Retail Staking Transfer`…                     | ignorée                    | mouvement entre comptes Coinbase                                 |
+| `Deposit`, `Withdrawal` d'euros                               | ignorée                    | hors portefeuille crypto                                         |
+| autres types                                                  | à vérifier                 | `Donation`, `Asset Migration`…                                   |
+
+Cas particuliers :
+
+- **ETH2**, l'ETH placé en staking chez Coinbase jusqu'en 2025, est traité comme de l'ETH. Sa
+  conversion depuis l'ETH n'a donc aucun effet, pas plus que l'envoi d'ETH2 suivi de la
+  réception d'ETH qui l'a remplacé.
+- **Ordres avancés contre une autre crypto** (paire BTC-USDC…) : à vérifier, seuls les ordres
+  contre des euros sont lus.
+- **Devises** : un relevé peut mêler euros et dollars. Une opération en dollars est lue si son
+  montant ne sert pas au calcul (échange, transfert) ; un achat, une vente ou un paiement en
+  dollars est à vérifier.
+
+**Vérifié sur des exemples publics seulement**, faute de compte Coinbase : la documentation de
+projets open source qui lisent ce format, et l'extrait de relevé réel publié par
+[Export-To-Ghostfolio](https://github.com/dickwolff/Export-To-Ghostfolio) (staking, conversions,
+ETH2, achat en euros et en dollars).

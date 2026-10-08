@@ -15,8 +15,8 @@ Importez l'historique de vos plateformes, obtenez les montants à reporter, cess
 - **Le calcul officiel, ligne par ligne**, tel que le formulaire 2086 le présente, testé sur les
   exemples chiffrés de la doctrine fiscale (BOFiP). Les règles et leurs sources sont détaillées
   dans [`docs/regles-fiscales.md`](docs/regles-fiscales.md).
-- **Imports** : Trade Republic (vérifié sur deux exports réels), Coinbase à venir. Formats et limites
-  dans [`docs/imports.md`](docs/imports.md).
+- **Imports** : Trade Republic (vérifié sur deux exports réels) et Coinbase (vérifié sur des
+  exemples publics). Formats et limites dans [`docs/imports.md`](docs/imports.md).
 
 ## Stack
 
