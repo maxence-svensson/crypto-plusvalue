@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { computeDisposals, summarizeYear } from '../tax/form2086'
+import { replayPortfolio } from '../portfolio/replay'
 import { buildTaxEvents } from '../portfolio/tax-events'
 import { ImportError } from './csv'
 import { importTradeRepublic } from './trade-republic'
@@ -157,7 +158,30 @@ describe('importTradeRepublic', () => {
     expect(skipped).toBe(2)
   })
 
-  it('traite les envois et réceptions comme des transferts, et ignore les migrations internes', () => {
+  it('lit les récompenses de staking, avec leur valeur au cours du jour', () => {
+    const { transactions } = importTradeRepublic(
+      csv({
+        datetime: '2025-11-24T19:30:13.670Z',
+        category: 'DELIVERY',
+        type: 'FREE_RECEIPT',
+        asset_class: 'CRYPTO',
+        name: 'Solana',
+        symbol: 'SOL',
+        shares: '0.0004110000',
+        price: '118.7000000000',
+        description: 'FREE_RECEIPT SOL',
+        id: 'r1',
+      }),
+    )
+
+    const [reward] = transactions
+    if (reward?.type !== 'reward') throw new Error('Récompense attendue')
+    expect(reward.received.asset).toBe('SOL')
+    expect(reward.received.quantity.toString()).toBe('0.000411')
+    expect(reward.valueEur?.toString()).toBe('0.0487857')
+  })
+
+  it('traite les envois comme des transferts, et ignore les migrations internes', () => {
     const delivery = (type: string, shares: string, id: string): Row => ({
       datetime: '2026-03-01T10:00:00Z',
       category: 'DELIVERY',
@@ -170,18 +194,61 @@ describe('importTradeRepublic', () => {
 
     const { transactions, unsupported } = importTradeRepublic(
       csv(
-        delivery('FREE_RECEIPT', '0.0500000000', 'r1'),
         delivery('FREE_DELIVERY', '-0.0200000000', 'd1'),
         delivery('MIGRATION', '-0.0300000000', 'm1'),
         delivery('MIGRATION', '0.0300000000', 'm2'),
       ),
     )
 
-    expect(transactions.map((transaction) => transaction.type)).toEqual([
-      'transfer-in',
-      'transfer-out',
-    ])
+    expect(transactions.map((transaction) => transaction.type)).toEqual(['transfer-out'])
     expect(unsupported).toEqual([])
+  })
+
+  it('retrouve le symbole derrière un pseudo-ISIN', () => {
+    const { transactions } = importTradeRepublic(
+      csv({
+        ...savingsPlan,
+        name: 'Render',
+        symbol: 'XF0RENDER015',
+        description: 'Buy trade XF0RENDER015 Render Token, quantity: 100',
+      }),
+    )
+
+    const [buy] = transactions
+    if (buy?.type !== 'buy') throw new Error('Achat attendu')
+    expect(buy.received.asset).toBe('RENDER')
+  })
+
+  it('compte le staking dans les avoirs vendus ensuite', () => {
+    const { transactions } = importTradeRepublic(
+      csv(
+        { ...savingsPlan, symbol: 'NEAR', shares: '390.1371', amount: '-500.00' },
+        {
+          datetime: '2025-12-01T18:01:04.792Z',
+          category: 'DELIVERY',
+          type: 'FREE_RECEIPT',
+          asset_class: 'CRYPTO',
+          symbol: 'NEAR',
+          shares: '7.532401',
+          price: '1.35',
+          id: 'r1',
+        },
+        {
+          datetime: '2026-09-27T05:59:25.530Z',
+          category: 'TRADING',
+          type: 'SELL',
+          asset_class: 'CRYPTO',
+          symbol: 'NEAR',
+          shares: '-397.6695010000',
+          price: '4.6418000000',
+          amount: '1845.90',
+          fee: '-1.00',
+          id: 's1',
+        },
+      ),
+    )
+
+    expect(replayPortfolio(transactions).missingHistory).toEqual([])
   })
 
   it('signale les lignes crypto inconnues au lieu de les perdre', () => {
