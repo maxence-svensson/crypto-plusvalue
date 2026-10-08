@@ -16,8 +16,9 @@ Importez l'historique de vos plateformes, obtenez les montants à reporter, cess
   incomplet (achats faits sur une autre plateforme).
 - **Cours historiques à la minute** pour la valeur globale du portefeuille, avec leur source
   ([`docs/prix.md`](docs/prix.md)), et saisie manuelle quand aucune source ne connaît l'actif.
-- **Le formulaire 2086 colonne par colonne**, les cases 3AN / 3BN de la 2042 C et le seuil de
-  305 €.
+- **Le formulaire 2086 officiel, rempli, en PDF** : toutes les cases calculées, généré dans le
+  navigateur ([`docs/formulaire-2086.md`](docs/formulaire-2086.md)), avec les cases 3AN / 3BN de
+  la 2042 C et le seuil de 305 €.
 - **Un exemple fictif** pour essayer sans fichier.
 
 ## Principes
@@ -38,8 +39,9 @@ Importez l'historique de vos plateformes, obtenez les montants à reporter, cess
 | Framework   | Nuxt 4, Vue 3, TypeScript strict, Pinia                      |
 | Interface   | Tailwind CSS 4, Archivo variable (hébergée par le site)      |
 | Calcul      | decimal.js (décimal exact, aucun nombre à virgule flottante) |
+| PDF         | pdf-lib, chargé seulement au téléchargement du formulaire    |
 | Serveur     | Routes Nitro : cours Binance et Coinbase Exchange, cache CDN |
-| Hébergement | Vercel (région Paris-Francfort)                              |
+| Hébergement | Vercel (région de Francfort)                                 |
 | Qualité     | Vitest, ESLint, Prettier, GitHub Actions                     |
 
 ## Lancer le projet
