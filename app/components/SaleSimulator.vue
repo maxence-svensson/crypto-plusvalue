@@ -26,6 +26,8 @@ const asset = ref('')
 const quantity = ref('')
 const unitPrice = ref('')
 const fee = ref('')
+/** Part de la crypto détenue à vendre, réglée au curseur ; synchronisée avec la quantité saisie. */
+const percent = ref(0)
 /** Dernière minute dont la bougie est close : le serveur de cours refuse la minute en cours. */
 const minute = ref<Date>()
 
@@ -59,12 +61,35 @@ watch(
 
 watch(asset, () => {
   quantity.value = ''
+  percent.value = 0
   unitPrice.value = marketPriceInput()
 })
 
-function sellAll() {
-  if (held.value) quantity.value = held.value.toString().replace('.', ',')
+function onSlide(event: Event) {
+  percent.value = Number((event.target as HTMLInputElement).value)
+  if (!held.value) return
+  // À 100 %, la quantité exacte détenue, sans reste dû aux arrondis.
+  const amount =
+    percent.value >= 100
+      ? held.value
+      : held.value.times(percent.value).div(100).toDecimalPlaces(8, Dec.ROUND_DOWN)
+  quantity.value = amount.isZero() ? '' : amount.toFixed().replace('.', ',')
 }
+
+function onQuantityInput() {
+  const amount = parse(quantity.value)
+  percent.value =
+    amount && held.value?.gt(0)
+      ? Math.min(100, amount.div(held.value).times(100).toDecimalPlaces(0).toNumber())
+      : 0
+}
+
+/** Ce que rapporterait la vente, avant frais et impôt. */
+const estimatedValue = computed(() => {
+  const amount = parse(quantity.value)
+  const price = parse(unitPrice.value)
+  return amount && price ? amount.times(price) : undefined
+})
 
 // Sans historique : trois montants suffisent.
 const invested = ref('')
@@ -157,23 +182,45 @@ const crossesThreshold = computed(
             </select>
           </label>
           <label class="block">
-            <span class="flex items-baseline justify-between text-sm font-semibold">
-              Quantité
-              <button
-                type="button"
-                class="text-xs font-normal text-ink-soft underline underline-offset-4 hover:text-ink"
-                @click="sellAll"
-              >
-                Tout vendre
-              </button>
-            </span>
+            <span class="text-sm font-semibold">Quantité</span>
             <input
               v-model="quantity"
               inputmode="decimal"
               placeholder="0,5"
               class="numeric mt-1 block w-full rounded-[4px] border-[1.5px] border-ink bg-paper px-3 py-2"
+              @input="onQuantityInput"
             />
           </label>
+          <div class="sm:col-span-2">
+            <div class="flex flex-wrap items-baseline justify-between gap-x-4 text-sm">
+              <label for="part-a-vendre" class="font-semibold"
+                >Part de vos {{ asset }} à vendre</label
+              >
+              <span class="numeric text-ink-soft">
+                <span class="font-semibold text-ink">{{ percent }} %</span>
+                <template v-if="estimatedValue">, soit {{ formatEuros(estimatedValue) }}</template>
+              </span>
+            </div>
+            <input
+              id="part-a-vendre"
+              type="range"
+              min="0"
+              max="100"
+              step="1"
+              :value="percent"
+              class="range-ink mt-3 block w-full"
+              :style="{ '--fill': `${percent}%` }"
+              :aria-valuetext="`${percent} %${quantity ? `, soit ${quantity} ${asset}` : ''}`"
+              @input="onSlide"
+            />
+            <div class="numeric mt-2 flex justify-between text-xs text-ink-soft" aria-hidden="true">
+              <span>0 %</span>
+              <span>25 %</span>
+              <span>50 %</span>
+              <span>75 %</span>
+              <span>100 %</span>
+            </div>
+          </div>
           <label class="block">
             <span class="text-sm font-semibold">Cours de vente, en euros</span>
             <input
