@@ -85,12 +85,18 @@ export const usePortfolioStore = defineStore('portfolio', () => {
   })
 
   async function fetchPrices() {
-    const missing = neededPrices.value.filter(({ key }) => !prices.value.has(key))
+    await fetchPricesFor(neededPrices.value)
+  }
+
+  /** Récupère les cours manquants, quelques requêtes à la fois pour ménager les sources. */
+  async function fetchPricesFor(requests: { asset: string; minute: Date }[]) {
+    const missing = requests
+      .map(({ asset, minute }) => ({ key: priceKey(asset, minute), asset, minute }))
+      .filter(({ key }) => !prices.value.has(key))
     if (missing.length === 0) return
 
     fetchingPrices.value = true
     const errors = new Map(priceErrors.value)
-    // Quelques requêtes à la fois, pour ménager les sources de cours.
     const queue = [...missing]
     const worker = async () => {
       for (let request = queue.shift(); request; request = queue.shift()) {
@@ -108,6 +114,11 @@ export const usePortfolioStore = defineStore('portfolio', () => {
     await Promise.all([worker(), worker(), worker(), worker()])
     priceErrors.value = errors
     fetchingPrices.value = false
+  }
+
+  /** Cours connu d'un actif à une date, à la minute près. */
+  function priceAt(asset: string, date: Date): Price | undefined {
+    return prices.value.get(priceKey(asset, date))
   }
 
   function setPrice(key: string, price: Price) {
@@ -133,7 +144,7 @@ export const usePortfolioStore = defineStore('portfolio', () => {
     if (transactions.value.length === 0) return { status: 'empty' }
     const events = buildTaxEvents(
       transactions.value,
-      (asset, date) => prices.value.get(priceKey(asset, date))?.priceEur,
+      (asset, date) => priceAt(asset, date)?.priceEur,
     )
     if (!events.ok) return { status: 'missing-prices' }
     try {
@@ -170,6 +181,8 @@ export const usePortfolioStore = defineStore('portfolio', () => {
     importFiles,
     loadExample,
     fetchPrices,
+    fetchPricesFor,
+    priceAt,
     setManualPrice,
     summary,
     reset,

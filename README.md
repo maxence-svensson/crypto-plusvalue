@@ -19,6 +19,9 @@ Importez l'historique de vos plateformes, obtenez les montants à reporter, cess
 - **Le formulaire 2086 officiel, rempli, en PDF** : toutes les cases calculées, généré dans le
   navigateur ([`docs/formulaire-2086.md`](docs/formulaire-2086.md)), avec les cases 3AN / 3BN de
   la 2042 C et le seuil de 305 €.
+- **« Et si je vendais aujourd'hui ? »** : la plus-value et l'impôt d'une vente aux cours du
+  moment, compte tenu des ventes déjà faites dans l'année et du seuil de 305 €. Fonctionne aussi
+  sans fichier, à partir de trois montants.
 - **Un exemple fictif** pour essayer sans fichier.
 
 ## Principes

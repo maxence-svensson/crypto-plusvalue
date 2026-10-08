@@ -109,6 +109,20 @@ Taux : prélèvement forfaitaire unique de **31,4 %** (12,8 % d'impôt sur le re
 prélèvements sociaux depuis la LFSS 2026), ou option pour le barème progressif en case 3CN
 ([FAQ impots.gouv.fr][faq]). Le BOFiP mentionne encore 30 %, un taux périmé.
 
+## Simulation d'une vente
+
+Le simulateur ajoute une vente fictive à l'historique, aux cours du moment, et refait tout le
+calcul. L'impôt affiché est celui que la vente **ajoute** à l'année :
+impôt de l'année avec la vente − impôt de l'année sans elle, au prélèvement forfaitaire de 31,4 %.
+Ainsi :
+
+- une vente en plus-value peut ne rien coûter si l'année compte déjà des moins-values ;
+- une petite vente peut coûter plus que sa propre plus-value × 31,4 % si elle fait dépasser le
+  seuil de 305 € : les ventes précédentes de l'année deviennent imposables elles aussi.
+
+Sans historique, l'utilisateur donne trois montants (somme investie, valeur du portefeuille,
+montant vendu) et la vente est supposée être la seule de l'année.
+
 ## Choix de l'application sur les points incertains
 
 | Question                              | Choix retenu                                                 | Pourquoi                                                                                                      |
