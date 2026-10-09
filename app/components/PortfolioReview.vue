@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Transaction } from '#shared/portfolio/transaction'
+import { TRANSACTION_LABELS, type Transaction } from '#shared/portfolio/transaction'
 
 const store = usePortfolioStore()
 

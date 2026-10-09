@@ -2,6 +2,7 @@ import { ZERO, type Dec } from '../tax/decimal'
 import type { PortfolioEvent } from '../tax/form2086'
 import { replayPortfolio } from './replay'
 import { chronological, type Transaction } from './transaction'
+import { valuePortfolio } from './valuation'
 
 /** Cours en euros d'une unité de l'actif à cette date, s'il est connu. */
 export type PriceLookup = (asset: string, date: Date) => Dec | undefined
@@ -69,22 +70,15 @@ export function buildTaxEvents(
   }
 
   for (const { transaction, holdingsBefore } of replayPortfolio(transactions).disposals) {
-    let portfolioValue = transaction.amountEur
-
-    for (const [asset, held] of holdingsBefore) {
-      const notSold =
-        asset === transaction.sent.asset ? held.minus(transaction.sent.quantity) : held
-      if (notSold.lte(0)) continue
-
-      const price = priceOf(asset, transaction.date, transaction.id)
-      if (price) portfolioValue = portfolioValue.plus(notSold.times(price))
-    }
+    const valuation = valuePortfolio(transaction, holdingsBefore, (asset) =>
+      priceOf(asset, transaction.date, transaction.id),
+    )
 
     events.push({
       kind: 'disposal',
       id: transaction.id,
       date: transaction.date,
-      portfolioValue,
+      portfolioValue: valuation.total,
       price: transaction.amountEur,
       fees: transaction.feeEur,
     })
