@@ -25,6 +25,8 @@ Importez l'historique de vos plateformes, obtenez les montants à reporter, cess
 - **Un dossier justificatif en PDF**, à garder en cas de contrôle : la valeur du portefeuille
   actif par actif, le calcul de chaque cession, les acquisitions, les cours et leurs sources,
   l'historique ([`docs/dossier-justificatif.md`](docs/dossier-justificatif.md)).
+- **« Et maintenant ? »** : les étapes après le calcul (annexe 2086, case 3AN, option 3CN,
+  comptes à l'étranger, dossier), à cocher, avec la date limite ou de correction de l'année.
 - **Prélèvement forfaitaire ou barème** : la comparaison des deux selon votre tranche
   d'imposition (ou votre revenu et vos parts), et s'il faut cocher la case 3CN.
 - **« Et si je vendais aujourd'hui ? »** : la plus-value et l'impôt d'une vente aux cours du

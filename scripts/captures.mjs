@@ -119,7 +119,7 @@ await capture('accueil')
 
 // Fenêtre haute : les halos du fond sont fixes et ne couvrent que la fenêtre, une capture
 // au-delà laisserait une coupure.
-await open('/?exemple', { width: 1280, height: 2500, scale: 2, wait: 10000 })
+await open('/?exemple', { width: 1280, height: 3600, scale: 2, wait: 10000 })
 // Tranche à 11 % : la comparaison des deux régimes s'affiche.
 await evaluate(`document.querySelector('input[name="tranche"][value="0.11"]').click()`)
 await sleep(800)

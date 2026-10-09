@@ -182,7 +182,10 @@ async function download(kind: 'form' | 'dossier') {
                 }}
               </button>
             </div>
-            <div class="glass flex flex-col items-start gap-5 rounded-card p-5 sm:p-6">
+            <div
+              id="dossier"
+              class="glass flex scroll-mt-28 flex-col items-start gap-5 rounded-card p-5 sm:p-6"
+            >
               <div class="flex gap-4">
                 <span
                   class="flex size-12 shrink-0 items-center justify-center rounded-control bg-accent-tint text-link"
@@ -226,16 +229,7 @@ async function download(kind: 'form' | 'dossier') {
         </div>
       </template>
 
-      <aside class="glass-subtle flex gap-4 rounded-card p-5 text-sm sm:p-6">
-        <AppIcon name="info" class="mt-0.5 text-link" />
-        <div>
-          <p class="font-semibold">Pensez aussi au formulaire 3916-bis</p>
-          <p class="mt-1 max-w-prose text-muted">
-            Chaque compte crypto ouvert auprès d'une plateforme étrangère (Coinbase, Trade Republic,
-            Binance…) se déclare chaque année, même sans vente. L'oubli coûte 750 € par compte.
-          </p>
-        </div>
-      </aside>
+      <NextSteps :summary="summary" />
     </template>
   </div>
 </template>
