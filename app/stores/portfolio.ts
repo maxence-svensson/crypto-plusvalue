@@ -3,7 +3,15 @@ import { defineStore } from 'pinia'
 import { MAX_FILE_BYTES, binaryFormat, decodeText } from '#shared/importers/decode'
 import type { ImportResult } from '#shared/importers/csv'
 import { importFile, type Platform } from '#shared/importers/detect'
+import {
+  applyCorrection,
+  deletedIds,
+  deletion,
+  revertCorrection,
+  type Correction,
+} from '#shared/portfolio/corrections'
 import { checkDuplicates, type DuplicateCheck } from '#shared/portfolio/duplicates'
+import { transactionProblems } from '#shared/portfolio/problems'
 import { assessQuality } from '#shared/portfolio/quality'
 import { replayPortfolio } from '#shared/portfolio/replay'
 import { fromPlain, toPlain, type Plain } from '#shared/persistence/serialize'
@@ -56,6 +64,8 @@ export const usePortfolioStore = defineStore('portfolio', () => {
   const prices = shallowRef(new Map<string, Price>())
   const priceErrors = shallowRef(new Map<string, string>())
   const fetchingPrices = ref(false)
+  /** Ajouts, modifications et suppressions faits à la main, du plus ancien au plus récent. */
+  const corrections = shallowRef<Correction[]>([])
 
   /** Fichiers lus, en attente de confirmation. */
   const pending = ref<PendingImport[]>([])
@@ -91,11 +101,23 @@ export const usePortfolioStore = defineStore('portfolio', () => {
         const { platform, ...result } = importFile(decodeText(bytes))
         const before = [...transactions.value, ...pending.value.flatMap((item) => accepted(item))]
         const dates = result.transactions.map((transaction) => transaction.date.getTime())
+        // Une opération supprimée à la main ne revient pas en réimportant le même fichier.
+        const deleted = deletedIds(corrections.value)
+        const check = checkDuplicates(
+          before,
+          result.transactions.filter((transaction) => !deleted.has(transaction.id)),
+        )
         pending.value.push({
           name: file.name,
           platform,
           result,
-          duplicates: checkDuplicates(before, result.transactions),
+          duplicates: {
+            ...check,
+            known: [
+              ...check.known,
+              ...result.transactions.filter((transaction) => deleted.has(transaction.id)),
+            ],
+          },
           ...(dates.length > 0
             ? { period: { from: new Date(Math.min(...dates)), to: new Date(Math.max(...dates)) } }
             : {}),
@@ -192,6 +214,8 @@ export const usePortfolioStore = defineStore('portfolio', () => {
     transactions: Transaction[]
     files: ImportedFile[]
     prices: [string, Price][]
+    /** Absent des enregistrements antérieurs au journal des corrections. */
+    corrections?: Correction[]
     savedAt: Date
   }
 
@@ -208,6 +232,7 @@ export const usePortfolioStore = defineStore('portfolio', () => {
       if (demo.value || transactions.value.length > 0) return
       transactions.value = state.transactions
       files.value = state.files
+      corrections.value = state.corrections ?? []
       prices.value = new Map(state.prices)
       savedAt.value = state.savedAt
     } catch {
@@ -221,7 +246,11 @@ export const usePortfolioStore = defineStore('portfolio', () => {
   async function save() {
     if (!keep.value || demo.value || restoring.value) return
     try {
-      if (transactions.value.length === 0 && files.value.length === 0) {
+      if (
+        transactions.value.length === 0 &&
+        files.value.length === 0 &&
+        corrections.value.length === 0
+      ) {
         await deleteStored(STATE_KEY)
         savedAt.value = undefined
         return
@@ -231,6 +260,7 @@ export const usePortfolioStore = defineStore('portfolio', () => {
         transactions: transactions.value,
         files: files.value,
         prices: [...prices.value],
+        corrections: corrections.value,
         savedAt: now,
       })
       await writeStored(STATE_KEY, { version: STATE_VERSION, data })
@@ -267,7 +297,7 @@ export const usePortfolioStore = defineStore('portfolio', () => {
   // Enregistrement automatique, regroupé : une modification toutes les 400 ms au plus.
   if (import.meta.client) {
     let timer: ReturnType<typeof setTimeout> | undefined
-    watch([transactions, files, prices], () => {
+    watch([transactions, files, prices, corrections], () => {
       clearTimeout(timer)
       timer = setTimeout(save, 400)
     })
@@ -277,16 +307,50 @@ export const usePortfolioStore = defineStore('portfolio', () => {
     files.value = []
     pending.value = []
     transactions.value = []
+    corrections.value = []
     prices.value = new Map()
     priceErrors.value = new Map()
   }
 
+  /** Applique une correction faite à la main et la note au journal. */
+  function correct(correction: Correction) {
+    transactions.value = applyCorrection(transactions.value, correction)
+    corrections.value = [...corrections.value, correction]
+    void save()
+    void fetchPrices()
+  }
+
+  function addTransaction(transaction: Transaction) {
+    correct({ kind: 'add', at: new Date(), transaction })
+  }
+
+  function editTransaction(before: Transaction, after: Transaction) {
+    correct({ kind: 'edit', at: new Date(), before, after })
+  }
+
+  function deleteTransactions(ids: Iterable<string>) {
+    const correction = deletion(transactions.value, ids, new Date())
+    if (correction.kind === 'delete' && correction.removed.length > 0) correct(correction)
+  }
+
+  /** Annule la dernière correction : la liste redevient ce qu'elle était juste avant. */
+  function undoCorrection() {
+    const last = corrections.value.at(-1)
+    if (!last) return
+    transactions.value = revertCorrection(transactions.value, last)
+    corrections.value = corrections.value.slice(0, -1)
+    void save()
+  }
+
   const replay = computed(() => replayPortfolio(transactions.value))
+
+  /** Cours à connaître pour le calcul, avec l'opération qui en a besoin. */
+  const required = computed(() => requiredPrices(transactions.value))
 
   /** Cours nécessaires au calcul, une seule fois par actif et par minute. */
   const neededPrices = computed<PriceRequest[]>(() => {
     const unique = new Map<string, PriceRequest>()
-    for (const { asset, date } of requiredPrices(transactions.value)) {
+    for (const { asset, date } of required.value) {
       const key = priceKey(asset, date)
       unique.set(key, { key, asset, minute: startOfMinute(date) })
     }
@@ -392,6 +456,20 @@ export const usePortfolioStore = defineStore('portfolio', () => {
     }),
   )
 
+  /** Points à vérifier, opération par opération. */
+  const problems = computed(() =>
+    transactionProblems({
+      transactions: transactions.value,
+      missingHistory: replay.value.missingHistory,
+      missingPriceIds: required.value
+        .filter(({ asset, date }) => {
+          const key = priceKey(asset, date)
+          return !prices.value.has(key) && priceErrors.value.has(key)
+        })
+        .map(({ transactionId }) => transactionId),
+    }),
+  )
+
   function summary(year: number) {
     const state = computation.value
     return state.status === 'ready' ? summarizeYear(state.disposals, year) : undefined
@@ -405,6 +483,7 @@ export const usePortfolioStore = defineStore('portfolio', () => {
     savedAt,
     storageError,
     transactions,
+    corrections,
     prices,
     priceErrors,
     fetchingPrices,
@@ -413,6 +492,7 @@ export const usePortfolioStore = defineStore('portfolio', () => {
     computation,
     years,
     quality,
+    problems,
     prepareImport,
     confirmImport,
     cancelImport,
@@ -427,6 +507,10 @@ export const usePortfolioStore = defineStore('portfolio', () => {
     fetchPricesFor,
     priceAt,
     setManualPrice,
+    addTransaction,
+    editTransaction,
+    deleteTransactions,
+    undoCorrection,
     summary,
     reset,
   }

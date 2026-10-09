@@ -65,7 +65,8 @@ export async function accessibilityViolations(page: Page) {
       document
         .getAnimations()
         .filter((animation) => animation.effect?.getTiming().iterations !== Infinity)
-        .map((animation) => animation.finished),
+        // Une animation interrompue (fenêtre refermée) rejette sa promesse : rien à attendre.
+        .map((animation) => animation.finished.catch(() => undefined)),
     ),
   )
   const results = await new AxeBuilder({ page })
