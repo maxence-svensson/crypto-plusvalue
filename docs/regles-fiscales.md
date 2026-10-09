@@ -105,14 +105,37 @@ reporte pas sur les années suivantes ([BOFiP 30-20][b20] §160 et §170).
 L'année d'une opération est l'année civile **à l'heure de Paris** : une vente faite le 31 décembre à
 23 h 30 UTC appartient à l'année suivante.
 
-Taux : prélèvement forfaitaire unique de **31,4 %** (12,8 % d'impôt sur le revenu et 18,6 % de
-prélèvements sociaux depuis la LFSS 2026), ou option pour le barème progressif en case 3CN
-([FAQ impots.gouv.fr][faq]). Le BOFiP mentionne encore 30 %, un taux périmé.
+## Taux par année
+
+Les taux dépendent de l'année des revenus. Ils sont dans `shared/tax/rules.ts`. Une année sans
+règles connues n'est jamais estimée avec celles d'une autre : l'application l'annonce et
+n'affiche pas d'impôt.
+
+| Revenus       | Impôt (PFU)  | Prélèvements sociaux | Total  | Option barème (3CN) | Barème par part                          |
+| ------------- | ------------ | -------------------- | ------ | ------------------- | ---------------------------------------- |
+| avant 2019    | autre régime |                      |        |                     | non calculé                              |
+| 2019 à 2022   | 12,8 %       | 17,2 %               | 30 %   | non                 |                                          |
+| 2023          | 12,8 %       | 17,2 %               | 30 %   | oui                 | 11 294 / 28 797 / 82 341 / 177 106 €     |
+| 2024          | 12,8 %       | 17,2 %               | 30 %   | oui                 | 11 497 / 29 315 / 83 823 / 180 294 €     |
+| 2025          | 12,8 %       | 18,6 %               | 31,4 % | oui                 | 11 600 / 29 579 / 84 577 / 181 917 €     |
+| 2026          | 12,8 %       | 18,6 %               | 31,4 % | oui                 | pas encore voté : celui de 2025, signalé |
+| 2027 et après | inconnus     |                      |        |                     |                                          |
+
+- **Régime** : article 150 VH bis du CGI, pour les cessions faites depuis le 1er janvier 2019.
+- **Prélèvements sociaux** : la CSG passe de 9,2 % à 10,6 % sur les revenus du patrimoine
+  « à compter des revenus 2025 », la CSG déductible restant à 6,8 % (LFSS 2026, art. 12 ; CSS,
+  art. L136-8 ; [Principales nouveautés, revenus 2025][nouveautes]). Les revenus fonciers, plus-values
+  immobilières, l'assurance-vie et l'épargne logement restent à 9,2 % ; les plus-values crypto n'en
+  font pas partie. Le BOFiP (30 %) décrit donc les revenus antérieurs à 2025.
+- **Option pour le barème** : ouverte aux cessions réalisées depuis le 1er janvier 2023 (loi de
+  finances pour 2022, art. 79 ; [BOFiP ACTU-2024-00078][option]).
+- **Barèmes** : lois de finances pour 2024, 2025 et 2026 ([service-public.gouv.fr][bareme]). Tranches
+  à 0 %, 11 %, 30 %, 41 % et 45 %, chacune à partir du seuil indiqué.
 
 ## Prélèvement forfaitaire ou barème
 
 Par défaut, la plus-value nette est taxée au **prélèvement forfaitaire** : 12,8 % d'impôt sur le
-revenu et 18,6 % de prélèvements sociaux. Sur option, en cochant la case **3CN** de la 2042 C,
+revenu et les prélèvements sociaux de l'année (17,2 % ou 18,6 %). Sur option, en cochant la case **3CN** de la 2042 C,
 elle est soumise au **barème progressif** : elle s'ajoute aux autres revenus du foyer, les
 prélèvements sociaux restant dus, et 6,8 % de CSG deviennent déductibles des revenus de l'année
 suivante. L'option est globale pour les plus-values crypto du foyer et indépendante de celle des
@@ -122,10 +145,11 @@ L'application compare les deux :
 
 - à partir de la **tranche marginale** choisie par l'utilisateur : impôt = plus-value × tranche ;
 - ou à partir du **revenu imposable** et du **nombre de parts** : impôt avec la plus-value moins
-  impôt sans elle, au barème des revenus 2025 (0 % jusqu'à 11 600 €, 11 % jusqu'à 29 579 €,
-  30 % jusqu'à 84 577 €, 41 % jusqu'à 181 917 €, 45 % au-delà, par part ;
-  [service-public.gouv.fr][bareme]). Une plus-value qui fait changer de tranche est ainsi
-  imposée exactement.
+  impôt sans elle, au barème de l'année (tableau ci-dessus). Une plus-value qui fait changer de
+  tranche est ainsi imposée exactement.
+
+Pour les revenus antérieurs à 2023, l'option n'existait pas : l'application l'indique au lieu de
+comparer.
 
 Le barème n'est avantageux que dans les tranches à 0 % et 11 %. Le calcul ignore la décote, le
 plafonnement du quotient familial et les réductions d'impôt ; l'économie de CSG déductible est
@@ -203,3 +227,5 @@ L'encadré « Et maintenant ? » liste ce qu'il reste à faire après le calcul.
 [faq]: https://www.impots.gouv.fr/particulier/questions/comment-declarer-les-plus-ou-moins-values-sur-cessions-dactifs-numeriques
 [modalites]: https://www.impots.gouv.fr/les-modalites-de-la-declaration-de-revenus-en-2026
 [correction]: https://www.service-public.gouv.fr/particuliers/actualites/A17433
+[nouveautes]: https://www.impots.gouv.fr/www2/fichiers/documentation/brochure/ir_2026/pdf_som/nouveautes.pdf
+[option]: https://bofip.impots.gouv.fr/bofip/14201-PGP.html/ACTU-2024-00078

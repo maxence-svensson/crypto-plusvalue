@@ -2,9 +2,13 @@
 import { startOfMinute } from '#shared/prices'
 import { simulateSale, simulateSimpleSale, type SaleSimulation } from '#shared/simulation/sale'
 import { Dec } from '#shared/tax/decimal'
-import { EXEMPTION_THRESHOLD } from '#shared/tax/form2086'
+import { EXEMPTION_THRESHOLD, taxYear } from '#shared/tax/form2086'
+import { flatRate, taxRules } from '#shared/tax/rules'
 
 const store = usePortfolioStore()
+
+/** Taux de l'année en cours : ceux qui s'appliqueraient à une vente faite maintenant. */
+const rulesNow = taxRules(taxYear(new Date()))
 
 const holdings = computed(() => [...store.replay.holdings].sort(([a], [b]) => a.localeCompare(b)))
 const fromHistory = computed(() => holdings.value.length > 0)
@@ -301,13 +305,15 @@ const crossesThreshold = computed(
             <div>
               <dt class="text-sm text-muted">Impôt supplémentaire</dt>
               <dd class="numeric mt-0.5 text-xl font-semibold tracking-tight">
-                {{ formatEuros(outcome.simulation.extraTax) }}
+                {{ outcome.simulation.extraTax ? formatEuros(outcome.simulation.extraTax) : '—' }}
               </dd>
             </div>
             <div>
               <dt class="text-sm text-muted">Il vous resterait</dt>
               <dd class="numeric mt-0.5 text-xl font-semibold tracking-tight">
-                {{ formatEuros(outcome.simulation.netProceeds) }}
+                {{
+                  outcome.simulation.netProceeds ? formatEuros(outcome.simulation.netProceeds) : '—'
+                }}
               </dd>
             </div>
           </div>
@@ -335,9 +341,17 @@ const crossesThreshold = computed(
         </p>
       </template>
       <p class="mt-6 border-t border-separator pt-4 text-xs text-muted">
-        Estimation au prélèvement forfaitaire de 31,4 % (12,8 % d'impôt et 18,6 % de prélèvements
-        sociaux), sans l'option pour le barème progressif. Simulation indicative : ce n'est ni un
-        conseil fiscal ni un conseil d'investissement.
+        <template v-if="rulesNow">
+          Estimation au prélèvement forfaitaire des revenus {{ rulesNow.year }} :
+          {{ formatPercent(flatRate(rulesNow)) }}, soit
+          {{ formatPercent(rulesNow.flatIncomeTax) }} d'impôt et
+          {{ formatPercent(rulesNow.socialContributions) }} de prélèvements sociaux, sans l'option
+          pour le barème progressif.
+        </template>
+        <template v-else>
+          Les taux de l'année en cours ne sont pas encore connus : l'impôt n'est pas estimé.
+        </template>
+        Simulation indicative : ce n'est ni un conseil fiscal ni un conseil d'investissement.
       </p>
     </div>
   </div>
