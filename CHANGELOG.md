@@ -6,7 +6,8 @@ Les changements notables, du plus récent au plus ancien. Chaque entrée renvoie
 
 ### Titre de l'accueil
 
-- « Vos plus-values crypto, prêtes à déclarer. » remplace « prêtes à recopier sur le 2086 ».
+- « Vos plus-values crypto, prêtes à déclarer. » remplace « prêtes à recopier sur le 2086 », sur
+  la page comme dans le titre de l'onglet.
 
 ### Navigation en haut sur ordinateur
 

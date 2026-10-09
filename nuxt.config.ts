@@ -28,7 +28,7 @@ export default defineNuxtConfig({
       htmlAttrs: { lang: 'fr' },
       // viewport-fit=cover : la barre de navigation tient compte de l'encoche des iPhone.
       viewport: 'width=device-width, initial-scale=1, viewport-fit=cover',
-      title: 'CryptoPlusValue : vos plus-values crypto pour le formulaire 2086',
+      title: 'CryptoPlusValue : vos plus-values crypto, prêtes à déclarer',
       // Thème choisi dans les paramètres, appliqué avant l'affichage : pas d'éclair de l'autre thème.
       script: [
         {
