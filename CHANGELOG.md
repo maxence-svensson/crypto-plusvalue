@@ -4,6 +4,13 @@ Les changements notables, du plus récent au plus ancien. Chaque entrée renvoie
 
 ## 9 octobre 2026
 
+### Phase 4 (quatrième partie) : graphiques du tableau de bord
+
+- Plus ou moins-value nette par année, achats et ventes par mois ou par année, achats par crypto,
+  volume par plateforme ; une période choisie s'applique à toute l'activité affichée.
+- Graphiques en SVG sans bibliothèque : infobulle au survol et au clavier, légende, vue tableau.
+- Couleurs validées pour le daltonisme et le contraste, en clair comme en sombre.
+
 ### Phase 4 (troisième partie) : page des transactions
 
 - Recherche instantanée (crypto, type, plateforme, libellé, date), filtres combinables (type,

@@ -32,6 +32,28 @@ même, le vert et le rouge iOS sont trop clairs pour du texte sur fond clair : o
 variantes foncées. Chaque texte atteint au moins 4,5:1 (WCAG AA), et le vert et le rouge ne
 portent jamais seuls l'information : les montants gardent leur signe.
 
+## Graphiques
+
+Dessinés à la main en SVG, sans bibliothèque (`ColumnChart`, `ShareBars`, `ChartCard`) :
+
+- **Une forme par question.** Plus ou moins-value par année : colonnes de part et d'autre de la
+  ligne de base. Achats et ventes : colonnes groupées par mois (ou par année). Répartition :
+  barres horizontales classées, montant et part écrits. Une seule année, une seule plateforme :
+  le chiffre plutôt qu'une colonne ou une barre seule.
+- **Couleurs validées**, pour le daltonisme et le contraste, sur les cartes claires (`#FFFFFF`)
+  et sombres (`#1C1C1E`) : `--series-1` (bleu, `#2A78D6` / `#3987E5`), `--series-2` (orange,
+  `#EB6834` / `#D95926`), `--series-negative` (rouge, `#E34948` / `#E66767`). Le vert et le
+  rouge des montants ne se distinguent pas assez en vision deutéranope (écart 3,7 en sombre) :
+  les colonnes de plus-value sont bleues. La direction (au-dessus ou au-dessous de zéro) et le
+  signe de l'étiquette portent aussi l'information.
+- **Traits fins** : colonnes de 24 px au plus, arrondies de 4 px au bout de la donnée, carrées sur
+  la ligne de base, 2 px entre deux colonnes voisines ; quadrillage d'un pixel, jamais pointillé.
+- **Texte à l'encre du texte**, jamais à la couleur de la série ; valeurs écrites avec
+  parcimonie (le maximum de chaque série, ou chaque colonne quand elles sont peu nombreuses).
+- **Infobulle au survol comme au clavier** : un bouton transparent par colonne, dont le nom
+  accessible donne toutes les valeurs ; légende dès deux séries ; vue tableau pour chaque
+  graphique.
+
 ## Le verre, avec parcimonie
 
 Quatre niveaux, du plus léger au plus flottant : `glass-subtle`, `glass`, `glass-strong` et

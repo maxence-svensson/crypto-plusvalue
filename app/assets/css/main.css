@@ -43,6 +43,14 @@
   --link: light-dark(#0066cc, #2997ff);
   --gain: light-dark(#1a7f37, #30d158);
   --loss: light-dark(#d70015, #ff6961);
+  /*
+   * Graphiques : séries et pôle négatif, validés pour le daltonisme et le contraste sur les
+   * cartes claires (#ffffff) et sombres (#1c1c1e). Vert et rouge ne se distinguent pas assez
+   * en vision deutéranope : les colonnes de plus-value sont bleues, celles de moins-value rouges.
+   */
+  --series-1: light-dark(#2a78d6, #3987e5);
+  --series-2: light-dark(#eb6834, #d95926);
+  --series-negative: light-dark(#e34948, #e66767);
   --warning: light-dark(#b83000, #ff9f0a);
   --warning-tint: light-dark(rgb(255 149 0 / 0.14), rgb(255 159 10 / 0.16));
   --success-tint: light-dark(rgb(52 199 89 / 0.14), rgb(48 209 88 / 0.16));
@@ -92,6 +100,9 @@
   --color-link: var(--link);
   --color-gain: var(--gain);
   --color-loss: var(--loss);
+  --color-series-1: var(--series-1);
+  --color-series-2: var(--series-2);
+  --color-series-negative: var(--series-negative);
   --color-warning: var(--warning);
   --color-warning-tint: var(--warning-tint);
   --color-success-tint: var(--success-tint);
