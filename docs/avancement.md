@@ -2,7 +2,7 @@
 
 Ce fichier suit la transformation de CryptoPlusValue en plateforme complète de préparation de la
 fiscalité crypto. Il est mis à jour à chaque phase, pour pouvoir reprendre le travail à tout
-moment. Dernière mise à jour : 9 octobre 2026, après la phase 3 (première partie).
+moment. Dernière mise à jour : 9 octobre 2026, après la phase 3.
 
 ## 1. Diagnostic initial (9 octobre 2026)
 
@@ -25,17 +25,17 @@ place sauf raison solide, et il n'y en a pas.
 
 ### Partiel ou défectueux
 
-| Constat                                                                                                | Conséquence                                                                                     |
-| ------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
-| Une seule ligne invalide faisait échouer tout le fichier.                                              | Corrigé en phase 1 : les lignes illisibles sont écartées et listées.                            |
-| Le symbole de l'actif n'était pas validé (« =CMD » accepté).                                           | Corrigé en phase 1 : lettres majuscules et chiffres seulement.                                  |
-| Une quantité négative est passée en valeur absolue.                                                    | Conservé : les exports signent les quantités selon le sens de l'opération.                      |
-| Doublons détectés seulement par identifiant exact.                                                     | Un même relevé exporté deux fois avec d'autres identifiants serait compté deux fois.            |
-| Taux de 31,4 % et barème 2025 étaient appliqués à toutes les années.                                   | Corrigé en phase 2 : règles par année (shared/tax/rules.ts), rien d'estimé sans règles connues. |
-| Une requête de cours par actif et par cession : 25 000 requêtes pour 5 000 cessions.                   | Calcul très lent sur les gros historiques.                                                      |
-| Import et calcul sur le fil principal : 2 s de blocage pour 50 000 lignes.                             | Interface figée sur les gros fichiers.                                                          |
-| Aucune persistance : un rechargement efface tout.                                                      | Il faut tout réimporter à chaque visite.                                                        |
-| Pas de gestion des opérations (ajout, modification, suppression), pas de rapprochement des transferts. | Un historique incomplet bloque l'utilisateur.                                                   |
+| Constat                                                                              | Conséquence                                                                                     |
+| ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| Une seule ligne invalide faisait échouer tout le fichier.                            | Corrigé en phase 1 : les lignes illisibles sont écartées et listées.                            |
+| Le symbole de l'actif n'était pas validé (« =CMD » accepté).                         | Corrigé en phase 1 : lettres majuscules et chiffres seulement.                                  |
+| Une quantité négative est passée en valeur absolue.                                  | Conservé : les exports signent les quantités selon le sens de l'opération.                      |
+| Doublons détectés seulement par identifiant exact.                                   | Corrigé en phase 3 : doublons probables repérés et soumis à l'utilisateur.                      |
+| Taux de 31,4 % et barème 2025 étaient appliqués à toutes les années.                 | Corrigé en phase 2 : règles par année (shared/tax/rules.ts), rien d'estimé sans règles connues. |
+| Une requête de cours par actif et par cession : 25 000 requêtes pour 5 000 cessions. | Calcul très lent sur les gros historiques.                                                      |
+| Import et calcul sur le fil principal : 2 s de blocage pour 50 000 lignes.           | Interface figée sur les gros fichiers.                                                          |
+| Aucune persistance : un rechargement efface tout.                                    | Il faut tout réimporter à chaque visite.                                                        |
+| Pas de gestion des opérations (ajout, modification, suppression).                    | Rapprochement des transferts fait en phase 3 ; gestion des opérations en phase 4.               |
 
 ### Manquant par rapport au brief
 
@@ -72,15 +72,15 @@ cours (une requête par cours) qui limitent.
 Chaque phase est livrée par une ou plusieurs pull requests testées. Elles sont fusionnées quand la
 CI est verte, puis vérifiées en production.
 
-| Phase                      | Contenu                                                                                                                                                                                      | État                                                                    |
-| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| 1. Stabilisation           | Vulnérabilités, en-têtes de sécurité, import ligne par ligne avec anomalies, validation des symboles, tests de bout en bout (Playwright)                                                     | fait (9 octobre)                                                        |
-| 2. Moteur fiscal versionné | Taux et barèmes par année vérifiés aux sources, option 3CN selon l'année, blocage des estimations sans règles connues                                                                        | fait (9 octobre)                                                        |
-| 3. Imports                 | Registre d'importeurs, aperçu et confirmation, doublons multicritères, qualité des données, cours groupés, lecture dans un Web Worker, nouvelles plateformes validées sur formats documentés | en cours : registre et Kraken, Crypto.com, Bitvavo faits (expérimental) |
-| 4. Interface               | Navigation multi-pages, persistance IndexedDB, page des transactions (recherche, filtres, ajout, modification, suppression, annulation, journal), tableau de bord                            | à faire                                                                 |
-| 5. Fonctions avancées      | Portefeuille et performances, scénarios comparés, rapports CSV et Excel, sauvegarde chiffrée, centre d'aide, glossaire, FAQ, pages de contenu, thème manuel, PWA                             | à faire                                                                 |
-| 6. Sécurité et performance | CSP stricte, injection CSV, limites de taille, tests de charge, Lighthouse                                                                                                                   | à faire                                                                 |
-| 7. Validation finale       | Tests multi-navigateurs et multi-résolutions, documentation, rapport final                                                                                                                   | à faire                                                                 |
+| Phase                      | Contenu                                                                                                                                                                                      | État                                                                      |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| 1. Stabilisation           | Vulnérabilités, en-têtes de sécurité, import ligne par ligne avec anomalies, validation des symboles, tests de bout en bout (Playwright)                                                     | fait (9 octobre)                                                          |
+| 2. Moteur fiscal versionné | Taux et barèmes par année vérifiés aux sources, option 3CN selon l'année, blocage des estimations sans règles connues                                                                        | fait (9 octobre)                                                          |
+| 3. Imports                 | Registre d'importeurs, aperçu et confirmation, doublons multicritères, qualité des données, cours groupés, lecture dans un Web Worker, nouvelles plateformes validées sur formats documentés | fait, sauf cours groupés et Web Worker (reportés en phase 6, performance) |
+| 4. Interface               | Navigation multi-pages, persistance IndexedDB, page des transactions (recherche, filtres, ajout, modification, suppression, annulation, journal), tableau de bord                            | à faire                                                                   |
+| 5. Fonctions avancées      | Portefeuille et performances, scénarios comparés, rapports CSV et Excel, sauvegarde chiffrée, centre d'aide, glossaire, FAQ, pages de contenu, thème manuel, PWA                             | à faire                                                                   |
+| 6. Sécurité et performance | CSP stricte, injection CSV, limites de taille, tests de charge, Lighthouse                                                                                                                   | à faire                                                                   |
+| 7. Validation finale       | Tests multi-navigateurs et multi-résolutions, documentation, rapport final                                                                                                                   | à faire                                                                   |
 
 ### Ce qui ne sera pas promis
 
@@ -101,6 +101,9 @@ Statuts : TERMINÉ ET TESTÉ, TERMINÉ MAIS NON TESTÉ, PARTIEL, BLOQUÉ, NON IM
 | Import Trade Republic               | TERMINÉ ET TESTÉ                | oui                    | oui                    | oui          | deux exports réels ; lignes illisibles écartées                     |
 | Import Coinbase                     | TERMINÉ ET TESTÉ                | oui                    | oui                    | non          | exemples publics                                                    |
 | Imports Kraken, Crypto.com, Bitvavo | TERMINÉ ET TESTÉ (expérimental) | oui                    | oui (Kraken vers 2086) | oui (Kraken) | formats documentés, pas d'export réel                               |
+| Aperçu avant import et doublons     | TERMINÉ ET TESTÉ                | oui                    | non                    | oui          | doublons probables à confirmer                                      |
+| Rapprochement des transferts        | TERMINÉ ET TESTÉ                | oui                    | non                    | non          | utilisé par le diagnostic                                           |
+| Diagnostic des données              | TERMINÉ ET TESTÉ                | oui                    | non                    | oui          | résultat « provisoire » si incomplet                                |
 | Cours historiques                   | TERMINÉ ET TESTÉ                | oui                    | non                    | non          | une requête par cours                                               |
 | 2086 officiel rempli                | TERMINÉ ET TESTÉ                | oui                    | non                    | oui          | revenus 2025                                                        |
 | Dossier justificatif                | TERMINÉ ET TESTÉ                | oui                    | oui                    | oui          |                                                                     |

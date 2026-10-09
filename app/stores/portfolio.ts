@@ -1,7 +1,10 @@
 import { defineStore } from 'pinia'
 
 import { MAX_FILE_BYTES, binaryFormat, decodeText } from '#shared/importers/decode'
+import type { ImportResult } from '#shared/importers/csv'
 import { importFile, type Platform } from '#shared/importers/detect'
+import { checkDuplicates, type DuplicateCheck } from '#shared/portfolio/duplicates'
+import { assessQuality } from '#shared/portfolio/quality'
 import { replayPortfolio } from '#shared/portfolio/replay'
 import { buildTaxEvents, requiredPrices } from '#shared/portfolio/tax-events'
 import type { Transaction } from '#shared/portfolio/transaction'
@@ -17,8 +20,22 @@ export type ImportedFile =
       skipped: number
       unsupported: { line: number; label: string }[]
       anomalies: { line: number; message: string }[]
+      /** Opérations déjà présentes, ou doublons probables que l'utilisateur a écartés. */
+      duplicates: number
     }
   | { name: string; error: string }
+
+/** Un fichier lu, en attente de confirmation : l'utilisateur voit ce qui sera importé. */
+export type PendingImport = {
+  name: string
+  platform: Platform
+  result: ImportResult
+  duplicates: DuplicateCheck
+  /** Première et dernière opération du fichier. */
+  period?: { from: Date; to: Date }
+  /** Doublons probables que l'utilisateur choisit d'importer quand même. */
+  keep: string[]
+}
 
 export type Price = { priceEur: Dec; source: string }
 
@@ -39,10 +56,17 @@ export const usePortfolioStore = defineStore('portfolio', () => {
   const priceErrors = shallowRef(new Map<string, string>())
   const fetchingPrices = ref(false)
 
+  /** Fichiers lus, en attente de confirmation. */
+  const pending = ref<PendingImport[]>([])
+
   /** Un fichier à importer : son nom, sa taille si elle est connue, et de quoi lire son contenu. */
   type FileSource = { name: string; size?: number; bytes: () => Promise<ArrayBuffer> }
 
-  async function importFiles(list: Iterable<FileSource>) {
+  /**
+   * Lit les fichiers et prépare leur import, sans rien ajouter : chaque fichier est comparé aux
+   * opérations déjà là et aux fichiers en attente avant lui, pour repérer les doublons.
+   */
+  async function prepareImport(list: Iterable<FileSource>) {
     for (const file of list) {
       try {
         if ((file.size ?? 0) > MAX_FILE_BYTES) {
@@ -51,24 +75,76 @@ export const usePortfolioStore = defineStore('portfolio', () => {
         const bytes = new Uint8Array(await file.bytes())
         const binary = binaryFormat(bytes)
         if (binary) throw new Error(binary)
-        const result = importFile(decodeText(bytes))
-        // Un même fichier importé deux fois ne double pas les transactions.
-        const known = new Set(transactions.value.map((transaction) => transaction.id))
-        const added = result.transactions.filter((transaction) => !known.has(transaction.id))
-        transactions.value = [...transactions.value, ...added]
-        files.value.push({
+        const { platform, ...result } = importFile(decodeText(bytes))
+        const before = [...transactions.value, ...pending.value.flatMap((item) => accepted(item))]
+        const dates = result.transactions.map((transaction) => transaction.date.getTime())
+        pending.value.push({
           name: file.name,
-          platform: result.platform,
-          transactions: result.transactions.length,
-          skipped: result.skipped,
-          unsupported: result.unsupported,
-          anomalies: result.anomalies,
+          platform,
+          result,
+          duplicates: checkDuplicates(before, result.transactions),
+          ...(dates.length > 0
+            ? { period: { from: new Date(Math.min(...dates)), to: new Date(Math.max(...dates)) } }
+            : {}),
+          keep: [],
         })
       } catch (error) {
         files.value.push({ name: file.name, error: (error as Error).message })
       }
     }
+  }
+
+  /** Ce qu'un fichier en attente ajoutera : les nouvelles opérations et les doublons gardés. */
+  function accepted(item: PendingImport): Transaction[] {
+    const kept = new Set(item.keep)
+    return [
+      ...item.duplicates.fresh,
+      ...item.duplicates.possible
+        .map(({ incoming }) => incoming)
+        .filter((transaction) => kept.has(transaction.id)),
+    ]
+  }
+
+  function toggleKeep(index: number, id: string) {
+    const item = pending.value[index]
+    if (!item) return
+    item.keep = item.keep.includes(id)
+      ? item.keep.filter((kept) => kept !== id)
+      : [...item.keep, id]
+  }
+
+  /** Importe les fichiers en attente (tous, ou celui d'indice `index`), puis cherche les cours. */
+  async function confirmImport(index?: number) {
+    const chosen =
+      index === undefined ? pending.value : pending.value.filter((_, at) => at === index)
+    for (const item of chosen) {
+      const added = accepted(item)
+      transactions.value = [...transactions.value, ...added]
+      files.value.push({
+        name: item.name,
+        platform: item.platform,
+        transactions: added.length,
+        skipped: item.result.skipped,
+        unsupported: item.result.unsupported,
+        anomalies: item.result.anomalies,
+        duplicates: item.result.transactions.length - added.length,
+      })
+    }
+    pending.value = index === undefined ? [] : pending.value.filter((_, at) => at !== index)
     await fetchPrices()
+  }
+
+  function cancelImport(index: number) {
+    pending.value = pending.value.filter((_, at) => at !== index)
+  }
+
+  /** Lit et importe sans demander : pour l'exemple fictif. */
+  async function importFiles(list: Iterable<FileSource>) {
+    const start = pending.value.length
+    await prepareImport(list)
+    for (let index = pending.value.length - 1; index >= start; index--) {
+      await confirmImport(index)
+    }
   }
 
   /** Exemple fictif au format Trade Republic, pour essayer sans fichier. */
@@ -84,6 +160,7 @@ export const usePortfolioStore = defineStore('portfolio', () => {
 
   function reset() {
     files.value = []
+    pending.value = []
     transactions.value = []
     prices.value = new Map()
     priceErrors.value = new Map()
@@ -180,6 +257,25 @@ export const usePortfolioStore = defineStore('portfolio', () => {
     return Array.from({ length: last - first + 1 }, (_, index) => last - index)
   })
 
+  /** Qualité des données : manques et points à vérifier, pour le diagnostic. */
+  const quality = computed(() =>
+    assessQuality({
+      transactions: transactions.value,
+      missingHistory: replay.value.missingHistory,
+      missingPrices: neededPrices.value.filter(
+        (request) => !prices.value.has(request.key) && priceErrors.value.has(request.key),
+      ).length,
+      unsupported: files.value.reduce(
+        (sum, file) => sum + ('error' in file ? 0 : file.unsupported.length),
+        0,
+      ),
+      anomalies: files.value.reduce(
+        (sum, file) => sum + ('error' in file ? 0 : file.anomalies.length),
+        0,
+      ),
+    }),
+  )
+
   function summary(year: number) {
     const state = computation.value
     return state.status === 'ready' ? summarizeYear(state.disposals, year) : undefined
@@ -187,6 +283,7 @@ export const usePortfolioStore = defineStore('portfolio', () => {
 
   return {
     files,
+    pending,
     transactions,
     prices,
     priceErrors,
@@ -195,6 +292,11 @@ export const usePortfolioStore = defineStore('portfolio', () => {
     neededPrices,
     computation,
     years,
+    quality,
+    prepareImport,
+    confirmImport,
+    cancelImport,
+    toggleKeep,
     importFiles,
     loadExample,
     fetchPrices,
