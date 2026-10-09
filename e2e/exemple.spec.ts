@@ -79,3 +79,26 @@ test('le tableau de bord résume l’exemple et juge son historique complet', as
   await expect(diagnostic.getByText('Complet', { exact: true })).toBeVisible()
   await expect(diagnostic.getByText('Récompenses à prix d’acquisition nul')).toBeVisible()
 })
+
+test('télécharge les rapports pour un comptable : classeur Excel et CSV', async ({ page }) => {
+  await page.goto('/fiscalite?exemple')
+  await expect(page.getByRole('img', { name: 'Case 3AN : 362 €' })).toBeVisible()
+  const reports = page.getByRole('group', { name: 'Rapports pour un comptable ou un tableur' })
+  const { readFile } = await import('node:fs/promises')
+
+  const workbook = page.waitForEvent('download')
+  await reports.getByRole('button', { name: 'Classeur Excel' }).click()
+  const xlsx = await readFile(await (await workbook).path())
+  expect(xlsx.subarray(0, 2).toString()).toBe('PK')
+  expect(xlsx.toString('utf8')).toContain('<sheet name="Cessions 2025"')
+
+  const disposals = page.waitForEvent('download')
+  await reports.getByRole('button', { name: 'Cessions (CSV)' }).click()
+  const file = await disposals
+  expect(file.suggestedFilename()).toBe('cessions-crypto-2025.csv')
+  const lines = (await readFile(await file.path())).toString('utf8').trim().split('\r\n')
+  // Les deux ventes de l'exemple, plus-values calculées à part (e2e/README.md).
+  expect(lines).toHaveLength(3)
+  expect(lines[1]).toMatch(/;315,46;/)
+  expect(lines[2]).toMatch(/;46,43;/)
+})

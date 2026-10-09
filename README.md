@@ -38,6 +38,9 @@ Importez l'historique de vos plateformes, obtenez les montants à reporter, cess
 - **« Et si je vendais aujourd'hui ? »** : la plus-value et l'impôt d'une vente aux cours du
   moment, compte tenu des ventes déjà faites dans l'année et du seuil de 305 €. Fonctionne aussi
   sans fichier, à partir de trois montants.
+- **Des rapports pour un comptable** : classeur Excel (résumé, cessions, opérations, points à
+  vérifier), cessions et points à vérifier en CSV
+  ([`docs/rapports.md`](docs/rapports.md)).
 - **Une sauvegarde chiffrée** (AES-256, mot de passe) pour garder ses données hors du navigateur
   ou les retrouver sur un autre appareil ; chiffrement et déchiffrement dans le navigateur.
 - **Un tableau de bord avec graphiques** : plus ou moins-value nette par année, achats et ventes

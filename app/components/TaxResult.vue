@@ -24,21 +24,33 @@ const startsBefore2019 = computed(() =>
   store.transactions.some((transaction) => taxYear(transaction.date) < FIRST_YEAR),
 )
 
-const downloading = ref<'form' | 'dossier'>()
+const downloading = ref<'form' | 'dossier' | ReportKind>()
+
+const REPORTS: { kind: ReportKind; label: string }[] = [
+  { kind: 'classeur', label: 'Classeur Excel' },
+  { kind: 'cessions', label: 'Cessions (CSV)' },
+  { kind: 'points', label: 'Points à vérifier (CSV)' },
+]
 const downloadError = ref('')
 
-async function download(kind: 'form' | 'dossier') {
+const FAILURES: Record<'form' | 'dossier' | ReportKind, string> = {
+  form: 'Le formulaire n’a pas pu être préparé.',
+  dossier: 'Le dossier n’a pas pu être préparé.',
+  classeur: 'Le classeur n’a pas pu être préparé.',
+  cessions: 'La liste des cessions n’a pas pu être préparée.',
+  points: 'La liste des points à vérifier n’a pas pu être préparée.',
+}
+
+async function download(kind: 'form' | 'dossier' | ReportKind) {
   if (!summary.value) return
   downloading.value = kind
   downloadError.value = ''
   try {
     if (kind === 'form') await downloadForm2086(summary.value)
-    else await downloadDossier(summary.value.year)
+    else if (kind === 'dossier') await downloadDossier(summary.value.year)
+    else await downloadReport(kind, summary.value.year)
   } catch {
-    downloadError.value =
-      kind === 'form'
-        ? 'Le formulaire n’a pas pu être préparé. Réessayez dans un instant.'
-        : 'Le dossier n’a pas pu être préparé. Réessayez dans un instant.'
+    downloadError.value = `${FAILURES[kind]} Réessayez dans un instant.`
   } finally {
     downloading.value = undefined
   }
@@ -276,6 +288,25 @@ async function download(kind: 'form' | 'dossier') {
                 }}
               </button>
             </div>
+          </div>
+          <div
+            class="mt-4 flex flex-wrap items-center gap-x-2 gap-y-2 text-sm"
+            role="group"
+            aria-label="Rapports pour un comptable ou un tableur"
+          >
+            <span class="mr-2 text-muted">Pour un comptable ou un tableur :</span>
+            <button
+              v-for="report in REPORTS"
+              :key="report.kind"
+              type="button"
+              class="btn btn-ghost btn-sm"
+              :disabled="downloading === report.kind"
+              @click="download(report.kind)"
+            >
+              <span v-if="downloading === report.kind" class="spinner" aria-hidden="true"></span>
+              <AppIcon v-else name="download" />
+              {{ report.label }}
+            </button>
           </div>
           <p v-if="downloadError" class="mt-3 text-sm text-loss" role="alert">
             {{ downloadError }}

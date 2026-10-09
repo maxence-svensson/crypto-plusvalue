@@ -9,6 +9,13 @@ Les changements notables, du plus récent au plus ancien. Chaque entrée renvoie
 - La barre latérale laisse place à une barre de navigation en haut, en verre, alignée sur le
   contenu : sections en libellés, paramètres en icône. Sur téléphone, les onglets restent en bas.
 
+### Phase 5 (deuxième partie) : rapports
+
+- Classeur Excel pour le comptable (résumé, cessions de l'année, opérations, points à vérifier),
+  cessions et points à vérifier en CSV, depuis la page Fiscalité.
+- Classeur XLSX écrit sans dépendance ; texte jamais interprété comme une formule, en CSV comme
+  en Excel.
+
 ### Phase 5 (première partie) : sauvegarde chiffrée
 
 - Télécharger toutes ses données (opérations, cours, fichiers, corrections) dans un fichier
