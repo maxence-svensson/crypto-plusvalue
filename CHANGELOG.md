@@ -4,6 +4,17 @@ Les changements notables, du plus récent au plus ancien. Chaque entrée renvoie
 
 ## 9 octobre 2026
 
+### Phase 3 (première partie) : nouvelles plateformes
+
+- Imports Kraken (grand livre), Crypto.com (application) et Bitvavo, marqués « expérimental » :
+  écrits d'après la documentation des plateformes et des exemples publics, à confirmer sur un
+  export réel. Marge, dérivés, conversions de poussières, transferts entre utilisateurs : à
+  vérifier, jamais calculés d'office.
+- Registre des importeurs : détection, liste des plateformes et instructions d'export viennent
+  d'une seule table ; guide « Ajouter une plateforme » dans `docs/imports.md`.
+- Heures locales converties selon le fuseau indiqué dans le fichier (Bitvavo), heure d'été
+  comprise.
+
 ### Phase 2 : règles fiscales versionnées par année
 
 - Taux par année de revenus : 30 % jusqu'en 2024, 31,4 % depuis 2025 (CSG à 10,6 %, LFSS 2026) ;
