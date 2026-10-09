@@ -38,6 +38,9 @@ Importez l'historique de vos plateformes, obtenez les montants à reporter, cess
 - **« Et si je vendais aujourd'hui ? »** : la plus-value et l'impôt d'une vente aux cours du
   moment, compte tenu des ventes déjà faites dans l'année et du seuil de 305 €. Fonctionne aussi
   sans fichier, à partir de trois montants.
+- **Un tableau de bord avec graphiques** : plus ou moins-value nette par année, achats et ventes
+  par mois ou par année, achats par crypto, volume par plateforme ; période au choix, infobulles
+  au clavier, vue tableau.
 - **Une liste des opérations à corriger soi-même** : recherche, filtres (type, plateforme, crypto,
   année, période, montant, points à vérifier), tri, ajout d'une opération absente des exports,
   modification, suppression, annulation et journal des corrections, export CSV.
@@ -48,6 +51,8 @@ Importez l'historique de vos plateformes, obtenez les montants à reporter, cess
   fichier.
 
 ![Le tableau de bord : opérations, cryptos détenues, plus-value et impôt de l'année, diagnostic](docs/captures/tableau-de-bord.jpg)
+
+![Les graphiques du tableau de bord : achats et ventes par mois, achats par crypto, volume par plateforme](docs/captures/graphiques.jpg)
 
 ![La page Fiscalité : case 3AN, comparaison des régimes, formulaire 2086 et étapes de la déclaration](docs/captures/resultat.jpg)
 

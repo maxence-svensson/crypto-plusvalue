@@ -114,6 +114,9 @@ await capture('accueil')
 await open('/?exemple', { width: 1440, height: 900, scale: 2, wait: 8000 })
 await capture('tableau-de-bord')
 
+await open('/?exemple', { width: 1440, height: 2400, scale: 2, wait: 8000 })
+await capture('graphiques', await areaOf('section[aria-labelledby="graphiques"]'))
+
 // Fenêtre haute : les halos du fond sont fixes et ne couvrent que la fenêtre, une capture
 // au-delà laisserait une coupure.
 await open('/fiscalite?exemple', { width: 1440, height: 4200, scale: 2, wait: 10000 })

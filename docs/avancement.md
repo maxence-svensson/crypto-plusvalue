@@ -2,7 +2,7 @@
 
 Ce fichier suit la transformation de CryptoPlusValue en plateforme complète de préparation de la
 fiscalité crypto. Il est mis à jour à chaque phase, pour pouvoir reprendre le travail à tout
-moment. Dernière mise à jour : 9 octobre 2026, après la phase 4 (troisième partie).
+moment. Dernière mise à jour : 9 octobre 2026, après la phase 4 (quatrième partie).
 
 ## 1. Diagnostic initial (9 octobre 2026)
 
@@ -77,7 +77,7 @@ CI est verte, puis vérifiées en production.
 | 1. Stabilisation           | Vulnérabilités, en-têtes de sécurité, import ligne par ligne avec anomalies, validation des symboles, tests de bout en bout (Playwright)                                                     | fait (9 octobre)                                                          |
 | 2. Moteur fiscal versionné | Taux et barèmes par année vérifiés aux sources, option 3CN selon l'année, blocage des estimations sans règles connues                                                                        | fait (9 octobre)                                                          |
 | 3. Imports                 | Registre d'importeurs, aperçu et confirmation, doublons multicritères, qualité des données, cours groupés, lecture dans un Web Worker, nouvelles plateformes validées sur formats documentés | fait, sauf cours groupés et Web Worker (reportés en phase 6, performance) |
-| 4. Interface               | Navigation multi-pages, persistance IndexedDB, page des transactions (recherche, filtres, ajout, modification, suppression, annulation, journal), tableau de bord                            | en cours : tout est fait sauf les graphiques du tableau de bord           |
+| 4. Interface               | Navigation multi-pages, persistance IndexedDB, page des transactions (recherche, filtres, ajout, modification, suppression, annulation, journal), tableau de bord                            | fait (9 octobre)                                                          |
 | 5. Fonctions avancées      | Portefeuille et performances, scénarios comparés, rapports CSV et Excel, sauvegarde chiffrée, centre d'aide, glossaire, FAQ, pages de contenu, thème manuel, PWA                             | à faire                                                                   |
 | 6. Sécurité et performance | CSP stricte, injection CSV, limites de taille, tests de charge, Lighthouse                                                                                                                   | à faire                                                                   |
 | 7. Validation finale       | Tests multi-navigateurs et multi-résolutions, documentation, rapport final                                                                                                                   | à faire                                                                   |
@@ -95,24 +95,24 @@ CI est verte, puis vérifiées en production.
 
 Statuts : TERMINÉ ET TESTÉ, TERMINÉ MAIS NON TESTÉ, PARTIEL, BLOQUÉ, NON IMPLÉMENTÉ.
 
-| Fonctionnalité                      | Statut                          | Tests unitaires        | Intégration            | Bout en bout | Remarques                                                                     |
-| ----------------------------------- | ------------------------------- | ---------------------- | ---------------------- | ------------ | ----------------------------------------------------------------------------- |
-| Moteur 2086 (150 VH bis)            | TERMINÉ ET TESTÉ                | oui                    | oui                    | oui          | exemples BOFiP ; exemple vérifié par un calcul indépendant                    |
-| Import Trade Republic               | TERMINÉ ET TESTÉ                | oui                    | oui                    | oui          | deux exports réels ; lignes illisibles écartées                               |
-| Import Coinbase                     | TERMINÉ ET TESTÉ                | oui                    | oui                    | non          | exemples publics                                                              |
-| Imports Kraken, Crypto.com, Bitvavo | TERMINÉ ET TESTÉ (expérimental) | oui                    | oui (Kraken vers 2086) | oui (Kraken) | formats documentés, pas d'export réel                                         |
-| Aperçu avant import et doublons     | TERMINÉ ET TESTÉ                | oui                    | non                    | oui          | doublons probables à confirmer                                                |
-| Rapprochement des transferts        | TERMINÉ ET TESTÉ                | oui                    | non                    | non          | utilisé par le diagnostic                                                     |
-| Diagnostic des données              | TERMINÉ ET TESTÉ                | oui                    | non                    | oui          | résultat « provisoire » si incomplet                                          |
-| Cours historiques                   | TERMINÉ ET TESTÉ                | oui                    | non                    | non          | une requête par cours                                                         |
-| 2086 officiel rempli                | TERMINÉ ET TESTÉ                | oui                    | non                    | oui          | revenus 2025                                                                  |
-| Dossier justificatif                | TERMINÉ ET TESTÉ                | oui                    | oui                    | oui          |                                                                               |
-| Comparaison PFU / barème            | TERMINÉ ET TESTÉ                | oui (2023 à 2026)      | non                    | oui          | barème de l'année ; 2026 signalé comme emprunté à 2025                        |
-| Simulateur de vente                 | TERMINÉ ET TESTÉ                | oui (2024, 2026, 2027) | non                    | oui          | taux de l'année de la vente                                                   |
-| « Et maintenant ? »                 | TERMINÉ ET TESTÉ                | oui (calendrier)       | non                    | oui          |                                                                               |
-| Persistance locale                  | TERMINÉ ET TESTÉ                | oui (sérialisation)    | non                    | oui          | IndexedDB, désactivable, « Tout effacer »                                     |
-| Gestion des transactions            | TERMINÉ ET TESTÉ                | oui                    | non                    | oui          | recherche, filtres, tri, pagination, saisie, corrections, annulation, journal |
-| Tableau de bord                     | PARTIEL                         |                        |                        | oui          | chiffres clés et diagnostic ; graphiques à venir                              |
-| Sauvegarde chiffrée                 | NON IMPLÉMENTÉ                  |                        |                        |              |                                                                               |
-| Rapports CSV et Excel               | PARTIEL                         | oui (CSV)              | non                    | oui (CSV)    | liste des opérations en CSV, formules neutralisées ; Excel à venir            |
-| Tests de bout en bout               | TERMINÉ ET TESTÉ                |                        |                        | oui          | 5 projets en CI, axe-core ; en-têtes de sécurité vérifiés avec curl           |
+| Fonctionnalité                      | Statut                          | Tests unitaires             | Intégration            | Bout en bout | Remarques                                                                     |
+| ----------------------------------- | ------------------------------- | --------------------------- | ---------------------- | ------------ | ----------------------------------------------------------------------------- |
+| Moteur 2086 (150 VH bis)            | TERMINÉ ET TESTÉ                | oui                         | oui                    | oui          | exemples BOFiP ; exemple vérifié par un calcul indépendant                    |
+| Import Trade Republic               | TERMINÉ ET TESTÉ                | oui                         | oui                    | oui          | deux exports réels ; lignes illisibles écartées                               |
+| Import Coinbase                     | TERMINÉ ET TESTÉ                | oui                         | oui                    | non          | exemples publics                                                              |
+| Imports Kraken, Crypto.com, Bitvavo | TERMINÉ ET TESTÉ (expérimental) | oui                         | oui (Kraken vers 2086) | oui (Kraken) | formats documentés, pas d'export réel                                         |
+| Aperçu avant import et doublons     | TERMINÉ ET TESTÉ                | oui                         | non                    | oui          | doublons probables à confirmer                                                |
+| Rapprochement des transferts        | TERMINÉ ET TESTÉ                | oui                         | non                    | non          | utilisé par le diagnostic                                                     |
+| Diagnostic des données              | TERMINÉ ET TESTÉ                | oui                         | non                    | oui          | résultat « provisoire » si incomplet                                          |
+| Cours historiques                   | TERMINÉ ET TESTÉ                | oui                         | non                    | non          | une requête par cours                                                         |
+| 2086 officiel rempli                | TERMINÉ ET TESTÉ                | oui                         | non                    | oui          | revenus 2025                                                                  |
+| Dossier justificatif                | TERMINÉ ET TESTÉ                | oui                         | oui                    | oui          |                                                                               |
+| Comparaison PFU / barème            | TERMINÉ ET TESTÉ                | oui (2023 à 2026)           | non                    | oui          | barème de l'année ; 2026 signalé comme emprunté à 2025                        |
+| Simulateur de vente                 | TERMINÉ ET TESTÉ                | oui (2024, 2026, 2027)      | non                    | oui          | taux de l'année de la vente                                                   |
+| « Et maintenant ? »                 | TERMINÉ ET TESTÉ                | oui (calendrier)            | non                    | oui          |                                                                               |
+| Persistance locale                  | TERMINÉ ET TESTÉ                | oui (sérialisation)         | non                    | oui          | IndexedDB, désactivable, « Tout effacer »                                     |
+| Gestion des transactions            | TERMINÉ ET TESTÉ                | oui                         | non                    | oui          | recherche, filtres, tri, pagination, saisie, corrections, annulation, journal |
+| Tableau de bord                     | TERMINÉ ET TESTÉ                | oui (agrégats, graduations) | non                    | oui          | chiffres clés, diagnostic, quatre graphiques, période au choix                |
+| Sauvegarde chiffrée                 | NON IMPLÉMENTÉ                  |                             |                        |              |                                                                               |
+| Rapports CSV et Excel               | PARTIEL                         | oui (CSV)                   | non                    | oui (CSV)    | liste des opérations en CSV, formules neutralisées ; Excel à venir            |
+| Tests de bout en bout               | TERMINÉ ET TESTÉ                |                             |                        | oui          | 5 projets en CI, axe-core ; en-têtes de sécurité vérifiés avec curl           |

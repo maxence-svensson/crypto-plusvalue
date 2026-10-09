@@ -64,6 +64,8 @@ const tax = computed(() => (summary.value ? flatTax(summary.value) : undefined))
 
     <DataQualityPanel />
 
+    <DashboardCharts />
+
     <div class="grid gap-4 md:grid-cols-2">
       <NuxtLink to="/fiscalite" class="glass lift flex items-center gap-4 rounded-card p-5">
         <span
