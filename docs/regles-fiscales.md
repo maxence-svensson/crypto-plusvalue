@@ -109,6 +109,28 @@ Taux : prélèvement forfaitaire unique de **31,4 %** (12,8 % d'impôt sur le re
 prélèvements sociaux depuis la LFSS 2026), ou option pour le barème progressif en case 3CN
 ([FAQ impots.gouv.fr][faq]). Le BOFiP mentionne encore 30 %, un taux périmé.
 
+## Prélèvement forfaitaire ou barème
+
+Par défaut, la plus-value nette est taxée au **prélèvement forfaitaire** : 12,8 % d'impôt sur le
+revenu et 18,6 % de prélèvements sociaux. Sur option, en cochant la case **3CN** de la 2042 C,
+elle est soumise au **barème progressif** : elle s'ajoute aux autres revenus du foyer, les
+prélèvements sociaux restant dus, et 6,8 % de CSG deviennent déductibles des revenus de l'année
+suivante. L'option est globale pour les plus-values crypto du foyer et indépendante de celle des
+revenus de placements (case 2OP) ([notice 2086][2086] ; [BOFiP 30-30][b30] §15).
+
+L'application compare les deux :
+
+- à partir de la **tranche marginale** choisie par l'utilisateur : impôt = plus-value × tranche ;
+- ou à partir du **revenu imposable** et du **nombre de parts** : impôt avec la plus-value moins
+  impôt sans elle, au barème des revenus 2025 (0 % jusqu'à 11 600 €, 11 % jusqu'à 29 579 €,
+  30 % jusqu'à 84 577 €, 41 % jusqu'à 181 917 €, 45 % au-delà, par part ;
+  [service-public.gouv.fr][bareme]). Une plus-value qui fait changer de tranche est ainsi
+  imposée exactement.
+
+Le barème n'est avantageux que dans les tranches à 0 % et 11 %. Le calcul ignore la décote, le
+plafonnement du quotient familial et les réductions d'impôt ; l'économie de CSG déductible est
+affichée à part, estimée à tranche égale.
+
 ## Simulation d'une vente
 
 Le simulateur ajoute une vente fictive à l'historique, aux cours du moment, et refait tout le
@@ -159,4 +181,5 @@ montant vendu) et la vente est supposée être la seule de l'année.
 [b20]: https://bofip.impots.gouv.fr/bofip/11968-PGP.html
 [b30]: https://bofip.impots.gouv.fr/bofip/11969-PGP.html
 [2086]: https://www.impots.gouv.fr/sites/default/files/formulaires/2086/2026/2086_5515.pdf
+[bareme]: https://www.service-public.gouv.fr/particuliers/vosdroits/F1419
 [faq]: https://www.impots.gouv.fr/particulier/questions/comment-declarer-les-plus-ou-moins-values-sur-cessions-dactifs-numeriques

@@ -9,18 +9,6 @@ const store = usePortfolioStore()
 const holdings = computed(() => [...store.replay.holdings].sort(([a], [b]) => a.localeCompare(b)))
 const fromHistory = computed(() => holdings.value.length > 0)
 
-/** Nombre saisi à la française ou à l'anglaise ; vide ou invalide : rien. */
-function parse(text: string): Dec | undefined {
-  const cleaned = text.replace(/[\s\u00a0\u202f€]/g, '').replace(',', '.')
-  if (cleaned === '') return undefined
-  try {
-    const value = new Dec(cleaned)
-    return value.isNegative() ? undefined : value
-  } catch {
-    return undefined
-  }
-}
-
 // Avec l'historique importé : une crypto détenue, une quantité, les cours du moment.
 const asset = ref('')
 const quantity = ref('')
@@ -77,7 +65,7 @@ function onSlide(event: Event) {
 }
 
 function onQuantityInput() {
-  const amount = parse(quantity.value)
+  const amount = parseAmount(quantity.value)
   percent.value =
     amount && held.value?.gt(0)
       ? Math.min(100, amount.div(held.value).times(100).toDecimalPlaces(0).toNumber())
@@ -86,8 +74,8 @@ function onQuantityInput() {
 
 /** Ce que rapporterait la vente, avant frais et impôt. */
 const estimatedValue = computed(() => {
-  const amount = parse(quantity.value)
-  const price = parse(unitPrice.value)
+  const amount = parseAmount(quantity.value)
+  const price = parseAmount(unitPrice.value)
   return amount && price ? amount.times(price) : undefined
 })
 
@@ -99,11 +87,11 @@ const saleAmount = ref('')
 type Outcome = { simulation: SaleSimulation } | { hint: string } | { error: string }
 
 const outcome = computed<Outcome>(() => {
-  const fees = parse(fee.value) ?? new Dec(0)
+  const fees = parseAmount(fee.value) ?? new Dec(0)
 
   if (fromHistory.value) {
-    const amount = parse(quantity.value)
-    const price = parse(unitPrice.value)
+    const amount = parseAmount(quantity.value)
+    const price = parseAmount(unitPrice.value)
     if (!amount || amount.isZero()) return { hint: 'Indiquez la quantité à vendre.' }
     if (held.value && amount.gt(held.value)) {
       return { error: `Vous ne détenez que ${formatQuantity(held.value)} ${asset.value}.` }
@@ -133,9 +121,9 @@ const outcome = computed<Outcome>(() => {
     return { simulation: result }
   }
 
-  const cost = parse(invested.value)
-  const value = parse(portfolioValue.value)
-  const sale = parse(saleAmount.value)
+  const cost = parseAmount(invested.value)
+  const value = parseAmount(portfolioValue.value)
+  const sale = parseAmount(saleAmount.value)
   if (!cost || !value || !sale) return { hint: 'Remplissez les trois montants.' }
   if (value.isZero()) return { error: 'La valeur de votre portefeuille doit être positive.' }
   if (sale.gt(value)) {
