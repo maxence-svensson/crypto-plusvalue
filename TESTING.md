@@ -28,6 +28,7 @@ Vitest, build, puis Playwright sur Chromium, Firefox et WebKit, en version ordin
 | `simulateur.spec.ts`      | simulation sans fichier, curseur de quantité                                                                                                                                                 |
 | `tableau-de-bord.spec.ts` | graphiques d'une seule année, plusieurs années et plateformes, période au choix, infobulles au clavier, vue tableau, accessibilité                                                           |
 | `parametres.spec.ts`      | données relues après rechargement, sortie de la démonstration, thème retenu, « Tout effacer », conservation coupée                                                                           |
+| `sauvegarde.spec.ts`      | sauvegarde chiffrée téléchargée, contenu illisible, mauvais mot de passe refusé, restauration après « Tout effacer », fichier étranger refusé                                                |
 | `transactions.spec.ts`    | recherche, filtres et tri, ajout avec erreurs signalées, modification depuis la fiche, suppression multiple, annulation, export CSV, persistance des corrections, accessibilité des fenêtres |
 
 En local, Playwright utilise Microsoft Edge installé sur la machine (projets `chromium` et

@@ -13,6 +13,13 @@
   seulement, pour les retrouver à la visite suivante. Couper l'option efface ce qui était
   enregistré ; « Tout effacer » supprime données et préférences après confirmation. Les données
   fictives de la démonstration ne sont jamais enregistrées.
+- **Sauvegarde chiffrée** (Paramètres) : un fichier téléchargé, chiffré dans le navigateur avec
+  WebCrypto. La clé est dérivée du mot de passe par PBKDF2-HMAC-SHA256 (600 000 itérations, sel
+  aléatoire de 16 octets) ; les données sont chiffrées et authentifiées par AES-GCM 256 bits (IV
+  aléatoire de 12 octets). Le mot de passe (12 caractères au moins) n'est ni enregistré ni envoyé :
+  perdu, la sauvegarde est illisible. Un fichier modifié est refusé. À la restauration, chaque
+  opération, cours, fichier et correction est vérifié avant de remplacer quoi que ce soit
+  (`shared/persistence/backup.ts`).
 - **Préférences** (`localStorage`) : thème, étapes cochées de « Et maintenant ? », choix de
   conservation. Aucun montant ni transaction.
 
@@ -42,6 +49,8 @@ des nonces. C'est prévu (phase 6 de [`docs/avancement.md`](docs/avancement.md))
   erreur de validation renvoie un message générique, sans détail technique ; délai maximal de 5 s
   vers les sources ; aucune clé ni secret.
 - **Affichage** : Vue échappe tout le texte affiché ; aucun `v-html`.
+- **Export CSV** : un libellé qui commence par `=`, `+`, `-` ou `@` est précédé d'une
+  apostrophe, pour qu'aucun tableur ne l'exécute comme une formule.
 
 ## Dépendances
 

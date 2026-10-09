@@ -4,6 +4,14 @@ Les changements notables, du plus récent au plus ancien. Chaque entrée renvoie
 
 ## 9 octobre 2026
 
+### Phase 5 (première partie) : sauvegarde chiffrée
+
+- Télécharger toutes ses données (opérations, cours, fichiers, corrections) dans un fichier
+  chiffré par un mot de passe : PBKDF2 (600 000 itérations) et AES-GCM 256 bits, dans le
+  navigateur.
+- Restaurer une sauvegarde, ici ou sur un autre appareil : mot de passe faux ou fichier modifié
+  refusés sans rien toucher ; contenu vérifié avant de remplacer les données, après confirmation.
+
 ### Phase 4 (quatrième partie) : graphiques du tableau de bord
 
 - Plus ou moins-value nette par année, achats et ventes par mois ou par année, achats par crypto,

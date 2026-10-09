@@ -14,6 +14,7 @@ import { checkDuplicates, type DuplicateCheck } from '#shared/portfolio/duplicat
 import { transactionProblems } from '#shared/portfolio/problems'
 import { assessQuality } from '#shared/portfolio/quality'
 import { replayPortfolio } from '#shared/portfolio/replay'
+import { decryptBackup, encryptBackup } from '#shared/persistence/backup'
 import { fromPlain, toPlain, type Plain } from '#shared/persistence/serialize'
 import { buildTaxEvents, requiredPrices } from '#shared/portfolio/tax-events'
 import type { Transaction } from '#shared/portfolio/transaction'
@@ -284,6 +285,35 @@ export const usePortfolioStore = defineStore('portfolio', () => {
     }
   }
 
+  /** Toutes les données dans un fichier chiffré par ce mot de passe. */
+  async function exportBackup(password: string): Promise<string> {
+    return encryptBackup(
+      {
+        transactions: transactions.value,
+        files: files.value,
+        prices: [...prices.value],
+        corrections: corrections.value,
+      },
+      password,
+    )
+  }
+
+  /**
+   * Remplace les données par celles d'une sauvegarde. Le fichier est déchiffré et vérifié
+   * d'abord : un mot de passe faux ne touche à rien.
+   */
+  async function restoreBackup(text: string, password: string) {
+    const content = await decryptBackup(text, password)
+    reset()
+    demo.value = false
+    transactions.value = content.transactions
+    files.value = content.files as ImportedFile[]
+    prices.value = new Map(content.prices)
+    corrections.value = content.corrections
+    await save()
+    await fetchPrices()
+  }
+
   /** Efface tout : opérations, cours, fichiers, préférences, et ce qui était enregistré. */
   async function clearAll() {
     reset()
@@ -503,6 +533,8 @@ export const usePortfolioStore = defineStore('portfolio', () => {
     restore,
     setKeep,
     clearAll,
+    exportBackup,
+    restoreBackup,
     fetchPrices,
     fetchPricesFor,
     priceAt,
