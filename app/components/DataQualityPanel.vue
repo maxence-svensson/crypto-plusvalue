@@ -64,5 +64,12 @@ const TONES: Record<Severity, string> = {
         </div>
       </li>
     </ul>
+    <NuxtLink
+      v-if="store.problems.size > 0"
+      to="/transactions?a-verifier"
+      class="inline-flex text-sm font-medium text-link hover:underline"
+    >
+      Voir les {{ plural(store.problems.size, 'opération concernée', 'opérations concernées') }}
+    </NuxtLink>
   </section>
 </template>

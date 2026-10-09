@@ -59,3 +59,8 @@ export function formatLongDay(date: Date): string {
 export function formatPercent(rate: Dec): string {
   return `${rate.times(100).toNumber().toLocaleString('fr-FR')} %`
 }
+
+/** « 1 opération », « 3 opérations » : zéro et un au singulier, comme en français. */
+export function plural(count: number, one: string, many: string): string {
+  return `${count.toLocaleString('fr-FR')} ${count > 1 ? many : one}`
+}

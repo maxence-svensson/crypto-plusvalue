@@ -202,6 +202,14 @@
   font-variant-numeric: tabular-nums;
 }
 
+/*
+ * Fenêtre modale toujours centrée : hors couche, cette règle l'emporte sur les marges que
+ * `space-y-*` donne aux enfants d'un conteneur, même quand la fenêtre est l'un d'eux.
+ */
+dialog.dialog:modal {
+  margin: auto;
+}
+
 @layer components {
   /* Boutons : sensation physique, montée d'un pixel au survol, enfoncement au clic. */
   .btn {

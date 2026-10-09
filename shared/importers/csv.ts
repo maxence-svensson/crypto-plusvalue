@@ -1,6 +1,7 @@
 import Papa from 'papaparse'
 
 import type { Transaction } from '../portfolio/transaction'
+import { zonedInstant } from '../time'
 import { Dec } from '../tax/decimal'
 
 /** Fichier illisible ou d'un format inattendu : le message s'affiche tel quel. */
@@ -178,51 +179,12 @@ export function utcDate(row: CsvRow, column: Column): Date {
  * décalage est celui du fuseau à cette date : heure d'été comprise.
  */
 export function zonedDate(row: CsvRow, date: string, time: string, timeZone: string): Date {
-  const day = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date)
-  const clock = /^(\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,3})\d*)?$/.exec(time)
-  if (!day || !clock) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !/^\d{2}:\d{2}:\d{2}(\.\d+)?$/.test(time)) {
     throw new ImportError(`Ligne ${row.line} : « ${date} ${time} » n'est pas une date.`)
   }
-  const local = Date.UTC(
-    Number(day[1]),
-    Number(day[2]) - 1,
-    Number(day[3]),
-    Number(clock[1]),
-    Number(clock[2]),
-    Number(clock[3]),
-    Number((clock[4] ?? '0').padEnd(3, '0')),
-  )
-  let format: Intl.DateTimeFormat
-  try {
-    format = new Intl.DateTimeFormat('en-US', {
-      timeZone,
-      hourCycle: 'h23',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-    })
-  } catch {
+  const instant = zonedInstant(date, time, timeZone)
+  if (!instant) {
     throw new ImportError(`Ligne ${row.line} : fuseau horaire « ${timeZone} » inconnu.`)
   }
-  // Décalage du fuseau à un instant : heure affichée dans le fuseau moins l'heure UTC.
-  const offset = (instant: number) => {
-    const parts = Object.fromEntries(
-      format.formatToParts(new Date(instant)).map((part) => [part.type, Number(part.value)]),
-    )
-    const shown = Date.UTC(
-      parts.year ?? 0,
-      (parts.month ?? 1) - 1,
-      parts.day ?? 1,
-      parts.hour ?? 0,
-      parts.minute ?? 0,
-      parts.second ?? 0,
-    )
-    return shown - Math.floor(instant / 1000) * 1000
-  }
-  // Deux passes : le décalage peut changer entre l'heure locale et l'instant cherché.
-  const first = local - offset(local)
-  return new Date(local - offset(first))
+  return instant
 }

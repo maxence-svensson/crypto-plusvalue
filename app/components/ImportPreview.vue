@@ -13,8 +13,6 @@ const confirming = ref(false)
 const verified = (platform: string) =>
   IMPORTERS.find((importer) => importer.platform === platform)?.verified ?? false
 
-const plural = (count: number, one: string, many: string) => `${count} ${count > 1 ? many : one}`
-
 function describe(transaction: Transaction): string {
   const parts = [formatDateTime(transaction.date), TRANSACTION_LABELS[transaction.type]]
   if ('sent' in transaction) {

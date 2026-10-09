@@ -4,6 +4,23 @@ Les changements notables, du plus récent au plus ancien. Chaque entrée renvoie
 
 ## 9 octobre 2026
 
+### Phase 4 (troisième partie) : page des transactions
+
+- Recherche instantanée (crypto, type, plateforme, libellé, date), filtres combinables (type,
+  plateforme, crypto, année, période, montant, opérations à vérifier), tri par colonne ou par menu
+  sur téléphone, pagination par 50.
+- Fiche de chaque opération : source, identifiant, libellé et horodatage d'origine, instant
+  enregistré en UTC, points à vérifier, corrections déjà faites.
+- Ajout d'une opération absente des exports, modification et suppression, une par une ou par
+  sélection multiple, avec confirmation ; saisie vérifiée champ par champ.
+- Journal des corrections, enregistré avec les données : chaque changement s'annule et la liste
+  redevient exactement ce qu'elle était ; une opération supprimée ne revient pas en réimportant
+  le même fichier.
+- Export CSV de la liste affichée, pour un tableur français, formules neutralisées.
+- Le diagnostic renvoie vers les opérations concernées.
+- Fenêtres modales toujours centrées ; confirmation « Enregistré dans ce navigateur » après un
+  import.
+
 ### Phase 4 (deuxième partie) : sauvegarde et paramètres
 
 - Données conservées dans le navigateur (IndexedDB) et relues à la visite suivante ; option

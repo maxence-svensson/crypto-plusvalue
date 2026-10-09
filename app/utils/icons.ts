@@ -90,6 +90,9 @@ export const ICONS = {
     'M6 12a1 1 0 1 1-2 0 1 1 0 0 1 2 0',
   ],
   plus: ['M5 12h14', 'M12 5v14'],
+  chevron: ['m6 9 6 6 6-6'],
+  'chevron-left': ['m15 18-6-6 6-6'],
+  'chevron-right': ['m9 18 6-6-6-6'],
   search: ['M21 21l-4.34-4.34', 'M19 11a8 8 0 1 1-16 0 8 8 0 0 1 16 0'],
   undo: ['M9 14 4 9l5-5', 'M4 9h10.5a5.5 5.5 0 0 1 0 11H11'],
   pencil: [

@@ -38,6 +38,9 @@ Importez l'historique de vos plateformes, obtenez les montants à reporter, cess
 - **« Et si je vendais aujourd'hui ? »** : la plus-value et l'impôt d'une vente aux cours du
   moment, compte tenu des ventes déjà faites dans l'année et du seuil de 305 €. Fonctionne aussi
   sans fichier, à partir de trois montants.
+- **Une liste des opérations à corriger soi-même** : recherche, filtres (type, plateforme, crypto,
+  année, période, montant, points à vérifier), tri, ajout d'une opération absente des exports,
+  modification, suppression, annulation et journal des corrections, export CSV.
 - **Une application en plusieurs pages** (tableau de bord, transactions, fiscalité,
   simulateur, portefeuille, plateformes), avec une barre latérale sur ordinateur et une barre
   d'onglets sur téléphone.
