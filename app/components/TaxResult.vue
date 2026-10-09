@@ -126,6 +126,21 @@ async function download(kind: 'form' | 'dossier') {
 
       <template v-else>
         <div
+          v-if="store.quality.level === 'incomplet'"
+          class="flex gap-4 rounded-card bg-warning-tint px-5 py-5 text-sm sm:px-6"
+          role="alert"
+        >
+          <AppIcon name="alert" class="mt-0.5 text-loss" />
+          <div>
+            <p class="font-semibold text-loss">Résultat provisoire</p>
+            <p class="mt-1 max-w-prose">
+              Il manque des données dans votre historique : les montants ci-dessous ne sont pas
+              encore ceux à déclarer. Le diagnostic, plus haut, indique quoi compléter.
+            </p>
+          </div>
+        </div>
+
+        <div
           class="glass-strong grid gap-8 rounded-section p-6 sm:p-10 md:grid-cols-[auto_1fr] md:items-center md:gap-14"
         >
           <div>

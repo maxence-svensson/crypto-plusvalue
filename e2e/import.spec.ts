@@ -1,12 +1,16 @@
 import { readFileSync } from 'node:fs'
 
-import { expect, test } from './fixtures'
+import { accessibilityViolations, expect, test } from './fixtures'
 
 const EXAMPLE = 'public/exemples/trade-republic.csv'
 
-test('importe un export Trade Republic', async ({ page }) => {
+test('montre un aperçu, puis importe un export Trade Republic', async ({ page }) => {
   await page.goto('/')
   await page.setInputFiles('#fichier-import', EXAMPLE)
+  await expect(page.getByText('14 opérations crypto à importer')).toBeVisible()
+  await expect(page.getByText('Opérations du 02/01/2025 au 20/11/2025')).toBeVisible()
+  expect(await accessibilityViolations(page)).toEqual([])
+  await page.getByRole('button', { name: 'Importer', exact: true }).click()
   await expect(page.getByText('14 opérations crypto lues')).toBeVisible()
   await expect(page.getByRole('img', { name: 'Case 3AN : 362 €' })).toBeVisible()
 })
@@ -37,6 +41,8 @@ test('écarte une ligne illisible et importe les autres', async ({ page }) => {
     mimeType: 'text/csv',
     buffer: Buffer.from(text),
   })
+  await expect(page.getByText('1 ligne illisible écartée')).toBeVisible()
+  await page.getByRole('button', { name: 'Importer', exact: true }).click()
   await expect(page.getByText('13 opérations crypto lues')).toBeVisible()
   await page.getByText('1 ligne écartée').click()
   await expect(page.getByText(/« mille euros » n'est pas un nombre/)).toBeVisible()
@@ -57,9 +63,51 @@ test('importe un grand livre Kraken, plateforme marquée expérimentale', async 
     mimeType: 'text/csv',
     buffer: Buffer.from(ledger),
   })
+  await page.getByRole('button', { name: 'Importer', exact: true }).click()
   await expect(page.getByText('Kraken : 2 opérations crypto lues')).toBeVisible()
   // Une seule vente de 150 € : sous le seuil de 305 €, exonérée.
   await expect(
     page.getByText(/ne dépassent pas 305 € : elles sont exonérées/).first(),
   ).toBeVisible()
+})
+
+test('ignore un fichier déjà importé et fait trancher les doublons probables', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('button', { name: 'Essayer avec un exemple fictif' }).click()
+  await expect(page.getByRole('img', { name: 'Case 3AN : 362 €' })).toBeVisible()
+
+  // Le même fichier : rien de nouveau.
+  await page.setInputFiles('#fichier-import', EXAMPLE)
+  await expect(page.getByText('14 déjà importées, ignorées')).toBeVisible()
+  await expect(page.getByText('0 opération crypto à importer')).toBeVisible()
+  await page.getByRole('button', { name: 'Annuler' }).click()
+
+  // Les mêmes opérations sous d'autres identifiants : doublons probables, écartés par défaut.
+  const copy = readFileSync(EXAMPLE, 'utf8').replaceAll('exemple-0', 'copie-0')
+  await page.setInputFiles('#fichier-import', {
+    name: 'copie.csv',
+    mimeType: 'text/csv',
+    buffer: Buffer.from(copy),
+  })
+  await expect(page.getByText('14 doublons probables')).toBeVisible()
+  await page.getByRole('button', { name: 'Importer', exact: true }).click()
+  await expect(page.getByText(/14 déjà présentes ou en double/)).toBeVisible()
+  await expect(page.getByRole('img', { name: 'Case 3AN : 362 €' })).toBeVisible()
+})
+
+test('déclare provisoire un résultat dont il manque des achats', async ({ page }) => {
+  // Une vente sans l'achat correspondant.
+  const header = readFileSync(EXAMPLE, 'utf8').split('\n')[0]
+  const sale =
+    '"2025-06-10T10:00:00.000Z","2025-06-10","DEFAULT","TRADING","SELL","CRYPTO","Bitcoin","BTC","0.0040000000","100000","400.00","-1.00","","EUR","","","","Vente","seule-1","","","",""'
+  await page.goto('/')
+  await page.setInputFiles('#fichier-import', {
+    name: 'vente-seule.csv',
+    mimeType: 'text/csv',
+    buffer: Buffer.from(`${header}\n${sale}\n`),
+  })
+  await page.getByRole('button', { name: 'Importer', exact: true }).click()
+  await expect(page.locator('#diagnostic').locator('..').getByText('Incomplet')).toBeVisible()
+  await expect(page.getByText('Achats manquants')).toBeVisible()
+  await expect(page.getByText('Résultat provisoire')).toBeVisible()
 })

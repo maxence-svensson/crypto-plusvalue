@@ -4,6 +4,17 @@ Les changements notables, du plus récent au plus ancien. Chaque entrée renvoie
 
 ## 9 octobre 2026
 
+### Phase 3 (deuxième partie) : aperçu, doublons, transferts, diagnostic
+
+- Aperçu avant import : période, opérations à importer, déjà présentes, lignes ignorées ou
+  écartées ; rien n'entre dans le calcul sans « Importer ».
+- Doublons : même identifiant ignoré ; doublon probable (même opération, autre identifiant)
+  écarté par défaut, à confirmer par l'utilisateur.
+- Rapprochement des transferts entre plateformes ; envois et réceptions sans contrepartie
+  signalés.
+- Diagnostic des données (complet, à vérifier, incomplet) ; résultat déclaré « provisoire » tant
+  qu'il manque des achats.
+
 ### Phase 3 (première partie) : nouvelles plateformes
 
 - Imports Kraken (grand livre), Crypto.com (application) et Bitvavo, marqués « expérimental » :

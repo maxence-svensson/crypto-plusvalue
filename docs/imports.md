@@ -18,7 +18,38 @@ Règles communes :
 - encodages acceptés : UTF-8 avec ou sans BOM, UTF-16 (« texte Unicode » d'Excel) et
   Windows-1252 (CSV réenregistré par Excel sous Windows) ;
 - un classeur Excel, une archive ZIP ou un PDF est refusé avec une explication, de même qu'un
-  fichier de plus de 50 Mo.
+  fichier de plus de 50 Mo ;
+- **rien n'entre dans le calcul sans confirmation** : un aperçu montre la période, les
+  opérations à importer, celles déjà présentes et les lignes ignorées ou écartées.
+
+## Doublons
+
+- **Même identifiant** qu'une opération déjà importée : ignorée. Réimporter un fichier, ou deux
+  exports qui se chevauchent, n'ajoute rien.
+- **Doublon probable** : même type, mêmes actifs, mêmes quantités et même montant, à moins de deux
+  minutes d'écart, mais un autre identifiant (la même opération exportée par deux outils, ou un
+  export modifié). Écarté par défaut, l'utilisateur coche ceux qui sont réellement différents.
+  Deux achats identiques à des moments différents, comme un plan d'épargne, ne sont pas des
+  doublons (`shared/portfolio/duplicates.ts`).
+
+## Transferts et qualité des données
+
+Un envoi depuis une plateforme est rapproché de la réception de la même crypto sur une autre :
+même actif, réception jusqu'à 72 heures après l'envoi (ou une heure avant, pour les horloges), et
+au moins 95 % de la quantité envoyée (`shared/portfolio/transfers.ts`). Le calcul n'en dépend
+pas : un transfert entre portefeuilles du foyer est neutre. Mais un envoi ou une réception sans
+contrepartie signale un historique incomplet.
+
+Le **diagnostic** (`shared/portfolio/quality.ts`) range les points relevés en trois niveaux :
+
+| Niveau      | Exemples                                                                                                     | Effet                           |
+| ----------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------- |
+| bloquant    | achats manquants, cours introuvables                                                                         | résultat déclaré « provisoire » |
+| à vérifier  | réception ou envoi sans contrepartie, lignes non prises en charge ou illisibles, historique antérieur à 2019 | résultat affiché, points listés |
+| information | récompenses entrées à prix d'acquisition nul                                                                 | choix de calcul expliqué        |
+
+Le niveau global (complet, à vérifier, incomplet) mesure la complétude de l'historique ; ce n'est
+pas une garantie de conformité fiscale.
 
 ## Trade Republic
 

@@ -8,7 +8,7 @@ const busy = ref(false)
 async function add(files: FileList | null | undefined) {
   if (!files || files.length === 0) return
   busy.value = true
-  await store.importFiles(
+  await store.prepareImport(
     Array.from(files, (file) => ({
       name: file.name,
       size: file.size,
@@ -103,6 +103,8 @@ async function loadExample() {
       </button>
     </p>
 
+    <ImportPreview />
+
     <ul
       v-if="store.files.length > 0"
       class="solid-card divide-y divide-separator overflow-hidden rounded-card"
@@ -124,7 +126,12 @@ async function loadExample() {
               {{ file.transactions > 1 ? 'opérations crypto lues' : 'opération crypto lue' }},
               {{ file.skipped }}
               {{ file.skipped > 1 ? 'lignes ignorées' : 'ligne ignorée' }} (espèces, actions,
-              fonds).
+              fonds)<template v-if="file.duplicates > 0"
+                >, {{ file.duplicates }}
+                {{
+                  file.duplicates > 1 ? 'déjà présentes ou en double' : 'déjà présente ou en double'
+                }}</template
+              >.
             </p>
             <details
               v-if="file.anomalies.length > 0"

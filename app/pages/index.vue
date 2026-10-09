@@ -104,6 +104,7 @@ async function showExample() {
         <template v-if="hasData">
           <section v-reveal aria-labelledby="etape-verification" class="space-y-8">
             <StepHeading id="etape-verification" :step="2">Vérifiez votre portefeuille</StepHeading>
+            <DataQualityPanel />
             <PortfolioReview />
             <PricesPanel />
           </section>

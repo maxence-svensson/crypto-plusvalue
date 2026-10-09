@@ -16,6 +16,13 @@ test.beforeEach(async ({ page }) => {
   await expect(page.getByRole('img', { name: BOX_3AN }).last()).toBeVisible()
 })
 
+test('juge complet l’historique de l’exemple', async ({ page }) => {
+  const diagnostic = page.locator('section[aria-labelledby="diagnostic"]')
+  await expect(diagnostic.getByText('Complet', { exact: true })).toBeVisible()
+  await expect(diagnostic.getByText('Récompenses à prix d’acquisition nul')).toBeVisible()
+  await expect(page.getByText('Résultat provisoire')).toBeHidden()
+})
+
 test('calcule les montants à déclarer de l’exemple', async ({ page }) => {
   const result = page.locator('section[aria-labelledby="etape-resultat"]')
   await expect(result.getByText('+361,88 €').first()).toBeVisible()
