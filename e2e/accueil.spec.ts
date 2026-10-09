@@ -1,6 +1,4 @@
-import AxeBuilder from '@axe-core/playwright'
-
-import { expect, test } from './fixtures'
+import { accessibilityViolations, expect, test } from './fixtures'
 
 test('présente l’outil et propose d’importer ou d’essayer l’exemple', async ({ page }) => {
   await page.goto('/')
@@ -41,9 +39,7 @@ test('le menu mobile s’ouvre, se ferme avec Échap et rend le focus', async ({
 })
 
 test('l’accueil respecte les règles d’accessibilité automatisables', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.goto('/')
-  const results = await new AxeBuilder({ page })
-    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
-    .analyze()
-  expect(results.violations).toEqual([])
+  expect(await accessibilityViolations(page)).toEqual([])
 })

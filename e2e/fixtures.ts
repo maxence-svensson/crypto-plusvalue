@@ -1,4 +1,5 @@
-import { test as base, expect } from '@playwright/test'
+import AxeBuilder from '@axe-core/playwright'
+import { test as base, expect, type Page } from '@playwright/test'
 
 /**
  * Cours fixes, pour des résultats reproductibles. Les valeurs attendues des tests ont été
@@ -34,5 +35,25 @@ export const test = base.extend<{ mockPrices: undefined }>({
     { auto: true },
   ],
 })
+
+/**
+ * Vérifie les règles WCAG automatisables sur l'état final de la page : sans animation, sinon axe
+ * mesure le contraste d'un texte encore en train d'apparaître.
+ */
+export async function accessibilityViolations(page: Page) {
+  // Les animations sans fin (indicateur de chargement) ne se terminent jamais : on les ignore.
+  await page.evaluate(() =>
+    Promise.all(
+      document
+        .getAnimations()
+        .filter((animation) => animation.effect?.getTiming().iterations !== Infinity)
+        .map((animation) => animation.finished),
+    ),
+  )
+  const results = await new AxeBuilder({ page })
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
+    .analyze()
+  return results.violations
+}
 
 export { expect }

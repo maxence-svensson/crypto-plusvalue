@@ -1,7 +1,6 @@
-import AxeBuilder from '@axe-core/playwright'
 import type { Download } from '@playwright/test'
 
-import { expect, test } from './fixtures'
+import { accessibilityViolations, expect, test } from './fixtures'
 
 /** Valeurs calculées à part (e2e/README.md), avec les cours simulés. */
 const BOX_3AN = 'Case 3AN : 362 €'
@@ -63,8 +62,5 @@ test('retient les étapes cochées après un rechargement', async ({ page }) => 
 
 test('le résultat respecte les règles d’accessibilité automatisables', async ({ page }) => {
   await page.locator('#regime').getByText('11 %', { exact: true }).click()
-  const results = await new AxeBuilder({ page })
-    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
-    .analyze()
-  expect(results.violations).toEqual([])
+  expect(await accessibilityViolations(page)).toEqual([])
 })
