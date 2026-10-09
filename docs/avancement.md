@@ -2,7 +2,7 @@
 
 Ce fichier suit la transformation de CryptoPlusValue en plateforme complète de préparation de la
 fiscalité crypto. Il est mis à jour à chaque phase, pour pouvoir reprendre le travail à tout
-moment. Dernière mise à jour : 9 octobre 2026, après la phase 5 (première partie).
+moment. Dernière mise à jour : 9 octobre 2026, après la phase 5 (deuxième partie).
 
 ## 1. Diagnostic initial (9 octobre 2026)
 
@@ -78,7 +78,7 @@ CI est verte, puis vérifiées en production.
 | 2. Moteur fiscal versionné | Taux et barèmes par année vérifiés aux sources, option 3CN selon l'année, blocage des estimations sans règles connues                                                                        | fait (9 octobre)                                                          |
 | 3. Imports                 | Registre d'importeurs, aperçu et confirmation, doublons multicritères, qualité des données, cours groupés, lecture dans un Web Worker, nouvelles plateformes validées sur formats documentés | fait, sauf cours groupés et Web Worker (reportés en phase 6, performance) |
 | 4. Interface               | Navigation multi-pages, persistance IndexedDB, page des transactions (recherche, filtres, ajout, modification, suppression, annulation, journal), tableau de bord                            | fait (9 octobre)                                                          |
-| 5. Fonctions avancées      | Portefeuille et performances, scénarios comparés, rapports CSV et Excel, sauvegarde chiffrée, centre d'aide, glossaire, FAQ, pages de contenu, thème manuel, PWA                             | en cours : sauvegarde chiffrée et thème manuel faits                      |
+| 5. Fonctions avancées      | Portefeuille et performances, scénarios comparés, rapports CSV et Excel, sauvegarde chiffrée, centre d'aide, glossaire, FAQ, pages de contenu, thème manuel, PWA                             | en cours : sauvegarde chiffrée, rapports et thème manuel faits            |
 | 6. Sécurité et performance | CSP stricte, injection CSV, limites de taille, tests de charge, Lighthouse                                                                                                                   | à faire                                                                   |
 | 7. Validation finale       | Tests multi-navigateurs et multi-résolutions, documentation, rapport final                                                                                                                   | à faire                                                                   |
 
@@ -114,5 +114,5 @@ Statuts : TERMINÉ ET TESTÉ, TERMINÉ MAIS NON TESTÉ, PARTIEL, BLOQUÉ, NON IM
 | Gestion des transactions            | TERMINÉ ET TESTÉ                | oui                                          | non                    | oui          | recherche, filtres, tri, pagination, saisie, corrections, annulation, journal |
 | Tableau de bord                     | TERMINÉ ET TESTÉ                | oui (agrégats, graduations)                  | non                    | oui          | chiffres clés, diagnostic, quatre graphiques, période au choix                |
 | Sauvegarde chiffrée                 | TERMINÉ ET TESTÉ                | oui (chiffrement, falsification, validation) | non                    | oui          | PBKDF2 600 000 itérations, AES-GCM 256 ; restauration vérifiée                |
-| Rapports CSV et Excel               | PARTIEL                         | oui (CSV)                                    | non                    | oui (CSV)    | liste des opérations en CSV, formules neutralisées ; Excel à venir            |
+| Rapports CSV et Excel               | TERMINÉ ET TESTÉ                | oui (ZIP, XLSX, rapports)                    | oui (openpyxl)         | oui          | classeur comptable, cessions, points à vérifier, liste des opérations         |
 | Tests de bout en bout               | TERMINÉ ET TESTÉ                |                                              |                        | oui          | 5 projets en CI, axe-core ; en-têtes de sécurité vérifiés avec curl           |
