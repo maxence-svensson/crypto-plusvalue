@@ -22,6 +22,9 @@ Importez l'historique de vos plateformes, obtenez les montants à reporter, cess
 - **Le formulaire 2086 officiel, rempli, en PDF** : toutes les cases calculées, généré dans le
   navigateur ([`docs/formulaire-2086.md`](docs/formulaire-2086.md)), avec les cases 3AN / 3BN de
   la 2042 C et le seuil de 305 €.
+- **Un dossier justificatif en PDF**, à garder en cas de contrôle : la valeur du portefeuille
+  actif par actif, le calcul de chaque cession, les acquisitions, les cours et leurs sources,
+  l'historique ([`docs/dossier-justificatif.md`](docs/dossier-justificatif.md)).
 - **Prélèvement forfaitaire ou barème** : la comparaison des deux selon votre tranche
   d'imposition (ou votre revenu et vos parts), et s'il faut cocher la case 3CN.
 - **« Et si je vendais aujourd'hui ? »** : la plus-value et l'impôt d'une vente aux cours du
@@ -32,6 +35,8 @@ Importez l'historique de vos plateformes, obtenez les montants à reporter, cess
 ![Le résultat : case 3AN, lignes 224 et 51, puis le formulaire 2086 colonne par colonne](docs/captures/resultat.jpg)
 
 ![Le formulaire 2086 officiel, rempli par le site avec l'exemple fictif](docs/captures/formulaire-2086.jpg)
+
+![Le dossier justificatif : une cession détaillée, du portefeuille au calcul](docs/captures/dossier-justificatif.jpg)
 
 ![Le simulateur : part de BTC à vendre au curseur, plus-value et impôt estimés](docs/captures/simulateur.jpg)
 

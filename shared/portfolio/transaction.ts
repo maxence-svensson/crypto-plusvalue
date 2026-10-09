@@ -84,6 +84,17 @@ export type TransferOut = Base & {
 
 export type Transaction = Buy | Sell | Payment | Swap | Reward | TransferIn | TransferOut
 
+/** Libellés français des types d'opération, à l'écran comme dans le dossier justificatif. */
+export const TRANSACTION_LABELS: Record<Transaction['type'], string> = {
+  buy: 'Achat',
+  sell: 'Vente',
+  payment: 'Paiement en crypto',
+  swap: 'Échange',
+  reward: 'Récompense',
+  'transfer-in': 'Réception',
+  'transfer-out': 'Envoi',
+}
+
 /** Cessions imposables : la contrepartie n'est pas un actif numérique. */
 export type TaxableTransaction = Sell | Payment
 

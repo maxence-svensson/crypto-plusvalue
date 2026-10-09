@@ -10,15 +10,5 @@ export async function downloadForm2086(summary: YearSummary) {
     import('#shared/cerfa/fill'),
     $fetch<ArrayBuffer>(FORM_2086.path, { responseType: 'arrayBuffer' }),
   ])
-  const bytes = await fillForm2086(template, summary)
-
-  const url = URL.createObjectURL(
-    new Blob([bytes as Uint8Array<ArrayBuffer>], { type: 'application/pdf' }),
-  )
-  const link = document.createElement('a')
-  link.href = url
-  link.download = `formulaire-2086-revenus-${summary.year}.pdf`
-  link.click()
-  // Laisse au navigateur le temps de lancer le téléchargement.
-  setTimeout(() => URL.revokeObjectURL(url), 10_000)
+  saveFile(await fillForm2086(template, summary), `formulaire-2086-revenus-${summary.year}.pdf`)
 }

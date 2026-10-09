@@ -16,19 +16,23 @@ const year = computed(() => chosenYear.value ?? defaultYear.value)
 const summary = computed(() => (year.value === undefined ? undefined : store.summary(year.value)))
 const isLoss = computed(() => (summary.value?.box3BN ?? 0) > 0)
 
-const downloading = ref(false)
+const downloading = ref<'form' | 'dossier'>()
 const downloadError = ref('')
 
-async function download() {
+async function download(kind: 'form' | 'dossier') {
   if (!summary.value) return
-  downloading.value = true
+  downloading.value = kind
   downloadError.value = ''
   try {
-    await downloadForm2086(summary.value)
+    if (kind === 'form') await downloadForm2086(summary.value)
+    else await downloadDossier(summary.value.year)
   } catch {
-    downloadError.value = 'Le formulaire n’a pas pu être préparé. Réessayez dans un instant.'
+    downloadError.value =
+      kind === 'form'
+        ? 'Le formulaire n’a pas pu être préparé. Réessayez dans un instant.'
+        : 'Le dossier n’a pas pu être préparé. Réessayez dans un instant.'
   } finally {
-    downloading.value = false
+    downloading.value = undefined
   }
 }
 </script>
@@ -137,42 +141,78 @@ async function download() {
 
         <div>
           <h3 class="headline text-2xl">Le formulaire 2086, cession par cession</h3>
-          <div
-            v-if="hasForm2086(year)"
-            class="glass mt-5 flex flex-col gap-5 rounded-card p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6"
-          >
-            <div class="flex gap-4">
-              <span
-                class="flex size-12 shrink-0 items-center justify-center rounded-control bg-accent-tint text-link"
-              >
-                <AppIcon name="file" class="size-6" />
-              </span>
-              <p class="max-w-prose text-sm text-muted">
-                <span class="block font-semibold text-label"
-                  >Le formulaire officiel, déjà rempli.</span
-                >
-                Toutes les cases calculées sont complétées, en euros entiers. Il reste à ajouter vos
-                nom et adresse, à vérifier, puis à le joindre à votre déclaration.
-              </p>
-            </div>
-            <button
-              type="button"
-              class="btn btn-primary shrink-0"
-              :disabled="downloading"
-              @click="download"
-            >
-              <span v-if="downloading" class="spinner" aria-hidden="true"></span>
-              <AppIcon v-else name="download" />
-              {{ downloading ? 'Préparation du formulaire…' : 'Télécharger le 2086 rempli' }}
-            </button>
-          </div>
-          <p v-else class="mt-3 max-w-prose text-sm text-muted">
+          <p v-if="!hasForm2086(year)" class="mt-3 max-w-prose text-sm text-muted">
             {{
               year > FORM_2086.year
                 ? `L'administration n'a pas encore publié le formulaire 2086 des revenus ${year} : recopiez les montants ci-dessous quand il sera disponible.`
                 : `Le formulaire rempli n'est proposé que pour les revenus ${FORM_2086.year} : recopiez les montants ci-dessous.`
             }}
           </p>
+          <div class="mt-5 grid gap-4 lg:grid-cols-2">
+            <div
+              v-if="hasForm2086(year)"
+              class="glass flex flex-col items-start gap-5 rounded-card p-5 sm:p-6"
+            >
+              <div class="flex gap-4">
+                <span
+                  class="flex size-12 shrink-0 items-center justify-center rounded-control bg-accent-tint text-link"
+                >
+                  <AppIcon name="file" class="size-6" />
+                </span>
+                <p class="text-sm text-muted">
+                  <span class="block font-semibold text-label"
+                    >Le formulaire officiel, déjà rempli.</span
+                  >
+                  Toutes les cases calculées sont complétées, en euros entiers. Il reste à ajouter
+                  vos nom et adresse, à vérifier, puis à le joindre à votre déclaration.
+                </p>
+              </div>
+              <button
+                type="button"
+                class="btn btn-primary mt-auto"
+                :disabled="downloading === 'form'"
+                @click="download('form')"
+              >
+                <span v-if="downloading === 'form'" class="spinner" aria-hidden="true"></span>
+                <AppIcon v-else name="download" />
+                {{
+                  downloading === 'form'
+                    ? 'Préparation du formulaire…'
+                    : 'Télécharger le 2086 rempli'
+                }}
+              </button>
+            </div>
+            <div class="glass flex flex-col items-start gap-5 rounded-card p-5 sm:p-6">
+              <div class="flex gap-4">
+                <span
+                  class="flex size-12 shrink-0 items-center justify-center rounded-control bg-accent-tint text-link"
+                >
+                  <AppIcon name="folder" class="size-6" />
+                </span>
+                <p class="text-sm text-muted">
+                  <span class="block font-semibold text-label"
+                    >Le dossier justificatif, à conserver.</span
+                  >
+                  Le détail de chaque cession, les cours retenus et leurs sources, et l'historique
+                  de vos opérations : de quoi refaire le calcul en cas de contrôle.
+                </p>
+              </div>
+              <button
+                type="button"
+                class="btn btn-secondary mt-auto"
+                :disabled="downloading === 'dossier'"
+                @click="download('dossier')"
+              >
+                <span v-if="downloading === 'dossier'" class="spinner" aria-hidden="true"></span>
+                <AppIcon v-else name="download" />
+                {{
+                  downloading === 'dossier'
+                    ? 'Préparation du dossier…'
+                    : 'Télécharger le dossier justificatif'
+                }}
+              </button>
+            </div>
+          </div>
           <p v-if="downloadError" class="mt-3 text-sm text-loss" role="alert">
             {{ downloadError }}
           </p>

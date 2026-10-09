@@ -1,4 +1,3 @@
-import type { Transaction } from '#shared/portfolio/transaction'
 import type { Dec } from '#shared/tax/decimal'
 
 const euros = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' })
@@ -48,14 +47,4 @@ export function formatDateTime(date: Date): string {
 /** 14/08/2025, heure de Paris. */
 export function formatDay(date: Date): string {
   return days.format(date)
-}
-
-export const TRANSACTION_LABELS: Record<Transaction['type'], string> = {
-  buy: 'Achat',
-  sell: 'Vente',
-  payment: 'Paiement en crypto',
-  swap: 'Échange',
-  reward: 'Récompense',
-  'transfer-in': 'Réception',
-  'transfer-out': 'Envoi',
 }
