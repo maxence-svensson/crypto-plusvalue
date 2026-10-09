@@ -13,7 +13,8 @@
     "format:check": "prettier --check .",
     "typecheck": "nuxt typecheck",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "captures": "node scripts/captures.mjs"
   },
   "dependencies": {
     "@fontsource-variable/archivo": "^5.3.0",

@@ -9,6 +9,12 @@ function chooseFiles() {
   document.getElementById('fichier-import')?.click()
 }
 
+// https://crypto-plusvalue.vercel.app/?exemple ouvre directement le résultat de l'exemple.
+const route = useRoute()
+onMounted(() => {
+  if ('exemple' in route.query) showExample()
+})
+
 async function showExample() {
   loadingExample.value = true
   await store.loadExample()
