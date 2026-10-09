@@ -13,8 +13,10 @@ Importez l'historique de vos plateformes, obtenez les montants à reporter, cess
 
 ## Fonctionnalités
 
-- **Import des historiques** Trade Republic et Coinbase, reconnus automatiquement : seules les
-  opérations crypto sont lues, le reste (espèces, actions, fonds) est ignoré.
+- **Import des historiques** Trade Republic et Coinbase, ainsi que Kraken, Crypto.com et Bitvavo
+  en version expérimentale, reconnus automatiquement : seules les opérations crypto sont lues, le
+  reste (espèces, actions, fonds) est ignoré, et une ligne illisible est signalée sans bloquer
+  les autres.
 - **Reconstitution du portefeuille** à chaque vente, avec une alerte quand l'historique est
   incomplet (achats faits sur une autre plateforme).
 - **Cours historiques à la minute** pour la valeur globale du portefeuille, avec leur source

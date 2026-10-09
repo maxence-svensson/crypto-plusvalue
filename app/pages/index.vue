@@ -47,8 +47,9 @@ async function showExample() {
           class="enter mx-auto mt-8 max-w-2xl text-lg text-pretty text-muted sm:text-xl"
           style="--delay: 80ms"
         >
-          Déposez votre export Trade Republic ou Coinbase. Le calcul suit la méthode officielle, et
-          votre fichier ne quitte pas votre navigateur.
+          Déposez les exports de vos plateformes : Trade Republic, Coinbase, Kraken, Crypto.com,
+          Bitvavo. Le calcul suit la méthode officielle, et vos fichiers ne quittent pas votre
+          navigateur.
         </p>
         <div class="enter mt-10 flex flex-wrap justify-center gap-3" style="--delay: 160ms">
           <button type="button" class="btn btn-primary" @click="chooseFiles">

@@ -28,6 +28,25 @@ describe('importFile', () => {
     expect(importFile(text).platform).toBe('coinbase')
   })
 
+  it('reconnaît Kraken, Crypto.com et Bitvavo d’après leur en-tête', () => {
+    const kraken =
+      '"txid","refid","time","type","subtype","aclass","asset","amount","fee","balance"\n'
+    const cryptoCom =
+      '\uFEFFTimestamp (UTC),Transaction Description,Currency,Amount,To Currency,To Amount,Native Currency,Native Amount,Native Amount (in USD),Transaction Kind\n'
+    const bitvavo =
+      'Timezone,Date,Time,Type,Currency,Amount,Quote Currency,Quote Price,Received / Paid Currency,Received / Paid Amount,Fee currency,Fee amount,Status,Transaction ID,Address\n'
+
+    expect(importFile(kraken).platform).toBe('kraken')
+    expect(importFile(cryptoCom).platform).toBe('crypto-com')
+    expect(importFile(bitvavo).platform).toBe('bitvavo')
+  })
+
+  it('refuse un autre fichier en citant les plateformes prises en charge', () => {
+    expect(() => importFile('Date,Libellé,Montant\n2025-01-01,Café,-2.50\n')).toThrow(
+      'Trade Republic, Coinbase, Kraken, Crypto.com ou Bitvavo',
+    )
+  })
+
   it('refuse un autre fichier', () => {
     expect(() => importFile('Date,Libellé,Montant\n2025-01-01,Café,-2.50\n')).toThrow(ImportError)
   })
