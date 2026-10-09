@@ -4,6 +4,14 @@ Les changements notables, du plus récent au plus ancien. Chaque entrée renvoie
 
 ## 9 octobre 2026
 
+### Phase 2 : règles fiscales versionnées par année
+
+- Taux par année de revenus : 30 % jusqu'en 2024, 31,4 % depuis 2025 (CSG à 10,6 %, LFSS 2026) ;
+  option pour le barème (3CN) depuis 2023 ; barèmes 2023, 2024 et 2025. Aucune estimation pour
+  une année sans règles connues (avant 2019, après 2026).
+- Impôt estimé de l'année dans le résultat ; comparaison des régimes, simulateur et étapes
+  adaptés à l'année ; avertissements pour un historique antérieur à 2019.
+
 ### Phase 1 : stabilisation
 
 - Import ligne par ligne : une ligne illisible est écartée et signalée, les autres sont

@@ -14,5 +14,6 @@ attendus ont été calculés à part, avec un script Python indépendant du mote
 | ETH, 14/08/2025 | 2 670,17 € | 2 102,00 € | +315,46 €  |
 | BTC, 20/11/2025 | 1 096,93 € | 931,24 €   | +46,43 €   |
 
-Ligne 224 : +361,88 € ; ligne 51 : 1 799,20 € ; case 3AN : 362 €. À la tranche de 11 % : prélèvement
+Ligne 224 : +361,88 € ; ligne 51 : 1 799,20 € ; case 3AN : 362 € ; impôt estimé au prélèvement
+forfaitaire des revenus 2025 : 46,32 € + 67,31 € = 113,63 €. À la tranche de 11 % : prélèvement
 forfaitaire 113,63 €, barème 107,12 €, écart 6,51 €.
