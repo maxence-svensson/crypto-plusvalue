@@ -106,6 +106,8 @@ async function clearAll() {
       />
     </section>
 
+    <BackupPanel />
+
     <section aria-labelledby="confidentialite" class="glass space-y-3 rounded-card p-5 sm:p-6">
       <h2 id="confidentialite" class="text-lg font-semibold tracking-tight">
         Ce qui transite par le réseau

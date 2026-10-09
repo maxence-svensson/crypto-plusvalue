@@ -38,6 +38,8 @@ Importez l'historique de vos plateformes, obtenez les montants à reporter, cess
 - **« Et si je vendais aujourd'hui ? »** : la plus-value et l'impôt d'une vente aux cours du
   moment, compte tenu des ventes déjà faites dans l'année et du seuil de 305 €. Fonctionne aussi
   sans fichier, à partir de trois montants.
+- **Une sauvegarde chiffrée** (AES-256, mot de passe) pour garder ses données hors du navigateur
+  ou les retrouver sur un autre appareil ; chiffrement et déchiffrement dans le navigateur.
 - **Un tableau de bord avec graphiques** : plus ou moins-value nette par année, achats et ventes
   par mois ou par année, achats par crypto, volume par plateforme ; période au choix, infobulles
   au clavier, vue tableau.
