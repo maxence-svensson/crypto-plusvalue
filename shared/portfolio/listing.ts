@@ -1,6 +1,7 @@
 import { PLATFORM_NAMES } from '../importers/detect'
 import { taxYear } from '../tax/form2086'
 import type { Dec } from '../tax/decimal'
+import { toCsv, type ReportTable } from '../reports/table'
 import { parisTimestamp } from '../time'
 import { parseDecimal } from './manual'
 import { PROBLEMS, type ProblemId } from './problems'
@@ -153,18 +154,6 @@ export function sortTransactions(
   return [...list].sort((a, b) => compare(a, b) || byDate(a, b))
 }
 
-/** Nombre au format français, sans arrondi ni notation scientifique : « 0,0015 ». */
-const number = (value: Dec | undefined) => (value ? value.toFixed().replace('.', ',') : '')
-
-/**
- * Cellule CSV : entre guillemets si besoin. Un libellé importé qui commence par =, +, - ou @
- * serait pris pour une formule par un tableur : il est neutralisé par une apostrophe.
- */
-function cell(value: string): string {
-  const safe = /^[=+\-@\t\r]/.test(value) ? `'${value}` : value
-  return /[;"\n\r]/.test(safe) ? `"${safe.replaceAll('"', '""')}"` : safe
-}
-
 const CSV_COLUMNS = [
   'Date (Paris)',
   'Date (UTC)',
@@ -182,36 +171,47 @@ const CSV_COLUMNS = [
   'Points à vérifier',
 ]
 
-/**
- * La liste au format CSV pour un tableur français : point-virgule, virgule décimale, UTF-8 avec
- * marque d'ordre des octets pour qu'Excel lise les accents.
- */
+/** La liste des opérations, en tableau de rapport (CSV ou feuille Excel). */
+export function transactionsTable(
+  list: readonly Transaction[],
+  problems: ReadonlyMap<string, readonly ProblemId[]> = new Map(),
+): ReportTable {
+  const amount = (value: Dec | undefined) => (value ? { euros: value } : null)
+  const quantity = (value: Dec | undefined) => (value ? { quantity: value } : null)
+  return {
+    name: 'Opérations',
+    columns: CSV_COLUMNS,
+    widths: [20, 25, 18, 16, 12, 14, 12, 14, 12, 10, 16, 40, 30, 30],
+    rows: list.map((transaction) => {
+      const sent = 'sent' in transaction ? transaction.sent : undefined
+      const received = 'received' in transaction ? transaction.received : undefined
+      const networkFee = transaction.type === 'transfer-out' ? transaction.fee : undefined
+      return [
+        { date: transaction.date },
+        transaction.date.toISOString(),
+        TRANSACTION_LABELS[transaction.type],
+        SOURCE_NAMES[transaction.source],
+        sent?.asset ?? null,
+        quantity(sent?.quantity),
+        received?.asset ?? null,
+        quantity(received?.quantity),
+        amount(eurosOf(transaction)),
+        'feeEur' in transaction ? amount(transaction.feeEur) : null,
+        networkFee
+          ? `${networkFee.quantity.toFixed().replace('.', ',')} ${networkFee.asset}`
+          : null,
+        transaction.label,
+        transaction.id,
+        (problems.get(transaction.id) ?? []).map((id) => PROBLEMS[id].title).join(', '),
+      ]
+    }),
+  }
+}
+
+/** La liste au format CSV pour un tableur français. */
 export function transactionsCsv(
   list: readonly Transaction[],
   problems: ReadonlyMap<string, readonly ProblemId[]> = new Map(),
 ): string {
-  const rows = list.map((transaction) => {
-    const sent = 'sent' in transaction ? transaction.sent : undefined
-    const received = 'received' in transaction ? transaction.received : undefined
-    const networkFee = transaction.type === 'transfer-out' ? transaction.fee : undefined
-    return [
-      parisTimestamp(transaction.date),
-      transaction.date.toISOString(),
-      TRANSACTION_LABELS[transaction.type],
-      SOURCE_NAMES[transaction.source],
-      sent?.asset ?? '',
-      number(sent?.quantity),
-      received?.asset ?? '',
-      number(received?.quantity),
-      number(eurosOf(transaction)),
-      'feeEur' in transaction ? number(transaction.feeEur) : '',
-      networkFee ? `${number(networkFee.quantity)} ${networkFee.asset}` : '',
-      transaction.label,
-      transaction.id,
-      (problems.get(transaction.id) ?? []).map((id) => PROBLEMS[id].title).join(', '),
-    ]
-      .map(cell)
-      .join(';')
-  })
-  return '\uFEFF' + [CSV_COLUMNS.map(cell).join(';'), ...rows].join('\r\n') + '\r\n'
+  return toCsv(transactionsTable(list, problems))
 }
