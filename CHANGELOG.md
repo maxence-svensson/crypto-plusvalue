@@ -4,6 +4,11 @@ Les changements notables, du plus récent au plus ancien. Chaque entrée renvoie
 
 ## 9 octobre 2026
 
+### Navigation en haut sur ordinateur
+
+- La barre latérale laisse place à une barre de navigation en haut, en verre, alignée sur le
+  contenu : sections en libellés, paramètres en icône. Sur téléphone, les onglets restent en bas.
+
 ### Phase 5 (deuxième partie) : rapports
 
 - Classeur Excel pour le comptable (résumé, cessions de l'année, opérations, points à vérifier),

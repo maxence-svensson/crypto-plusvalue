@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
- * Mise en page de toutes les pages : barre latérale sur ordinateur, barre d'onglets sur
- * téléphone. `?exemple` ouvre n'importe quelle page en mode démonstration ; sinon, les données
+ * Mise en page de toutes les pages : barre de navigation en haut sur ordinateur, barre
+ * d'onglets en bas sur téléphone. `?exemple` ouvre n'importe quelle page en mode démonstration ; sinon, les données
  * enregistrées dans ce navigateur sont relues, une fois la page affichée (avant, elles
  * différeraient de la page rendue par le serveur).
  */
@@ -28,16 +28,13 @@ onMounted(() => {
       Aller au contenu
     </a>
 
-    <AppSidebar />
     <AppTopBar />
 
-    <div class="lg:pl-64">
-      <main id="contenu" class="mx-auto max-w-[72rem] px-5 pt-6 pb-36 sm:px-8 lg:pt-10 lg:pb-16">
-        <DemoBanner />
-        <slot />
-      </main>
-      <AppFooter />
-    </div>
+    <main id="contenu" class="mx-auto max-w-[72rem] px-5 pt-6 pb-36 sm:px-8 lg:pt-10 lg:pb-16">
+      <DemoBanner />
+      <slot />
+    </main>
+    <AppFooter />
 
     <AppTabBar />
   </div>

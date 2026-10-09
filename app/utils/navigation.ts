@@ -1,4 +1,4 @@
-/** Une section de l'application, dans la barre latérale et la barre d'onglets. */
+/** Une section de l'application, dans la barre du haut et la barre d'onglets. */
 export type NavItem = {
   to: string
   label: string
@@ -19,7 +19,7 @@ export const NAVIGATION: readonly NavItem[] = [
   { to: '/parametres', label: 'Paramètres', icon: 'settings' },
 ]
 
-/** Liens vers la documentation du dépôt, en bas de la navigation. */
+/** Liens vers la documentation du dépôt, dans le menu « Plus » du téléphone. */
 export const EXTERNAL_LINKS = [
   { href: docUrl('regles-fiscales'), label: 'Méthode et sources' },
   { href: REPOSITORY, label: 'Code source' },
