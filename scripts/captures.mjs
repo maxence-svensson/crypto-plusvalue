@@ -71,16 +71,25 @@ const evaluate = async (expression) =>
   (await send('Runtime.evaluate', { expression, awaitPromise: true, returnByValue: true })).result
     .value
 
-async function open(path, { width, height, scale, wait }) {
+async function open(path, { width, height, scale, wait, theme = 'light' }) {
   await send('Emulation.setDeviceMetricsOverride', {
     width,
     height,
     deviceScaleFactor: scale,
     mobile: width < 600,
   })
+  await send('Emulation.setEmulatedMedia', {
+    features: [{ name: 'prefers-color-scheme', value: theme }],
+  })
   await send('Page.navigate', { url: BASE + path })
   // Laisse charger l'exemple, récupérer les cours et finir l'animation de la case.
   await sleep(wait)
+}
+
+/** Fait défiler jusqu'à un bloc, pour qu'il finisse d'apparaître (directive v-reveal). */
+async function reach(selector) {
+  await evaluate(`document.querySelector(${JSON.stringify(selector)}).scrollIntoView()`)
+  await sleep(1200)
 }
 
 /** Rectangle d'un élément dans la page, avec une marge autour. */
@@ -105,10 +114,15 @@ async function capture(name, clip) {
 await mkdir(OUT, { recursive: true })
 await send('Page.enable')
 
-await open('/', { width: 1280, height: 800, scale: 2, wait: 3000 })
+await open('/', { width: 1280, height: 800, scale: 2, wait: 3500 })
 await capture('accueil')
 
-await open('/?exemple', { width: 1280, height: 800, scale: 2, wait: 10000 })
+// Fenêtre haute : les halos du fond sont fixes et ne couvrent que la fenêtre, une capture
+// au-delà laisserait une coupure.
+await open('/?exemple', { width: 1280, height: 2500, scale: 2, wait: 10000 })
+// Tranche à 11 % : la comparaison des deux régimes s'affiche.
+await evaluate(`document.querySelector('input[name="tranche"][value="0.11"]').click()`)
+await sleep(800)
 await capture('resultat', await areaOf('section[aria-labelledby="etape-resultat"]'))
 
 await evaluate(`(() => {
@@ -116,11 +130,15 @@ await evaluate(`(() => {
   slider.value = 60
   slider.dispatchEvent(new Event('input', { bubbles: true }))
 })()`)
+await reach('#simulation')
 await sleep(800)
 await capture('simulateur', await areaOf('#simulation > div', 0))
 
-await open('/', { width: 390, height: 844, scale: 3, wait: 3000 })
+await open('/', { width: 390, height: 844, scale: 3, wait: 3500 })
 await capture('mobile')
+
+await open('/?exemple', { width: 1280, height: 800, scale: 2, wait: 10000, theme: 'dark' })
+await capture('sombre')
 
 socket.close()
 const exited = new Promise((resolve) => browser.once('exit', resolve))

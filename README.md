@@ -35,6 +35,8 @@ Importez l'historique de vos plateformes, obtenez les montants à reporter, cess
 
 ![Le simulateur : part de BTC à vendre au curseur, plus-value et impôt estimés](docs/captures/simulateur.jpg)
 
+![Le mode sombre, qui suit le réglage du système](docs/captures/sombre.jpg)
+
 <p align="center">
   <img src="docs/captures/mobile.jpg" alt="L'accueil sur mobile" width="320">
 </p>
@@ -48,14 +50,16 @@ Importez l'historique de vos plateformes, obtenez les montants à reporter, cess
   [`docs/regles-fiscales.md`](docs/regles-fiscales.md).
 - **Imports vérifiés sur de vrais fichiers** : Trade Republic sur deux exports réels, Coinbase sur
   des exemples publics. Formats et limites dans [`docs/imports.md`](docs/imports.md).
-- **Un design tiré du formulaire lui-même** : cases en peigne, champs bleutés et surligneur ; choix et contrastes dans [`docs/design.md`](docs/design.md).
+- **Une interface inspirée d'iOS** : verre dépoli, mode sombre, animations courtes, et deux
+  repères du formulaire papier (cases en peigne et surligneur) ; choix et contrastes dans
+  [`docs/design.md`](docs/design.md).
 
 ## Stack
 
 | Domaine     | Outils                                                       |
 | ----------- | ------------------------------------------------------------ |
 | Framework   | Nuxt 4, Vue 3, TypeScript strict, Pinia                      |
-| Interface   | Tailwind CSS 4, Archivo variable (hébergée par le site)      |
+| Interface   | Tailwind CSS 4, polices du système, mode sombre automatique  |
 | Calcul      | decimal.js (décimal exact, aucun nombre à virgule flottante) |
 | PDF         | pdf-lib, chargé seulement au téléchargement du formulaire    |
 | Serveur     | Routes Nitro : cours Binance et Coinbase Exchange, cache CDN |

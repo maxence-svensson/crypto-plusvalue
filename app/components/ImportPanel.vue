@@ -34,8 +34,8 @@ async function loadExample() {
 <template>
   <div class="space-y-5">
     <label
-      class="flex cursor-pointer flex-col items-start gap-1 rounded-md border-[1.5px] border-dashed px-6 py-8 transition-colors focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-ink sm:px-8"
-      :class="dragging ? 'border-ink bg-highlight' : 'border-ink-soft bg-field hover:border-ink'"
+      class="glass lift block cursor-pointer rounded-card p-2 transition-[transform,scale,box-shadow] duration-300 ease-ios focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-accent"
+      :class="dragging ? 'scale-[1.01]' : ''"
       @dragover.prevent="dragging = true"
       @dragleave="dragging = false"
       @drop.prevent="onDrop"
@@ -48,31 +48,38 @@ async function loadExample() {
         class="sr-only"
         @change="onChange"
       />
-      <span class="display text-lg">Déposez vos fichiers CSV ici</span>
-      <span class="text-ink-soft">
-        ou
-        <span class="font-semibold text-ink underline underline-offset-4"
-          >parcourez vos fichiers</span
-        >
-      </span>
-      <span class="mt-4 grid gap-1 text-sm text-ink-soft sm:grid-cols-2 sm:gap-6">
+      <span
+        class="flex flex-col items-center gap-1 rounded-[22px] border-[1.5px] border-dashed px-6 py-10 text-center transition-colors duration-300 ease-ios sm:py-12"
+        :class="dragging ? 'border-accent bg-accent-tint' : 'border-separator'"
+      >
         <span
-          ><strong class="font-semibold text-ink">Trade Republic</strong> : Profil, Relevés, Export
-          de transactions.</span
+          class="mb-3 flex size-14 items-center justify-center rounded-[18px] bg-accent-tint text-link"
         >
-        <span
-          ><strong class="font-semibold text-ink">Coinbase</strong> : Relevés, Générer un relevé,
-          format CSV.</span
-        >
+          <AppIcon name="upload" class="size-7" />
+        </span>
+        <span class="headline text-xl">Déposez vos fichiers CSV ici</span>
+        <span class="text-muted">
+          ou <span class="font-semibold text-link">parcourez vos fichiers</span>
+        </span>
+        <span class="mt-6 grid w-full max-w-2xl gap-2 text-left text-sm sm:grid-cols-2">
+          <span class="rounded-control bg-field px-4 py-3 text-muted"
+            ><strong class="font-semibold text-label">Trade Republic</strong> : Profil, Relevés,
+            Export de transactions.</span
+          >
+          <span class="rounded-control bg-field px-4 py-3 text-muted"
+            ><strong class="font-semibold text-label">Coinbase</strong> : Relevés, Générer un
+            relevé, format CSV.</span
+          >
+        </span>
       </span>
     </label>
 
-    <p class="text-sm text-ink-soft">
+    <p class="text-sm text-muted">
       Importez l'historique complet, depuis l'ouverture de chaque compte. Pas de fichier sous la
       main ?
       <button
         type="button"
-        class="font-semibold text-ink underline underline-offset-4 disabled:opacity-60"
+        class="btn btn-ghost min-h-8 px-1.5 text-sm"
         :disabled="busy"
         @click="loadExample"
       >
@@ -82,37 +89,50 @@ async function loadExample() {
 
     <ul
       v-if="store.files.length > 0"
-      class="divide-y divide-rule border-y border-rule"
+      class="solid-card divide-y divide-separator overflow-hidden rounded-card"
       aria-live="polite"
     >
-      <li v-for="(file, index) in store.files" :key="index" class="py-3 text-sm">
-        <p class="font-semibold break-all">{{ file.name }}</p>
-        <p v-if="'error' in file" class="mt-1 text-loss">{{ file.error }}</p>
-        <template v-else>
-          <p class="mt-1 text-ink-soft">
-            {{ PLATFORM_NAMES[file.platform] }} : {{ file.transactions }}
-            {{ file.transactions > 1 ? 'opérations crypto lues' : 'opération crypto lue' }},
-            {{ file.skipped }}
-            {{ file.skipped > 1 ? 'lignes ignorées' : 'ligne ignorée' }} (espèces, actions, fonds).
-          </p>
-          <details
-            v-if="file.unsupported.length > 0"
-            class="mt-2 rounded-md bg-warning-soft px-3 py-2 text-warning"
-          >
-            <summary class="cursor-pointer font-semibold">
-              {{ file.unsupported.length }} {{ file.unsupported.length > 1 ? 'lignes' : 'ligne' }} à
-              vérifier : leur type n'est pas encore pris en charge
-            </summary>
-            <ul class="mt-2 space-y-1">
-              <li v-for="item in file.unsupported" :key="item.line">
-                Ligne {{ item.line }} : {{ item.label }}
-              </li>
-            </ul>
-          </details>
-        </template>
+      <li v-for="(file, index) in store.files" :key="index" class="flex gap-4 px-5 py-4 text-sm">
+        <span
+          class="flex size-10 shrink-0 items-center justify-center rounded-chip"
+          :class="'error' in file ? 'bg-warning-tint text-warning' : 'bg-accent-tint text-link'"
+        >
+          <AppIcon :name="'error' in file ? 'alert' : 'file'" />
+        </span>
+        <div class="min-w-0 flex-1">
+          <p class="font-semibold break-all">{{ file.name }}</p>
+          <p v-if="'error' in file" class="mt-1 text-loss">{{ file.error }}</p>
+          <template v-else>
+            <p class="mt-1 text-muted">
+              {{ PLATFORM_NAMES[file.platform] }} : {{ file.transactions }}
+              {{ file.transactions > 1 ? 'opérations crypto lues' : 'opération crypto lue' }},
+              {{ file.skipped }}
+              {{ file.skipped > 1 ? 'lignes ignorées' : 'ligne ignorée' }} (espèces, actions,
+              fonds).
+            </p>
+            <details
+              v-if="file.unsupported.length > 0"
+              class="mt-3 rounded-control bg-warning-tint px-4 py-3 text-warning"
+            >
+              <summary class="cursor-pointer font-semibold">
+                {{ file.unsupported.length }}
+                {{ file.unsupported.length > 1 ? 'lignes' : 'ligne' }} à vérifier : leur type n'est
+                pas encore pris en charge
+              </summary>
+              <ul class="mt-2 space-y-1">
+                <li v-for="item in file.unsupported" :key="item.line">
+                  Ligne {{ item.line }} : {{ item.label }}
+                </li>
+              </ul>
+            </details>
+          </template>
+        </div>
       </li>
     </ul>
 
-    <p v-if="busy" class="text-sm text-ink-soft" role="status">Lecture en cours…</p>
+    <p v-if="busy" class="flex items-center gap-2 text-sm text-muted" role="status">
+      <span class="spinner" aria-hidden="true"></span>
+      Lecture en cours…
+    </p>
   </div>
 </template>
