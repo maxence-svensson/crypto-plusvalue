@@ -161,10 +161,11 @@ describe('importCoinbase', () => {
     expect(sell.amountEur.toString()).toBe('3050')
   })
 
-  it('indique la ligne fautive, en comptant les lignes avant l’en-tête', () => {
-    expect(() => importCoinbase(statement(BUY.replace('€600.00', '€six cents')))).toThrow(
-      'Ligne 5 :',
-    )
+  it('signale la ligne fautive, en comptant les lignes avant l’en-tête', () => {
+    const result = importCoinbase(statement(BUY.replace('€600.00', '€six cents'), SELL))
+
+    expect(result.transactions.map((transaction) => transaction.id)).toEqual(['coinbase:s1'])
+    expect(result.anomalies).toEqual([{ line: 5, message: "« €six cents » n'est pas un montant." }])
   })
 
   it('signale les achats en dollars, mais lit les échanges en dollars', () => {

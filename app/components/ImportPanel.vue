@@ -8,7 +8,13 @@ const busy = ref(false)
 async function add(files: FileList | null | undefined) {
   if (!files || files.length === 0) return
   busy.value = true
-  await store.importFiles(Array.from(files))
+  await store.importFiles(
+    Array.from(files, (file) => ({
+      name: file.name,
+      size: file.size,
+      bytes: () => file.arrayBuffer(),
+    })),
+  )
   busy.value = false
 }
 
@@ -110,6 +116,21 @@ async function loadExample() {
               {{ file.skipped > 1 ? 'lignes ignorées' : 'ligne ignorée' }} (espèces, actions,
               fonds).
             </p>
+            <details
+              v-if="file.anomalies.length > 0"
+              class="mt-3 rounded-control bg-warning-tint px-4 py-3 text-warning"
+            >
+              <summary class="cursor-pointer font-semibold">
+                {{ file.anomalies.length }}
+                {{ file.anomalies.length > 1 ? 'lignes écartées' : 'ligne écartée' }} : illisibles,
+                elles ne sont pas dans le calcul
+              </summary>
+              <ul class="mt-2 space-y-1">
+                <li v-for="item in file.anomalies" :key="item.line">
+                  Ligne {{ item.line }} : {{ item.message }}
+                </li>
+              </ul>
+            </details>
             <details
               v-if="file.unsupported.length > 0"
               class="mt-3 rounded-control bg-warning-tint px-4 py-3 text-warning"

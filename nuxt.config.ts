@@ -8,6 +8,21 @@ export default defineNuxtConfig({
   // Polices du système (San Francisco sur les appareils Apple) : rien à télécharger.
   css: ['~/assets/css/main.css'],
   vite: { plugins: [tailwindcss()] },
+  // En-têtes de sécurité sur toutes les réponses (pages, fichiers et API). La CSP se limite pour
+  // l'instant à ce qui ne gêne pas les scripts intégrés de Nuxt ; voir SECURITY.md.
+  routeRules: {
+    '/**': {
+      headers: {
+        'Content-Security-Policy':
+          "frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'",
+        'X-Frame-Options': 'DENY',
+        'X-Content-Type-Options': 'nosniff',
+        'Referrer-Policy': 'strict-origin-when-cross-origin',
+        'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=(), usb=()',
+        'Cross-Origin-Opener-Policy': 'same-origin',
+      },
+    },
+  },
   app: {
     head: {
       htmlAttrs: { lang: 'fr' },

@@ -3,6 +3,9 @@ import { Dec } from '../tax/decimal'
 import {
   ImportError,
   cell,
+  cryptoSymbol,
+  eachRow,
+  emptyResult,
   isoDate,
   readCsv,
   type Column,
@@ -63,8 +66,8 @@ const FIAT = new Set(['EUR', 'USD', 'GBP', 'CHF', 'CAD'])
 /** ETH2 était l'ETH placé en staking chez Coinbase, redevenu de l'ETH en 2025 : le même actif. */
 const ALIASES: Record<string, string> = { ETH2: 'ETH' }
 
-function asset(symbol: string): string {
-  const upper = symbol.toUpperCase()
+function asset(row: CsvRow, symbol: string): string {
+  const upper = cryptoSymbol(row, symbol)
   return ALIASES[upper] ?? upper
 }
 
@@ -75,18 +78,18 @@ export function importCoinbase(text: string): ImportResult {
     throw new ImportError("En-tête introuvable : ce fichier n'est pas un relevé Coinbase.")
   }
 
-  const result: ImportResult = { transactions: [], skipped: 0, unsupported: [] }
+  const result = emptyResult()
   const rows = readCsv(lines.slice(headerIndex).join('\n'), COLUMNS, headerIndex + 1)
 
-  for (const row of rows) {
+  eachRow(rows, result, (row) => {
     // Dépôts et retraits d'euros : rien à voir avec le portefeuille crypto.
     if (FIAT.has(cell(row, 'Asset').toUpperCase())) {
       result.skipped++
-      continue
+      return
     }
 
     const transaction = toTransaction(row)
-    if (transaction === 'ignored') continue
+    if (transaction === 'ignored') return
     if (transaction) {
       result.transactions.push(transaction)
     } else {
@@ -97,7 +100,7 @@ export function importCoinbase(text: string): ImportResult {
         label: currency === 'EUR' ? label : `${label} (montants en ${currency})`,
       })
     }
-  }
+  })
 
   // Coinbase liste les opérations de la plus récente à la plus ancienne.
   return { ...result, transactions: chronological(result.transactions) }
@@ -115,7 +118,7 @@ function toTransaction(row: CsvRow): Transaction | 'ignored' | undefined {
     label: notes || type,
   }
   const crypto = {
-    asset: asset(cell(row, 'Asset')),
+    asset: asset(row, cell(row, 'Asset')),
     quantity: money(row, 'Quantity Transacted'),
   }
   // Un relevé peut mêler plusieurs devises. Une opération en dollars reste lisible quand son
@@ -139,7 +142,7 @@ function toTransaction(row: CsvRow): Transaction | 'ignored' | undefined {
     // « Converted 0.002 BTC to 0.05 ETH » : l'actif reçu n'apparaît que dans les notes.
     const converted = /^Converted [\d.,]+ \w+ to ([\d.,]+) (\w+)/.exec(notes)
     if (!converted?.[1] || !converted[2]) return undefined
-    const received = { asset: asset(converted[2]), quantity: number(row, converted[1]) }
+    const received = { asset: asset(row, converted[2]), quantity: number(row, converted[1]) }
     // ETH → ETH2 : le même actif, rien ne change.
     if (received.asset === crypto.asset) return 'ignored'
     return { ...base, type: 'swap', sent: crypto, received }

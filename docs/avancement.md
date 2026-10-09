@@ -2,7 +2,7 @@
 
 Ce fichier suit la transformation de CryptoPlusValue en plateforme complète de préparation de la
 fiscalité crypto. Il est mis à jour à chaque phase, pour pouvoir reprendre le travail à tout
-moment. Dernière mise à jour : 9 octobre 2026.
+moment. Dernière mise à jour : 9 octobre 2026, après la phase 1.
 
 ## 1. Diagnostic initial (9 octobre 2026)
 
@@ -27,9 +27,9 @@ place sauf raison solide, et il n'y en a pas.
 
 | Constat                                                                                                | Conséquence                                                                                                         |
 | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------- |
-| Une seule ligne invalide (date, montant) fait échouer tout le fichier.                                 | L'utilisateur n'importe rien et ne sait pas quoi corriger ligne par ligne.                                          |
-| Le symbole de l'actif n'est pas validé (« =CMD » est accepté).                                         | Risque d'injection de formule dans de futurs exports CSV ; le cours est introuvable.                                |
-| Une quantité négative est passée en valeur absolue sans signalement.                                   | Anomalie silencieuse.                                                                                               |
+| Une seule ligne invalide faisait échouer tout le fichier.                                              | Corrigé en phase 1 : les lignes illisibles sont écartées et listées.                                                |
+| Le symbole de l'actif n'était pas validé (« =CMD » accepté).                                           | Corrigé en phase 1 : lettres majuscules et chiffres seulement.                                                      |
+| Une quantité négative est passée en valeur absolue.                                                    | Conservé : les exports signent les quantités selon le sens de l'opération.                                          |
 | Doublons détectés seulement par identifiant exact.                                                     | Un même relevé exporté deux fois avec d'autres identifiants serait compté deux fois.                                |
 | Taux de 31,4 % et barème 2025 appliqués à toutes les années (simulateur, comparaison).                 | Faux pour les revenus antérieurs à 2025 ; l'option 3CN n'existe pas avant 2023. À vérifier et versionner (phase 2). |
 | Une requête de cours par actif et par cession : 25 000 requêtes pour 5 000 cessions.                   | Calcul très lent sur les gros historiques.                                                                          |
@@ -72,15 +72,15 @@ cours (une requête par cours) qui limitent.
 Chaque phase est livrée par une ou plusieurs pull requests testées. Elles sont fusionnées quand la
 CI est verte, puis vérifiées en production.
 
-| Phase                      | Contenu                                                                                                                                                                                      | État    |
-| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| 1. Stabilisation           | Vulnérabilités, en-têtes de sécurité, import ligne par ligne avec anomalies, validation des symboles, tests de bout en bout (Playwright)                                                     | à faire |
-| 2. Moteur fiscal versionné | Taux et barèmes par année vérifiés aux sources, option 3CN selon l'année, blocage des estimations sans règles connues                                                                        | à faire |
-| 3. Imports                 | Registre d'importeurs, aperçu et confirmation, doublons multicritères, qualité des données, cours groupés, lecture dans un Web Worker, nouvelles plateformes validées sur formats documentés | à faire |
-| 4. Interface               | Navigation multi-pages, persistance IndexedDB, page des transactions (recherche, filtres, ajout, modification, suppression, annulation, journal), tableau de bord                            | à faire |
-| 5. Fonctions avancées      | Portefeuille et performances, scénarios comparés, rapports CSV et Excel, sauvegarde chiffrée, centre d'aide, glossaire, FAQ, pages de contenu, thème manuel, PWA                             | à faire |
-| 6. Sécurité et performance | CSP stricte, injection CSV, limites de taille, tests de charge, Lighthouse                                                                                                                   | à faire |
-| 7. Validation finale       | Tests multi-navigateurs et multi-résolutions, documentation, rapport final                                                                                                                   | à faire |
+| Phase                      | Contenu                                                                                                                                                                                      | État             |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- |
+| 1. Stabilisation           | Vulnérabilités, en-têtes de sécurité, import ligne par ligne avec anomalies, validation des symboles, tests de bout en bout (Playwright)                                                     | fait (9 octobre) |
+| 2. Moteur fiscal versionné | Taux et barèmes par année vérifiés aux sources, option 3CN selon l'année, blocage des estimations sans règles connues                                                                        | à faire          |
+| 3. Imports                 | Registre d'importeurs, aperçu et confirmation, doublons multicritères, qualité des données, cours groupés, lecture dans un Web Worker, nouvelles plateformes validées sur formats documentés | à faire          |
+| 4. Interface               | Navigation multi-pages, persistance IndexedDB, page des transactions (recherche, filtres, ajout, modification, suppression, annulation, journal), tableau de bord                            | à faire          |
+| 5. Fonctions avancées      | Portefeuille et performances, scénarios comparés, rapports CSV et Excel, sauvegarde chiffrée, centre d'aide, glossaire, FAQ, pages de contenu, thème manuel, PWA                             | à faire          |
+| 6. Sécurité et performance | CSP stricte, injection CSV, limites de taille, tests de charge, Lighthouse                                                                                                                   | à faire          |
+| 7. Validation finale       | Tests multi-navigateurs et multi-résolutions, documentation, rapport final                                                                                                                   | à faire          |
 
 ### Ce qui ne sera pas promis
 
@@ -95,20 +95,20 @@ CI est verte, puis vérifiées en production.
 
 Statuts : TERMINÉ ET TESTÉ, TERMINÉ MAIS NON TESTÉ, PARTIEL, BLOQUÉ, NON IMPLÉMENTÉ.
 
-| Fonctionnalité           | Statut           | Tests unitaires  | Intégration                      | Bout en bout | Remarques                          |
-| ------------------------ | ---------------- | ---------------- | -------------------------------- | ------------ | ---------------------------------- |
-| Moteur 2086 (150 VH bis) | TERMINÉ ET TESTÉ | oui              | oui (transactions vers cessions) | non          | exemples BOFiP                     |
-| Import Trade Republic    | TERMINÉ ET TESTÉ | oui              | oui                              | non          | deux exports réels                 |
-| Import Coinbase          | TERMINÉ ET TESTÉ | oui              | oui                              | non          | exemples publics                   |
-| Cours historiques        | TERMINÉ ET TESTÉ | oui              | non                              | non          | une requête par cours              |
-| 2086 officiel rempli     | TERMINÉ ET TESTÉ | oui              | non                              | non          | revenus 2025                       |
-| Dossier justificatif     | TERMINÉ ET TESTÉ | oui              | oui                              | non          |                                    |
-| Comparaison PFU / barème | PARTIEL          | oui              | non                              | non          | barème 2025 pour toutes les années |
-| Simulateur de vente      | PARTIEL          | oui              | non                              | non          | taux 2025 pour toutes les années   |
-| « Et maintenant ? »      | TERMINÉ ET TESTÉ | oui (calendrier) | non                              | non          |                                    |
-| Persistance locale       | NON IMPLÉMENTÉ   |                  |                                  |              |                                    |
-| Gestion des transactions | NON IMPLÉMENTÉ   |                  |                                  |              |                                    |
-| Tableau de bord          | NON IMPLÉMENTÉ   |                  |                                  |              |                                    |
-| Sauvegarde chiffrée      | NON IMPLÉMENTÉ   |                  |                                  |              |                                    |
-| Rapports CSV et Excel    | NON IMPLÉMENTÉ   |                  |                                  |              |                                    |
-| Tests de bout en bout    | NON IMPLÉMENTÉ   |                  |                                  |              |                                    |
+| Fonctionnalité           | Statut           | Tests unitaires  | Intégration | Bout en bout | Remarques                                                           |
+| ------------------------ | ---------------- | ---------------- | ----------- | ------------ | ------------------------------------------------------------------- |
+| Moteur 2086 (150 VH bis) | TERMINÉ ET TESTÉ | oui              | oui         | oui          | exemples BOFiP ; exemple vérifié par un calcul indépendant          |
+| Import Trade Republic    | TERMINÉ ET TESTÉ | oui              | oui         | oui          | deux exports réels ; lignes illisibles écartées                     |
+| Import Coinbase          | TERMINÉ ET TESTÉ | oui              | oui         | non          | exemples publics                                                    |
+| Cours historiques        | TERMINÉ ET TESTÉ | oui              | non         | non          | une requête par cours                                               |
+| 2086 officiel rempli     | TERMINÉ ET TESTÉ | oui              | non         | oui          | revenus 2025                                                        |
+| Dossier justificatif     | TERMINÉ ET TESTÉ | oui              | oui         | oui          |                                                                     |
+| Comparaison PFU / barème | PARTIEL          | oui              | non         | oui          | barème 2025 pour toutes les années                                  |
+| Simulateur de vente      | PARTIEL          | oui              | non         | oui          | taux 2025 pour toutes les années                                    |
+| « Et maintenant ? »      | TERMINÉ ET TESTÉ | oui (calendrier) | non         | oui          |                                                                     |
+| Persistance locale       | NON IMPLÉMENTÉ   |                  |             |              |                                                                     |
+| Gestion des transactions | NON IMPLÉMENTÉ   |                  |             |              |                                                                     |
+| Tableau de bord          | NON IMPLÉMENTÉ   |                  |             |              |                                                                     |
+| Sauvegarde chiffrée      | NON IMPLÉMENTÉ   |                  |             |              |                                                                     |
+| Rapports CSV et Excel    | NON IMPLÉMENTÉ   |                  |             |              |                                                                     |
+| Tests de bout en bout    | TERMINÉ ET TESTÉ |                  |             | oui          | 5 projets en CI, axe-core ; en-têtes de sécurité vérifiés avec curl |

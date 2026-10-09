@@ -46,7 +46,12 @@ function save(key: string) {
         Voici les cours retenus, à la minute près. Seuls le symbole et la minute sont envoyés au
         serveur, jamais vos montants.
       </p>
-      <div class="mt-3 overflow-x-auto">
+      <div
+        class="mt-3 overflow-x-auto"
+        tabindex="0"
+        role="region"
+        aria-label="Cours retenus pour chaque vente"
+      >
         <table class="w-full text-left">
           <caption class="sr-only">
             Cours historiques en euros utilisés pour le calcul
