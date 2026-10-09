@@ -117,6 +117,8 @@ async function download() {
           </dl>
         </div>
 
+        <RegimeComparison v-if="summary.box3AN > 0" :gain="summary.netGain" :year="year" />
+
         <div>
           <h3 class="display text-lg">Le formulaire 2086, cession par cession</h3>
           <div
