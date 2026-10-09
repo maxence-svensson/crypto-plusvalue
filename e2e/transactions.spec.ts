@@ -10,6 +10,7 @@ async function importExample(page: Page) {
   await page.setInputFiles('#fichier-import', EXAMPLE)
   await page.getByRole('button', { name: 'Importer', exact: true }).click()
   await expect(page.getByText('14 opérations crypto lues')).toBeVisible()
+  await expect(page.getByText(/Enregistré dans ce navigateur le/)).toBeVisible()
 }
 
 test.describe('liste des opérations', () => {
@@ -18,7 +19,7 @@ test.describe('liste des opérations', () => {
     await expect(rows(page)).toHaveCount(14)
   })
 
-  test('cherche, filtre et trie', async ({ page }) => {
+  test('cherche, filtre et trie', async ({ page, isMobile }) => {
     await page.getByRole('searchbox', { name: 'Rechercher une opération' }).fill('eth')
     await expect(rows(page)).toHaveCount(2)
     await expect(page.getByText('2 opérations sur 14')).toBeVisible()
@@ -34,7 +35,15 @@ test.describe('liste des opérations', () => {
     await expect(rows(page)).toHaveCount(5)
     await page.getByLabel('Crypto', { exact: true }).selectOption('')
 
-    // Tri par montant : le plus élevé d'abord, puis le plus faible.
+    // Tri par montant : le plus élevé d'abord, puis le plus faible. Sur mobile, les en-têtes de
+    // date et de montant sont masqués : le tri passe par un menu.
+    if (isMobile) {
+      await page.getByLabel('Trier par').selectOption({ label: 'Montant décroissant' })
+      await expect(rows(page).first()).toContainText('1 487,22 €')
+      await page.getByLabel('Trier par').selectOption({ label: 'Montant croissant' })
+      await expect(rows(page).first()).toContainText('2,22 €')
+      return
+    }
     const amount = page.getByRole('button', { name: 'Montant' })
     await amount.click()
     await expect(page.getByRole('columnheader', { name: 'Montant' })).toHaveAttribute(

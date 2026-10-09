@@ -20,12 +20,14 @@ Vitest, build, puis Playwright sur Chromium, Firefox et WebKit, en version ordin
 
 ## Couverture des tests de bout en bout
 
-| Fichier              | Parcours                                                                                                                                |
-| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `accueil.spec.ts`    | accroche, absence de défilement horizontal de 320 à 1 440 px, menu mobile au clavier, accessibilité                                     |
-| `exemple.spec.ts`    | montants de l'exemple, comparaison des régimes, téléchargement du 2086 et du dossier, étapes retenues après rechargement, accessibilité |
-| `import.spec.ts`     | import d'un export, fichier au mauvais format, PDF, ligne illisible écartée                                                             |
-| `simulateur.spec.ts` | simulation sans fichier, curseur de quantité                                                                                            |
+| Fichier                | Parcours                                                                                                                                                                                     |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `accueil.spec.ts`      | accroche, absence de défilement horizontal de 320 à 1 440 px, menu mobile au clavier, accessibilité                                                                                          |
+| `exemple.spec.ts`      | montants de l'exemple, comparaison des régimes, téléchargement du 2086 et du dossier, étapes retenues après rechargement, accessibilité                                                      |
+| `import.spec.ts`       | import d'un export, fichier au mauvais format, PDF, ligne illisible écartée                                                                                                                  |
+| `simulateur.spec.ts`   | simulation sans fichier, curseur de quantité                                                                                                                                                 |
+| `parametres.spec.ts`   | données relues après rechargement, sortie de la démonstration, thème retenu, « Tout effacer », conservation coupée                                                                           |
+| `transactions.spec.ts` | recherche, filtres et tri, ajout avec erreurs signalées, modification depuis la fiche, suppression multiple, annulation, export CSV, persistance des corrections, accessibilité des fenêtres |
 
 En local, Playwright utilise Microsoft Edge installé sur la machine (projets `chromium` et
 `mobile-chromium`) ; Firefox et WebKit ne tournent qu'en CI.

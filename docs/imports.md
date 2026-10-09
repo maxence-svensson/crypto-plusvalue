@@ -31,6 +31,26 @@ Règles communes :
   export modifié). Écarté par défaut, l'utilisateur coche ceux qui sont réellement différents.
   Deux achats identiques à des moments différents, comme un plan d'épargne, ne sont pas des
   doublons (`shared/portfolio/duplicates.ts`).
+- **Opération supprimée à la main** (page Transactions) : comptée comme déjà importée, elle ne
+  revient pas en réimportant le même fichier. Pour la retrouver, on annule la suppression depuis
+  le journal des corrections.
+
+## Corrections à la main
+
+La page Transactions permet d'ajouter une opération absente des exports, d'en modifier ou d'en
+supprimer. Chaque correction est notée dans un journal avec l'état d'avant
+(`shared/portfolio/corrections.ts`) : on peut l'annuler, de la plus récente à la plus ancienne,
+et la liste redevient exactement ce qu'elle était. Une opération ajoutée a pour source « Saisie
+manuelle » ; une opération importée puis modifiée garde sa source et son identifiant, et la liste
+l'indique comme corrigée. La saisie est vérifiée champ par champ (`shared/portfolio/manual.ts`) :
+symbole, quantité positive, montant en euros pour un achat, une vente ou un paiement, date ni
+future ni antérieure au 3 janvier 2009, heure de Paris convertie en tenant compte de l'heure
+d'été.
+
+La liste exportée en CSV (point-virgule, virgule décimale, UTF-8 avec BOM, pour un tableur
+français) reprend les opérations affichées, filtres compris. Un libellé importé qui commence par
+`=`, `+`, `-` ou `@` est précédé d'une apostrophe, pour qu'aucun tableur ne l'exécute comme une
+formule.
 
 ## Transferts et qualité des données
 
