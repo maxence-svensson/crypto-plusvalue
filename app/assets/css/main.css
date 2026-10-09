@@ -1,73 +1,223 @@
 @import 'tailwindcss';
 
 /*
- * Direction « surligneur » : l'outil emprunte au formulaire de déclaration ses cases numérotées et
- * ses champs en peigne, et au geste de celui qui le remplit son surligneur fluo. Le jaune ne sert
- * qu'aux montants à recopier ; tout le reste est à l'encre, sur blanc et sur le bleu pâle des
- * champs. Contrastes : chaque texte dépasse 5,5:1. Choix détaillés dans docs/design.md.
+ * Direction « verre » inspirée des interfaces iOS : un fond clair presque opaque, des halos de
+ * couleur très diffus derrière, du verre dépoli là où il crée de la hiérarchie (barre de
+ * navigation, cartes principales, menus) et des surfaces pleines pour les tableaux et les
+ * listes. Le surligneur jaune reste réservé aux montants à recopier. Choix et contrastes dans
+ * docs/design.md.
  */
-@theme {
-  --font-sans: 'Archivo Variable', ui-sans-serif, system-ui, sans-serif;
 
-  --color-paper: #ffffff;
-  --color-field: #eef2f8;
-  --color-rule: #c9d2e3;
-  --color-ink: #1b2240;
-  --color-ink-soft: #4a5578;
-  --color-highlight: #ffe94d;
-  --color-gain: #0c6e42;
-  --color-loss: #b02c16;
-  --color-warning: #8a4b00;
-  --color-warning-soft: #fdf3e2;
+:root {
+  color-scheme: light dark;
+  interpolate-size: allow-keywords;
+
+  --ios-blue: #007aff;
+  --ios-indigo: #5856d6;
+  --ios-purple: #af52de;
+  --ios-pink: #ff2d55;
+  --ios-green: #34c759;
+  --ios-orange: #ff9500;
+  --ios-red: #ff3b30;
+  --ios-cyan: #32ade6;
+
+  --background: #f5f5f7;
+  --elevated: #ffffff;
+  --surface: rgb(255 255 255 / 0.62);
+  --surface-strong: rgb(255 255 255 / 0.78);
+  --surface-subtle: rgb(255 255 255 / 0.38);
+  --border: rgb(255 255 255 / 0.55);
+  --separator: rgb(60 60 67 / 0.14);
+  --field: rgb(118 118 128 / 0.08);
+  --text-primary: #1d1d1f;
+  --text-secondary: #6e6e73;
+  --segment: #ffffff;
+
+  /* Bleu des boutons : #007AFF ne donne que 4:1 avec du blanc, #0071E3 donne 4,7:1. */
+  --accent: #0071e3;
+  --accent-strong: #0062c9;
+  --link: #0066cc;
+  --gain: #1a7f37;
+  --loss: #d70015;
+  --warning: #b83000;
+  --warning-tint: rgb(255 149 0 / 0.14);
+  --success-tint: rgb(52 199 89 / 0.14);
+  --accent-tint: rgb(0 122 255 / 0.1);
+  --highlight: #ffe066;
+
+  --glass-shadow: 0 8px 32px rgb(0 0 0 / 0.08);
+  --glass-shadow-floating: 0 12px 48px rgb(0 0 0 / 0.12), 0 2px 8px rgb(0 0 0 / 0.04);
+  --glass-highlight: inset 0 1px 0 rgb(255 255 255 / 0.6);
+  --glass-sheen: linear-gradient(180deg, rgb(255 255 255 / 0.4), rgb(255 255 255 / 0) 42%);
+  --glow-opacity: 1;
+  --shimmer: rgb(255 255 255 / 0.6);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #000000;
+    --elevated: #1c1c1e;
+    --surface: rgb(28 28 30 / 0.62);
+    --surface-strong: rgb(44 44 46 / 0.78);
+    --surface-subtle: rgb(28 28 30 / 0.42);
+    --border: rgb(255 255 255 / 0.12);
+    --separator: rgb(84 84 88 / 0.5);
+    --field: rgb(118 118 128 / 0.24);
+    --text-primary: #f5f5f7;
+    --text-secondary: #a1a1a6;
+    --segment: #636366;
+
+    --link: #2997ff;
+    --gain: #30d158;
+    --loss: #ff6961;
+    --warning: #ff9f0a;
+    --warning-tint: rgb(255 159 10 / 0.16);
+    --success-tint: rgb(48 209 88 / 0.16);
+    --accent-tint: rgb(10 132 255 / 0.18);
+    --highlight: rgb(255 214 10 / 0.45);
+
+    --glass-shadow: 0 8px 32px rgb(0 0 0 / 0.5);
+    --glass-shadow-floating: 0 12px 48px rgb(0 0 0 / 0.6), 0 2px 8px rgb(0 0 0 / 0.3);
+    --glass-highlight: inset 0 1px 0 rgb(255 255 255 / 0.08);
+    --glass-sheen: linear-gradient(180deg, rgb(255 255 255 / 0.06), rgb(255 255 255 / 0) 42%);
+    --glow-opacity: 1.6;
+    --shimmer: rgb(255 255 255 / 0.07);
+  }
+}
+
+@theme inline {
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, 'Segoe UI',
+    Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+  --color-canvas: var(--background);
+  --color-elevated: var(--elevated);
+  --color-label: var(--text-primary);
+  --color-muted: var(--text-secondary);
+  --color-separator: var(--separator);
+  --color-surface-subtle: var(--surface-subtle);
+  --color-field: var(--field);
+  --color-accent: var(--accent);
+  --color-accent-tint: var(--accent-tint);
+  --color-link: var(--link);
+  --color-gain: var(--gain);
+  --color-loss: var(--loss);
+  --color-warning: var(--warning);
+  --color-warning-tint: var(--warning-tint);
+  --color-success-tint: var(--success-tint);
+  --color-highlight: var(--highlight);
+
+  --radius-chip: 12px;
+  --radius-control: 16px;
+  --radius-card: 28px;
+  --radius-section: 36px;
+
+  --ease-ios: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @layer base {
   body {
-    @apply bg-paper font-sans text-ink antialiased;
+    @apply bg-canvas font-sans text-label antialiased;
+    font-feature-settings: 'kern';
+  }
+
+  ::selection {
+    background: rgb(0 122 255 / 0.22);
   }
 
   :focus-visible {
-    @apply outline-2 outline-offset-2 outline-ink;
+    @apply outline-2 outline-offset-2 outline-accent;
+  }
+
+  /* Barre de défilement discrète sur ordinateur, pour les tableaux qui défilent. */
+  @media (hover: hover) {
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: rgb(128 128 128 / 0.4) transparent;
+    }
   }
 }
 
-/* Curseur : piste fine remplie à l'encre jusqu'à la valeur (--fill), poignée blanche cerclée. */
-@layer components {
-  .range-ink {
-    appearance: none;
-    height: 0.375rem;
-    border-radius: 999px;
-    background: linear-gradient(
-      to right,
-      var(--color-ink) 0 var(--fill, 0%),
-      var(--color-rule) var(--fill, 0%) 100%
+/*
+ * Halos du fond : grandes taches de couleur très diffuses, fixes, qui donnent au verre quelque
+ * chose à flouter. Bleu, violet, cyan et rose à faible opacité.
+ */
+@utility backdrop-glow {
+  background:
+    radial-gradient(
+      circle at 12% 8%,
+      rgb(0 122 255 / calc(0.12 * var(--glow-opacity))),
+      transparent 42%
+    ),
+    radial-gradient(
+      circle at 88% 18%,
+      rgb(175 82 222 / calc(0.1 * var(--glow-opacity))),
+      transparent 40%
+    ),
+    radial-gradient(
+      circle at 18% 72%,
+      rgb(50 173 230 / calc(0.09 * var(--glow-opacity))),
+      transparent 40%
+    ),
+    radial-gradient(
+      circle at 92% 88%,
+      rgb(255 45 85 / calc(0.07 * var(--glow-opacity))),
+      transparent 38%
     );
-    cursor: pointer;
-  }
-
-  .range-ink::-webkit-slider-thumb {
-    appearance: none;
-    width: 1.375rem;
-    height: 1.375rem;
-    border: 2px solid var(--color-ink);
-    border-radius: 999px;
-    background: var(--color-paper);
-  }
-
-  .range-ink::-moz-range-thumb {
-    width: 1.375rem;
-    height: 1.375rem;
-    border: 2px solid var(--color-ink);
-    border-radius: 999px;
-    background: var(--color-paper);
-  }
 }
 
-/* Titres : Archivo élargie et grasse. */
-@utility display {
+/* Verre : quatre niveaux, du plus léger au plus flottant. */
+@utility glass-subtle {
+  background: var(--glass-sheen), var(--surface-subtle);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid var(--border);
+  box-shadow: var(--glass-highlight);
+}
+
+@utility glass {
+  background: var(--glass-sheen), var(--surface);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--border);
+  box-shadow: var(--glass-shadow), var(--glass-highlight);
+}
+
+@utility glass-strong {
+  background: var(--glass-sheen), var(--surface-strong);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid var(--border);
+  box-shadow: var(--glass-shadow), var(--glass-highlight);
+}
+
+@utility glass-floating {
+  background: var(--glass-sheen), var(--surface-strong);
+  backdrop-filter: blur(30px) saturate(190%);
+  -webkit-backdrop-filter: blur(30px) saturate(190%);
+  border: 1px solid var(--border);
+  box-shadow: var(--glass-shadow-floating), var(--glass-highlight);
+}
+
+/* Surface pleine pour les tableaux et les listes : le verre n'y apporterait que du bruit. */
+@utility solid-card {
+  background: var(--elevated);
+  border: 1px solid var(--separator);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
+}
+
+/* Titres : serrés, gras, courts. */
+@utility text-hero {
+  font-size: clamp(3rem, 7vw, 6.5rem);
   font-weight: 700;
-  font-stretch: 118%;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.055em;
+  line-height: 0.95;
+}
+
+@utility headline {
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
 }
 
 /* Montants : chiffres de même largeur, pour que les colonnes s'alignent. */
@@ -75,20 +225,255 @@
   font-variant-numeric: tabular-nums;
 }
 
+@layer components {
+  /* Boutons : sensation physique, montée d'un pixel au survol, enfoncement au clic. */
+  .btn {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-control px-5 font-semibold whitespace-nowrap select-none;
+    transition:
+      transform 180ms var(--ease-ios),
+      box-shadow 180ms var(--ease-ios),
+      background-color 180ms var(--ease-ios);
+  }
+
+  @media (hover: hover) {
+    .btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+    }
+  }
+
+  .btn:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+
+  .btn:disabled {
+    @apply cursor-not-allowed opacity-50;
+  }
+
+  .btn-primary {
+    color: #ffffff;
+    background: linear-gradient(180deg, var(--accent), var(--accent-strong));
+    box-shadow:
+      0 1px 2px rgb(0 60 140 / 0.2),
+      0 6px 16px rgb(0 113 227 / 0.22),
+      inset 0 1px 0 rgb(255 255 255 / 0.22);
+  }
+
+  .btn-secondary {
+    @apply glass-strong text-label;
+  }
+
+  .btn-ghost {
+    @apply min-h-0 px-2 font-medium text-link;
+  }
+
+  @media (hover: hover) {
+    .btn-ghost:hover:not(:disabled) {
+      @apply bg-accent-tint;
+    }
+  }
+
+  .btn-sm {
+    @apply min-h-9 rounded-chip px-3.5 text-sm;
+  }
+
+  /* Champs : contrôle natif, fond légèrement teinté, anneau bleu au focus. */
+  .input {
+    @apply block min-h-12 w-full rounded-control border border-separator bg-field px-4 text-base text-label placeholder:text-muted;
+    transition:
+      border-color 180ms var(--ease-ios),
+      box-shadow 180ms var(--ease-ios),
+      background-color 180ms var(--ease-ios);
+  }
+
+  .input:focus {
+    @apply border-accent bg-elevated outline-none;
+    box-shadow: 0 0 0 4px rgb(0 122 255 / 0.15);
+  }
+
+  select.input {
+    @apply appearance-none pr-10;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%238e8e93' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' viewBox='0 0 24 24'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-position: right 0.875rem center;
+    background-repeat: no-repeat;
+  }
+
+  /* Contrôle segmenté : le choix actif ressort comme une pastille blanche, comme sur iOS. */
+  .segmented {
+    @apply inline-flex flex-wrap gap-1 rounded-control bg-field p-1;
+  }
+
+  .segmented > label {
+    @apply numeric relative flex min-h-9 cursor-pointer items-center rounded-chip px-3.5 text-sm font-semibold text-muted;
+    transition:
+      background-color 220ms var(--ease-ios),
+      color 220ms var(--ease-ios),
+      box-shadow 220ms var(--ease-ios);
+  }
+
+  .segmented > label:hover {
+    @apply text-label;
+  }
+
+  .segmented > label:has(:checked) {
+    @apply text-label;
+    background: var(--segment);
+    box-shadow:
+      0 1px 3px rgb(0 0 0 / 0.12),
+      0 1px 1px rgb(0 0 0 / 0.04);
+  }
+
+  .segmented > label:has(:focus-visible) {
+    @apply outline-2 outline-offset-1 outline-accent;
+  }
+
+  /* Volets dépliables : chevron qui pivote, hauteur animée là où le navigateur le permet. */
+  .disclosure > summary {
+    @apply flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 font-semibold sm:px-6;
+  }
+
+  .disclosure > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .disclosure > summary::after {
+    content: '';
+    @apply size-5 shrink-0 bg-muted;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+    transition: transform 250ms var(--ease-ios);
+  }
+
+  .disclosure[open] > summary::after {
+    transform: rotate(180deg);
+  }
+
+  .disclosure::details-content {
+    height: 0;
+    overflow: clip;
+    transition:
+      height 350ms var(--ease-ios),
+      content-visibility 350ms allow-discrete;
+  }
+
+  .disclosure[open]::details-content {
+    height: auto;
+  }
+
+  /* Curseur : piste fine remplie en bleu jusqu'à la valeur (--fill), poignée blanche en relief. */
+  .range {
+    appearance: none;
+    height: 0.25rem;
+    border-radius: 999px;
+    background: linear-gradient(
+      to right,
+      var(--ios-blue) 0 var(--fill, 0%),
+      var(--field) var(--fill, 0%) 100%
+    );
+    cursor: pointer;
+  }
+
+  .range::-webkit-slider-thumb {
+    appearance: none;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 999px;
+    background: #ffffff;
+    box-shadow:
+      0 0.5px 4px rgb(0 0 0 / 0.12),
+      0 6px 13px rgb(0 0 0 / 0.12);
+    transition: transform 180ms var(--ease-ios);
+  }
+
+  .range:active::-webkit-slider-thumb {
+    transform: scale(1.12);
+  }
+
+  .range::-moz-range-thumb {
+    width: 1.75rem;
+    height: 1.75rem;
+    border: none;
+    border-radius: 999px;
+    background: #ffffff;
+    box-shadow:
+      0 0.5px 4px rgb(0 0 0 / 0.12),
+      0 6px 13px rgb(0 0 0 / 0.12);
+  }
+
+  /* Squelette de chargement : un reflet qui passe lentement. */
+  .skeleton {
+    @apply rounded-chip bg-field;
+    background-image: linear-gradient(90deg, transparent 0%, var(--shimmer) 50%, transparent 100%);
+    background-size: 200% 100%;
+    background-repeat: no-repeat;
+    animation: shimmer 1.6s var(--ease-ios) infinite;
+  }
+
+  .spinner {
+    @apply inline-block size-4 shrink-0 rounded-full border-2 border-current border-r-transparent;
+    animation: spin 700ms linear infinite;
+  }
+
+  /* Entrée de la page d'accueil : chaque élément arrive avec un décalage (--delay). */
+  .enter {
+    animation: enter 700ms var(--ease-ios) var(--delay, 0ms) both;
+  }
+
+  /* Apparition au défilement (directive v-reveal) : seulement pour ce qui est hors écran. */
+  .reveal {
+    opacity: 0;
+    transform: translateY(12px);
+    filter: blur(6px);
+    transition:
+      opacity 600ms var(--ease-ios),
+      transform 600ms var(--ease-ios),
+      filter 600ms var(--ease-ios);
+  }
+
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+
+  /* Cartes cliquables : légère montée au survol, sur ordinateur seulement. */
+  @media (hover: hover) {
+    .lift {
+      transition:
+        transform 250ms var(--ease-ios),
+        box-shadow 250ms var(--ease-ios);
+    }
+
+    .lift:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--glass-shadow-floating), var(--glass-highlight);
+    }
+  }
+
+  /* Menus et volets flottants : ouverture en fondu et léger zoom. */
+  .popover-enter-active,
+  .popover-leave-active {
+    transition:
+      opacity 250ms var(--ease-ios),
+      transform 250ms var(--ease-ios),
+      filter 250ms var(--ease-ios);
+  }
+
+  .popover-enter-from,
+  .popover-leave-to {
+    opacity: 0;
+    transform: scale(0.96) translateY(-6px);
+    filter: blur(4px);
+  }
+}
+
 /*
- * Le seul moment animé : le surligneur passe sur la case, puis les chiffres s'y inscrivent.
- * Désactivé si le système demande de réduire les animations.
+ * Le surligneur passe sur la case, puis les chiffres s'y inscrivent. C'est la signature du site,
+ * réservée aux montants à recopier.
  */
 @utility highlighter {
-  background: linear-gradient(
-      transparent 8%,
-      var(--color-highlight) 8%,
-      var(--color-highlight) 92%,
-      transparent 92%
-    )
-    no-repeat;
+  background: linear-gradient(var(--highlight), var(--highlight)) no-repeat;
   background-size: 0% 100%;
-  animation: sweep 900ms 300ms cubic-bezier(0.6, 0, 0.2, 1) forwards;
+  animation: sweep 900ms 300ms var(--ease-ios) forwards;
 }
 
 @keyframes sweep {
@@ -100,22 +485,76 @@
 @keyframes ink-in {
   from {
     opacity: 0;
-    transform: translateY(0.15em);
+    transform: translateY(0.2em);
+    filter: blur(4px);
   }
   to {
     opacity: 1;
     transform: none;
+    filter: none;
+  }
+}
+
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 150% 0;
+  }
+  to {
+    background-position: -50% 0;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+
   .highlighter {
     animation: none;
     background-size: 100% 100%;
   }
 
-  .ink-in {
+  .ink-in,
+  .enter {
     animation: none !important;
     opacity: 1 !important;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+
+  .spinner {
+    animation: spin 1.4s linear infinite !important;
+  }
+
+  .skeleton {
+    animation: none !important;
   }
 }

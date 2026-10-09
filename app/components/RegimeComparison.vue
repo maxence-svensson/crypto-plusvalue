@@ -51,10 +51,10 @@ const columns = computed(() => {
 </script>
 
 <template>
-  <div class="space-y-5">
+  <div class="glass space-y-6 rounded-card p-6 sm:p-8">
     <div>
-      <h3 class="display text-lg">Prélèvement forfaitaire ou barème ?</h3>
-      <p class="mt-1 max-w-prose text-sm text-ink-soft">
+      <h3 class="headline text-2xl">Prélèvement forfaitaire ou barème ?</h3>
+      <p class="mt-2 max-w-prose text-muted">
         Par défaut, vos plus-values crypto sont taxées à 31,4 % : 12,8 % d'impôt et 18,6 % de
         prélèvements sociaux. En cochant la case 3CN, vous pouvez choisir le barème progressif : la
         plus-value s'ajoute alors à vos autres revenus.
@@ -63,14 +63,10 @@ const columns = computed(() => {
 
     <fieldset>
       <legend class="text-sm font-semibold">Votre tranche marginale d'imposition</legend>
-      <div
-        class="mt-2 inline-flex flex-wrap overflow-hidden rounded-[4px] border-[1.5px] border-ink"
-      >
+      <div class="segmented mt-3">
         <label
           v-for="option in [...MARGINAL_RATES.map((rate) => rate.toString()), UNKNOWN]"
           :key="option"
-          class="numeric cursor-pointer border-ink px-3 py-1.5 text-sm font-semibold not-first:border-l-[1.5px] focus-within:outline-2 focus-within:-outline-offset-4 focus-within:outline-paper"
-          :class="option === choice ? 'bg-ink text-paper' : 'bg-paper text-ink hover:bg-field'"
         >
           <input v-model="choice" type="radio" name="tranche" :value="option" class="sr-only" />
           {{ option === UNKNOWN ? 'Je ne sais pas' : percent(new Dec(option)) }}
@@ -78,55 +74,60 @@ const columns = computed(() => {
       </div>
     </fieldset>
 
-    <div v-if="choice === UNKNOWN" class="grid max-w-xl gap-4 sm:grid-cols-[1fr_auto]">
-      <label class="block">
-        <span class="text-sm font-semibold"
-          >Revenu imposable du foyer en {{ year }}, hors crypto</span
-        >
-        <input
-          v-model="income"
-          inputmode="decimal"
-          placeholder="35 000"
-          class="numeric mt-1 block w-full rounded-[4px] border-[1.5px] border-ink bg-paper px-3 py-2"
-        />
-        <span class="mt-1 block text-xs text-ink-soft">
-          La ligne « revenu imposable » de votre dernier avis d'impôt donne un ordre d'idée.
-        </span>
-      </label>
-      <label class="block">
-        <span class="text-sm font-semibold">Nombre de parts</span>
-        <select
-          v-model="parts"
-          class="numeric mt-1 block w-full rounded-[4px] border-[1.5px] border-ink bg-paper px-3 py-2"
-        >
-          <option v-for="option in PARTS" :key="option" :value="option">{{ option }}</option>
-        </select>
-      </label>
-    </div>
+    <Transition name="popover">
+      <div v-if="choice === UNKNOWN" class="grid max-w-xl gap-4 sm:grid-cols-[1fr_auto]">
+        <label class="block">
+          <span class="text-sm font-semibold"
+            >Revenu imposable du foyer en {{ year }}, hors crypto</span
+          >
+          <input
+            v-model="income"
+            inputmode="decimal"
+            placeholder="35 000"
+            class="input numeric mt-2"
+          />
+          <span class="mt-1.5 block text-xs text-muted">
+            La ligne « revenu imposable » de votre dernier avis d'impôt donne un ordre d'idée.
+          </span>
+        </label>
+        <label class="block">
+          <span class="text-sm font-semibold">Nombre de parts</span>
+          <select v-model="parts" class="input numeric mt-2 sm:w-32">
+            <option v-for="option in PARTS" :key="option" :value="option">{{ option }}</option>
+          </select>
+        </label>
+      </div>
+    </Transition>
 
     <template v-if="comparison">
-      <div class="grid gap-3 sm:grid-cols-2">
+      <div class="grid gap-4 sm:grid-cols-2">
         <div
           v-for="column in columns"
           :key="column.key"
-          class="rounded-md bg-field p-5"
-          :class="column.best ? 'outline-[1.5px] outline-ink outline-solid' : ''"
+          class="solid-card rounded-[22px] p-5 transition-shadow duration-300 ease-ios"
+          :class="column.best ? 'ring-2 ring-accent' : ''"
         >
-          <p class="flex items-baseline justify-between gap-3">
+          <p class="flex items-center justify-between gap-3">
             <span class="font-semibold">{{ column.title }}</span>
-            <span v-if="column.best" class="text-sm font-semibold">Le moins cher</span>
+            <span
+              v-if="column.best"
+              class="shrink-0 rounded-full bg-success-tint px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap text-gain"
+              >Le moins cher</span
+            >
           </p>
-          <p class="text-sm text-ink-soft">{{ column.rate }}</p>
-          <dl class="numeric mt-3 space-y-1 text-sm">
+          <p class="text-sm text-muted">{{ column.rate }}</p>
+          <dl class="numeric mt-4 space-y-1.5 text-sm">
             <div class="flex justify-between gap-4">
-              <dt class="text-ink-soft">Impôt sur le revenu</dt>
+              <dt class="text-muted">Impôt sur le revenu</dt>
               <dd>{{ formatEuros(column.cost.incomeTax) }}</dd>
             </div>
             <div class="flex justify-between gap-4">
-              <dt class="text-ink-soft">Prélèvements sociaux</dt>
+              <dt class="text-muted">Prélèvements sociaux</dt>
               <dd>{{ formatEuros(column.cost.socialContributions) }}</dd>
             </div>
-            <div class="flex justify-between gap-4 border-t border-rule pt-2 font-semibold">
+            <div
+              class="flex justify-between gap-4 border-t border-separator pt-2.5 text-base font-semibold"
+            >
               <dt>Total</dt>
               <dd>{{ formatEuros(column.cost.total) }}</dd>
             </div>
@@ -137,7 +138,8 @@ const columns = computed(() => {
       <p class="text-base" role="status">
         <template v-if="comparison.better === 'progressive'">
           <span class="font-semibold">
-            Cochez la case <span class="highlighter px-1">3CN</span> de la déclaration 2042 C
+            Cochez la case <span class="highlighter rounded-md px-1.5">3CN</span> de la déclaration
+            2042 C
           </span>
           : le barème vous fait économiser {{ formatEuros(comparison.difference) }}.
         </template>
@@ -150,7 +152,7 @@ const columns = computed(() => {
         </template>
       </p>
 
-      <ul class="max-w-prose list-disc space-y-1 pl-5 text-xs text-ink-soft">
+      <ul class="max-w-prose list-disc space-y-1 pl-5 text-xs text-muted">
         <li>
           Au barème, 6,8 % de CSG sont déductibles des revenus de l'année suivante : environ
           {{ formatEuros(comparison.progressive.deductibleCsgSaving) }} d'impôt en moins, à tranche

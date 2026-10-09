@@ -1,67 +1,101 @@
 # Design
 
-Direction « surligneur » : l'outil emprunte au **formulaire de déclaration** ses cases numérotées
-et ses champs en peigne (un chiffre par case), et au geste de celui qui le remplit son
-**surligneur fluo**. Il ne cherche pas pour autant à ressembler au site des impôts : pas de police
-Marianne ni de charte de l'État, et la mention « outil indépendant » en pied de page.
+Direction « verre » inspirée des interfaces iOS : un fond clair et calme, des surfaces en verre
+dépoli qui créent la hiérarchie, une typographie système serrée et des animations courtes. Le site
+garde deux repères du formulaire de déclaration : les **cases en peigne** (un chiffre par case) et
+le **surligneur** sur les montants à recopier. Il ne cherche pas à ressembler au site des impôts
+(pas de police Marianne ni de charte de l'État) ni à copier Apple : aucune police ni icône
+propriétaire n'est embarquée.
 
-## Pourquoi cette direction
-
-La première version, « fintech sobre », était propre mais anonyme. La refonte a suivi la méthode
-du skill `frontend-design` d'Anthropic : partir du sujet plutôt que d'un style à la mode, et
-écarter les choix par défaut des interfaces générées. Trois pistes ont été écartées pour cette
-raison : fond crème avec titre à empattements et accent terre cuite, fond noir avec un accent
-fluo, et le « kit SaaS » de cartes arrondies identiques avec ombres et dégradés.
-
-Le sujet, lui, a un vocabulaire visuel fort : les cases 3AN et 3BN, les lignes 211 à 224, les
-champs bleutés du formulaire papier. C'est de là que viennent les choix ci-dessous.
+Tous les jetons sont dans `app/assets/css/main.css`.
 
 ## Couleurs
 
-| Nom         | Valeur               | Rôle                                                           |
-| ----------- | -------------------- | -------------------------------------------------------------- |
-| Encre       | `#1B2240`            | texte, boutons, filets forts                                   |
-| Encre pâle  | `#4A5578`            | texte secondaire (7,3:1 sur blanc, 6,5:1 sur champ)            |
-| Papier      | `#FFFFFF`            | fond                                                           |
-| Champ       | `#EEF2F8`            | zones de saisie et de résultat, comme les champs du formulaire |
-| Trait       | `#C9D2E3`            | séparateurs                                                    |
-| Surligneur  | `#FFE94D`            | **uniquement** derrière les montants à recopier                |
-| Gain, perte | `#0C6E42`, `#B02C16` | montants signés (au moins 5,6:1 sur champ)                     |
+| Jeton              | Clair                | Sombre               | Rôle                                 |
+| ------------------ | -------------------- | -------------------- | ------------------------------------ |
+| `--background`     | `#F5F5F7`            | `#000000`            | fond de page                         |
+| `--elevated`       | `#FFFFFF`            | `#1C1C1E`            | surfaces pleines (tableaux, listes)  |
+| `--surface`        | blanc à 62 %         | `#1C1C1E` à 62 %     | verre des cartes                     |
+| `--surface-strong` | blanc à 78 %         | `#2C2C2E` à 78 %     | verre des cartes de résultat, menus  |
+| `--text-primary`   | `#1D1D1F`            | `#F5F5F7`            | texte                                |
+| `--text-secondary` | `#6E6E73`            | `#A1A1A6`            | texte secondaire                     |
+| `--accent`         | `#0071E3`            | `#0071E3`            | boutons principaux                   |
+| `--link`           | `#0066CC`            | `#2997FF`            | liens, étapes, états actifs          |
+| `--gain`, `--loss` | `#1A7F37`, `#D70015` | `#30D158`, `#FF6961` | montants signés                      |
+| `--warning`        | `#B83000`            | `#FF9F0A`            | alertes (historique incomplet…)      |
+| `--highlight`      | `#FFE066`            | jaune à 45 %         | **uniquement** les montants à copier |
 
-Le jaune n'apparaît qu'à un endroit à la fois : là où il y a quelque chose à recopier. C'est le
-seul élément audacieux de la page ; tout le reste est à l'encre. Chaque texte dépasse 5,5:1 de
-contraste (WCAG AA demande 4,5:1), et le vert et le rouge ne portent jamais seuls l'information :
-les montants gardent leur signe.
+Les couleurs iOS (`--ios-blue`, `--ios-indigo`, `--ios-purple`, `--ios-pink`…) servent aux halos
+du fond et au remplissage du curseur. Le bleu iOS `#007AFF` ne donne que 4:1 de contraste avec du
+blanc : les boutons utilisent `#0071E3` (4,7:1) et les liens `#0066CC` (5,1:1 sur le fond). De
+même, le vert et le rouge iOS sont trop clairs pour du texte sur fond clair : on garde leurs
+variantes foncées. Chaque texte atteint au moins 4,5:1 (WCAG AA), et le vert et le rouge ne
+portent jamais seuls l'information : les montants gardent leur signe.
+
+## Le verre, avec parcimonie
+
+Quatre niveaux, du plus léger au plus flottant : `glass-subtle`, `glass`, `glass-strong` et
+`glass-floating`. Chacun combine un flou d'arrière-plan avec saturation, une bordure presque
+blanche, un reflet intérieur d'un pixel et un très léger dégradé interne qui imite la lumière.
+
+- **Barre de navigation et menus** : `glass-floating`, le plus de flou et d'ombre. La barre passe
+  de `glass` à `glass-floating` dès que la page défile.
+- **Cartes principales** (dépôt de fichiers, résultat, comparaison, simulateur) : `glass` ou
+  `glass-strong`.
+- **Tableaux et listes** : surface pleine (`solid-card`), pour la lisibilité des chiffres.
+- **Fond** : `#F5F5F7` presque opaque, avec quatre halos très diffus (bleu, violet, cyan, rose)
+  qui donnent au verre quelque chose à flouter.
+
+Le verre n'est jamais imbriqué dans du verre : un flou dans un flou ne floute plus la page.
 
 ## Typographie
 
-Une seule famille, **Archivo** (variable en graisse et en largeur), hébergée par le site : aucune
-requête vers un service de polices.
+La police du système : San Francisco sur les appareils Apple, Segoe UI sous Windows, Roboto sous
+Android. Rien à télécharger.
 
-- Titres : graisse 700, largeur 118 %, interlignage serré. La largeur donne la personnalité.
-- Texte : largeur normale, lignes de moins de 80 caractères.
-- Montants : chiffres tabulaires (`font-variant-numeric: tabular-nums`) pour aligner les colonnes,
-  sans police à chasse fixe.
+- Accroche : `clamp(3rem, 7vw, 6.5rem)`, graisse 700, approche −0,055 em, interlignage 0,95.
+- Titres : graisse 700, approche −0,035 em.
+- Montants : chiffres tabulaires pour aligner les colonnes.
 
 ## Composants
 
-- **Case en peigne** (`CombBox.vue`) : le code de la case sur fond d'encre, puis un chiffre par
-  cellule. Les lecteurs d'écran lisent « Case 3AN : 331 € ».
-- **Lignes du 2086** : le numéro de ligne dans un petit cadre, la valeur dans un champ bleuté,
-  une colonne par cession comme sur le formulaire.
-- **Étapes numérotées** : importer, vérifier, recopier. Les numéros sont justifiés : c'est une
-  vraie suite d'actions.
+- **Case en peigne** (`CombBox.vue`) : le code de la case, puis un chiffre par cellule, comme les
+  champs de code à usage unique d'iOS. Le surligneur passe sur les cellules, puis les chiffres
+  s'inscrivent un à un. Les lecteurs d'écran lisent « Case 3AN : 331 € ».
+- **Boutons** (`.btn-primary`, `.btn-secondary`, `.btn-ghost`) : montée d'un pixel au survol,
+  enfoncement à 97 % au clic.
+- **Champs** (`.input`) : fond légèrement teinté, anneau bleu au focus.
+- **Contrôle segmenté** (`.segmented`) : année des ventes et tranche d'imposition.
+- **Volets dépliables** (`.disclosure`) : chevron qui pivote, hauteur animée.
+- **Icônes** (`AppIcon.vue`) : trait fin, redessinées d'après Lucide (licence ISC).
 
 ## Mouvement
 
-Un seul moment animé : le surligneur passe sur la case, puis les chiffres s'y inscrivent un par
-un. Il joue dans l'accroche et sur le résultat de l'utilisateur, et il est désactivé si le système
-demande de réduire les animations (`prefers-reduced-motion`). Aucune autre animation d'entrée.
+Des animations courtes, sur l'opacité, la position et le flou, avec la courbe
+`cubic-bezier(0.22, 1, 0.36, 1)` :
+
+- à l'ouverture, l'accroche arrive en fondu, élément par élément, puis le surligneur passe sur la
+  case 3AN ;
+- les blocs encore hors de l'écran apparaissent quand on les atteint (`v-reveal`) ; ce qui est
+  déjà visible n'est jamais masqué ;
+- menus et volets s'ouvrent en fondu avec un léger zoom ;
+- squelette de chargement pendant la récupération des cours.
+
+Tout est désactivé si le système demande de réduire les animations (`prefers-reduced-motion`).
+
+## Mode sombre
+
+Il suit le réglage du système. Ce n'est pas une inversion : fond noir, surfaces gris foncé
+translucides, bordures blanches à très faible opacité, halos un peu plus présents pour que le
+verre reste visible.
 
 ## Accessibilité
 
-- Lien d'évitement, focus visible à l'encre sur tout élément interactif.
+- Lien d'évitement, focus visible en bleu sur tout élément interactif.
 - La zone de dépôt est un `<label>` autour d'un `<input type="file">`, utilisable au clavier ; le
   bouton « Importer mon export » ouvre le même sélecteur.
-- Tableaux avec `<caption>` et en-têtes `scope`, messages d'état dans des zones `aria-live`.
-- Vérifié à 375, 800 et 1 280 px de large, sans défilement horizontal de la page.
+- Menu mobile : `aria-expanded`, fermeture avec Échap (le focus revient au bouton) ou en touchant
+  ailleurs.
+- Zones tactiles d'au moins 44 px, tableaux avec `<caption>` et en-têtes `scope`, messages d'état
+  dans des zones `aria-live`.
+- Vérifié à 375 et 1 280 px de large, en clair et en sombre, sans défilement horizontal.

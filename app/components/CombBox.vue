@@ -11,8 +11,10 @@ const props = withDefaults(
     value: number
     cells?: number
     size?: 'md' | 'lg'
+    /** Attente avant le surligneur, en millisecondes : laisse finir une entrée de page. */
+    delay?: number
   }>(),
-  { cells: 5, size: 'lg' },
+  { cells: 5, size: 'lg', delay: 0 },
 )
 
 const digits = computed(() => {
@@ -20,35 +22,41 @@ const digits = computed(() => {
   return [...text.padStart(Math.max(props.cells, text.length), ' ')]
 })
 
+const SWEEP_START_MS = 300
 const SWEEP_END_MS = 1150
 const STEP_MS = 110
 </script>
 
 <template>
   <div
-    class="flex items-center gap-3"
+    class="flex items-center gap-2 sm:gap-3"
     role="img"
     :aria-label="`Case ${code} : ${formatWholeEuros(value)}`"
   >
     <span
-      class="display rounded-[3px] bg-ink px-2 py-1 text-paper"
+      class="rounded-chip bg-label px-2.5 py-1.5 font-bold tracking-tight text-canvas"
       :class="size === 'lg' ? 'text-base' : 'text-sm'"
       aria-hidden="true"
     >
       {{ code }}
     </span>
     <!-- La clé rejoue l'animation quand le montant change. -->
-    <div :key="value" class="highlighter flex px-1.5" aria-hidden="true">
+    <div
+      :key="value"
+      class="highlighter flex gap-1 rounded-[14px] p-1.5"
+      :style="{ animationDelay: `${delay + SWEEP_START_MS}ms` }"
+      aria-hidden="true"
+    >
       <span
         v-for="(digit, index) in digits"
         :key="index"
-        class="numeric flex items-center justify-center border-y-[1.5px] border-r-[1.5px] border-ink font-semibold first:rounded-l-[4px] first:border-l-[1.5px] last:rounded-r-[4px]"
-        :class="size === 'lg' ? 'h-14 w-10 text-3xl' : 'h-11 w-8 text-2xl'"
+        class="numeric flex items-center justify-center rounded-[10px] bg-elevated font-semibold shadow-[0_1px_2px_rgb(0_0_0/0.08)] ring-1 ring-separator"
+        :class="size === 'lg' ? 'h-14 w-8 text-3xl sm:w-10' : 'h-11 w-8 text-2xl'"
       >
         <span
           v-if="digit !== ' '"
           class="ink-in"
-          :style="{ animation: `ink-in 160ms ${SWEEP_END_MS + index * STEP_MS}ms both` }"
+          :style="{ animation: `ink-in 260ms ${delay + SWEEP_END_MS + index * STEP_MS}ms both` }"
         >
           {{ digit }}
         </span>

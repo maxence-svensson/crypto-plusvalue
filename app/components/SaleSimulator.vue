@@ -150,20 +150,17 @@ const crossesThreshold = computed(
 </script>
 
 <template>
-  <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-12">
-    <form class="space-y-5" @submit.prevent>
+  <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-8">
+    <form class="glass space-y-5 rounded-card p-6 sm:p-8" @submit.prevent>
       <template v-if="fromHistory">
-        <p class="max-w-prose text-sm text-ink-soft">
+        <p class="max-w-prose text-sm text-muted">
           Le calcul part de vos fichiers importés : ce qu'il reste de vos prix d'achat, et vos
           ventes déjà faites cette année.
         </p>
         <div class="grid gap-4 sm:grid-cols-2">
           <label class="block">
             <span class="text-sm font-semibold">Crypto à vendre</span>
-            <select
-              v-model="asset"
-              class="mt-1 block w-full rounded-[4px] border-[1.5px] border-ink bg-paper px-3 py-2"
-            >
+            <select v-model="asset" class="input mt-2">
               <option v-for="[symbol, amount] in holdings" :key="symbol" :value="symbol">
                 {{ symbol }} ({{ formatQuantity(amount) }} détenus)
               </option>
@@ -175,7 +172,7 @@ const crossesThreshold = computed(
               v-model="quantity"
               inputmode="decimal"
               placeholder="0,5"
-              class="numeric mt-1 block w-full rounded-[4px] border-[1.5px] border-ink bg-paper px-3 py-2"
+              class="input numeric mt-2"
               @input="onQuantityInput"
             />
           </label>
@@ -184,8 +181,8 @@ const crossesThreshold = computed(
               <label for="part-a-vendre" class="font-semibold"
                 >Part de vos {{ asset }} à vendre</label
               >
-              <span class="numeric text-ink-soft">
-                <span class="font-semibold text-ink">{{ percent }} %</span>
+              <span class="numeric text-muted">
+                <span class="font-semibold text-label">{{ percent }} %</span>
                 <template v-if="estimatedValue">, soit {{ formatEuros(estimatedValue) }}</template>
               </span>
             </div>
@@ -196,12 +193,12 @@ const crossesThreshold = computed(
               max="100"
               step="1"
               :value="percent"
-              class="range-ink mt-3 block w-full"
+              class="range mt-4 block w-full"
               :style="{ '--fill': `${percent}%` }"
               :aria-valuetext="`${percent} %${quantity ? `, soit ${quantity} ${asset}` : ''}`"
               @input="onSlide"
             />
-            <div class="numeric mt-2 flex justify-between text-xs text-ink-soft" aria-hidden="true">
+            <div class="numeric mt-4 flex justify-between text-xs text-muted" aria-hidden="true">
               <span>0 %</span>
               <span>25 %</span>
               <span>50 %</span>
@@ -211,12 +208,8 @@ const crossesThreshold = computed(
           </div>
           <label class="block">
             <span class="text-sm font-semibold">Cours de vente, en euros</span>
-            <input
-              v-model="unitPrice"
-              inputmode="decimal"
-              class="numeric mt-1 block w-full rounded-[4px] border-[1.5px] border-ink bg-paper px-3 py-2"
-            />
-            <span class="mt-1 block text-xs text-ink-soft">
+            <input v-model="unitPrice" inputmode="decimal" class="input numeric mt-2" />
+            <span class="mt-1.5 block text-xs text-muted">
               {{
                 marketPrice
                   ? `Cours d'il y a 2 minutes, ${marketPrice.source}.`
@@ -226,27 +219,23 @@ const crossesThreshold = computed(
               }}
               <button
                 type="button"
-                class="underline underline-offset-4 hover:text-ink"
+                class="inline-flex items-center gap-1 font-medium text-link hover:underline"
                 @click="refreshPrices"
               >
+                <AppIcon name="refresh" class="size-3.5" />
                 Actualiser
               </button>
             </span>
           </label>
           <label class="block">
             <span class="text-sm font-semibold">Frais de vente, en euros</span>
-            <input
-              v-model="fee"
-              inputmode="decimal"
-              placeholder="0"
-              class="numeric mt-1 block w-full rounded-[4px] border-[1.5px] border-ink bg-paper px-3 py-2"
-            />
+            <input v-model="fee" inputmode="decimal" placeholder="0" class="input numeric mt-2" />
           </label>
         </div>
       </template>
 
       <template v-else>
-        <p class="max-w-prose text-sm text-ink-soft">
+        <p class="max-w-prose text-sm text-muted">
           Sans fichier, trois montants suffisent. Importez votre historique plus haut pour un calcul
           automatique, crypto par crypto.
         </p>
@@ -259,9 +248,9 @@ const crossesThreshold = computed(
               v-model="invested"
               inputmode="decimal"
               placeholder="5 000"
-              class="numeric mt-1 block w-full rounded-[4px] border-[1.5px] border-ink bg-paper px-3 py-2"
+              class="input numeric mt-2"
             />
-            <span class="mt-1 block text-xs text-ink-soft">
+            <span class="mt-1.5 block text-xs text-muted">
               Si vous avez déjà vendu, reprenez la ligne 223 de votre dernier formulaire 2086.
             </span>
           </label>
@@ -271,7 +260,7 @@ const crossesThreshold = computed(
               v-model="portfolioValue"
               inputmode="decimal"
               placeholder="8 000"
-              class="numeric mt-1 block w-full rounded-[4px] border-[1.5px] border-ink bg-paper px-3 py-2"
+              class="input numeric mt-2"
             />
           </label>
           <label class="block">
@@ -280,46 +269,44 @@ const crossesThreshold = computed(
               v-model="saleAmount"
               inputmode="decimal"
               placeholder="2 000"
-              class="numeric mt-1 block w-full rounded-[4px] border-[1.5px] border-ink bg-paper px-3 py-2"
+              class="input numeric mt-2"
             />
           </label>
           <label class="block">
             <span class="text-sm font-semibold">Frais de vente</span>
-            <input
-              v-model="fee"
-              inputmode="decimal"
-              placeholder="0"
-              class="numeric mt-1 block w-full rounded-[4px] border-[1.5px] border-ink bg-paper px-3 py-2"
-            />
+            <input v-model="fee" inputmode="decimal" placeholder="0" class="input numeric mt-2" />
           </label>
         </div>
       </template>
     </form>
 
-    <div class="rounded-md bg-field p-6 sm:p-8" aria-live="polite">
-      <p v-if="'hint' in outcome" class="text-ink-soft">{{ outcome.hint }}</p>
+    <div
+      class="glass-strong rounded-card p-6 sm:p-8 lg:sticky lg:top-24 lg:self-start"
+      aria-live="polite"
+    >
+      <p v-if="'hint' in outcome" class="text-muted">{{ outcome.hint }}</p>
       <p v-else-if="'error' in outcome" class="text-loss">{{ outcome.error }}</p>
       <template v-else>
         <dl class="space-y-4">
           <div>
-            <dt class="text-sm text-ink-soft">Plus ou moins-value de cette vente</dt>
+            <dt class="text-sm text-muted">Plus ou moins-value de cette vente</dt>
             <dd
-              class="numeric display text-3xl"
+              class="numeric headline mt-1 text-4xl sm:text-5xl"
               :class="outcome.simulation.disposal.gain.lt(0) ? 'text-loss' : 'text-gain'"
             >
               {{ formatSignedEuros(outcome.simulation.disposal.gain) }}
             </dd>
           </div>
-          <div class="grid grid-cols-2 gap-4 border-t border-rule pt-4">
+          <div class="grid grid-cols-2 gap-4 border-t border-separator pt-5">
             <div>
-              <dt class="text-sm text-ink-soft">Impôt supplémentaire</dt>
-              <dd class="numeric text-xl font-semibold">
+              <dt class="text-sm text-muted">Impôt supplémentaire</dt>
+              <dd class="numeric mt-0.5 text-xl font-semibold tracking-tight">
                 {{ formatEuros(outcome.simulation.extraTax) }}
               </dd>
             </div>
             <div>
-              <dt class="text-sm text-ink-soft">Il vous resterait</dt>
-              <dd class="numeric text-xl font-semibold">
+              <dt class="text-sm text-muted">Il vous resterait</dt>
+              <dd class="numeric mt-0.5 text-xl font-semibold tracking-tight">
                 {{ formatEuros(outcome.simulation.netProceeds) }}
               </dd>
             </div>
@@ -327,24 +314,27 @@ const crossesThreshold = computed(
         </dl>
         <p
           v-if="crossesThreshold"
-          class="mt-4 rounded-md bg-warning-soft px-3 py-2 text-sm text-warning"
+          class="mt-5 flex gap-3 rounded-control bg-warning-tint px-4 py-3 text-sm text-warning"
         >
-          Cette vente ferait dépasser {{ EXEMPTION_THRESHOLD }} € de ventes dans l'année : vos
-          ventes précédentes, jusque-là exonérées, deviendraient imposables elles aussi.
+          <AppIcon name="alert" class="mt-0.5 size-4" />
+          <span>
+            Cette vente ferait dépasser {{ EXEMPTION_THRESHOLD }} € de ventes dans l'année : vos
+            ventes précédentes, jusque-là exonérées, deviendraient imposables elles aussi.
+          </span>
         </p>
-        <p class="mt-4 text-sm text-ink-soft">
+        <p class="mt-4 text-sm text-muted">
           Sur l'année {{ outcome.simulation.yearAfter.year }}, vos ventes totaliseraient
-          <span class="numeric font-semibold text-ink">{{
+          <span class="numeric font-semibold text-label">{{
             formatEuros(outcome.simulation.yearAfter.totalPrice)
           }}</span
           >, pour une plus ou moins-value nette de
-          <span class="numeric font-semibold text-ink">{{
+          <span class="numeric font-semibold text-label">{{
             formatSignedEuros(outcome.simulation.yearAfter.netGain)
           }}</span
           >.
         </p>
       </template>
-      <p class="mt-6 border-t border-rule pt-4 text-xs text-ink-soft">
+      <p class="mt-6 border-t border-separator pt-4 text-xs text-muted">
         Estimation au prélèvement forfaitaire de 31,4 % (12,8 % d'impôt et 18,6 % de prélèvements
         sociaux), sans l'option pour le barème progressif. Simulation indicative : ce n'est ni un
         conseil fiscal ni un conseil d'investissement.
