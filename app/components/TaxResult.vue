@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { FORM_2086, hasForm2086 } from '#shared/cerfa/form2086'
 import { EXEMPTION_THRESHOLD, taxYear } from '#shared/tax/form2086'
+import { FIRST_YEAR, flatRate, flatTax, taxRules } from '#shared/tax/rules'
 
 const store = usePortfolioStore()
 
@@ -15,6 +16,13 @@ const year = computed(() => chosenYear.value ?? defaultYear.value)
 
 const summary = computed(() => (year.value === undefined ? undefined : store.summary(year.value)))
 const isLoss = computed(() => (summary.value?.box3BN ?? 0) > 0)
+const rules = computed(() => (year.value === undefined ? undefined : taxRules(year.value)))
+const estimatedTax = computed(() => (summary.value ? flatTax(summary.value) : undefined))
+
+/** Un historique antérieur à 2019 relève en partie d'un autre régime : à signaler. */
+const startsBefore2019 = computed(() =>
+  store.transactions.some((transaction) => taxYear(transaction.date) < FIRST_YEAR),
+)
 
 const downloading = ref<'form' | 'dossier'>()
 const downloadError = ref('')
@@ -82,7 +90,32 @@ async function download(kind: 'form' | 'dossier') {
         </div>
       </fieldset>
 
-      <div v-if="summary.disposals.length === 0" class="glass rounded-card p-6 sm:p-8">
+      <div
+        v-if="startsBefore2019"
+        class="flex gap-4 rounded-card bg-warning-tint px-5 py-5 text-sm sm:px-6"
+        role="note"
+      >
+        <AppIcon name="alert" class="mt-0.5 text-warning" />
+        <div>
+          <p class="font-semibold text-warning">Historique antérieur à {{ FIRST_YEAR }}</p>
+          <p class="mt-1 max-w-prose">
+            Le calcul du formulaire 2086 s'applique aux cessions faites depuis le 1er janvier
+            {{ FIRST_YEAR }}. Le prix total d'acquisition des cryptos achetées avant obéit à des
+            règles particulières (BOFiP BOI-RPPM-PVBMC-30-20, §130) : vérifiez la ligne 220 avec un
+            conseil fiscal.
+          </p>
+        </div>
+      </div>
+
+      <div v-if="year < FIRST_YEAR" class="glass rounded-card p-6 sm:p-8">
+        <p class="headline text-xl">Revenus {{ year }} : autre régime</p>
+        <p class="mt-2 max-w-prose text-muted">
+          Avant {{ FIRST_YEAR }}, les cessions de cryptos relevaient d'un autre régime d'imposition,
+          sans formulaire 2086 : elles ne sont pas calculées ici.
+        </p>
+      </div>
+
+      <div v-else-if="summary.disposals.length === 0" class="glass rounded-card p-6 sm:p-8">
         <p class="headline text-xl">Rien à déclarer pour {{ year }}</p>
         <p class="mt-2 max-w-prose text-muted">
           Vous n'avez rien vendu contre des euros ni payé avec vos cryptos cette année-là : pas de
@@ -128,6 +161,19 @@ async function download(kind: 'form' | 'dossier') {
               </dt>
               <dd class="numeric text-base font-semibold whitespace-nowrap">
                 {{ formatEuros(summary.totalPrice) }}
+              </dd>
+            </div>
+            <div class="flex items-baseline justify-between gap-4 py-3.5">
+              <dt>
+                <span class="font-semibold">Impôt estimé</span>
+                <span class="text-muted">
+                  au prélèvement forfaitaire<template v-if="rules">
+                    de {{ formatPercent(flatRate(rules)) }}</template
+                  ></span
+                >
+              </dt>
+              <dd class="numeric text-base font-semibold whitespace-nowrap">
+                {{ estimatedTax ? formatEuros(estimatedTax) : 'taux pas encore connus' }}
               </dd>
             </div>
             <div class="flex items-baseline justify-between gap-4 py-3.5">
@@ -229,7 +275,7 @@ async function download(kind: 'form' | 'dossier') {
         </div>
       </template>
 
-      <NextSteps :summary="summary" />
+      <NextSteps v-if="year >= FIRST_YEAR" :summary="summary" />
     </template>
   </div>
 </template>

@@ -2,6 +2,7 @@
 import { hasForm2086 } from '#shared/cerfa/form2086'
 import { PLATFORM_NAMES } from '#shared/importers/detect'
 import { declarationStatus } from '#shared/tax/calendar'
+import { taxRules } from '#shared/tax/rules'
 import { EXEMPTION_THRESHOLD, type YearSummary } from '#shared/tax/form2086'
 
 /**
@@ -49,7 +50,7 @@ const steps = computed<Step[]>(() => {
     })
   }
 
-  if (!exempt && box3AN > 0) {
+  if (!exempt && box3AN > 0 && taxRules(year.value)?.progressive) {
     list.push({
       id: '3cn',
       title: 'Choisir entre prélèvement forfaitaire et barème',
