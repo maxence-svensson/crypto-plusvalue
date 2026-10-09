@@ -150,7 +150,7 @@ function exportCsv() {
 
       <div
         v-if="selected.size > 0"
-        class="glass-strong sticky top-20 z-20 flex flex-wrap items-center justify-between gap-3 rounded-card px-5 py-3 text-sm lg:top-6"
+        class="glass-strong sticky top-20 z-20 flex flex-wrap items-center justify-between gap-3 rounded-card px-5 py-3 text-sm lg:top-24"
       >
         <span class="font-semibold">
           {{ plural(selected.size, 'opération sélectionnée', 'opérations sélectionnées') }}

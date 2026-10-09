@@ -47,8 +47,8 @@ Importez l'historique de vos plateformes, obtenez les montants à reporter, cess
   année, période, montant, points à vérifier), tri, ajout d'une opération absente des exports,
   modification, suppression, annulation et journal des corrections, export CSV.
 - **Une application en plusieurs pages** (tableau de bord, transactions, fiscalité,
-  simulateur, portefeuille, plateformes), avec une barre latérale sur ordinateur et une barre
-  d'onglets sur téléphone.
+  simulateur, portefeuille, plateformes), avec une barre de navigation en haut sur ordinateur et une
+  barre d'onglets sur téléphone.
 - **Un mode démonstration** avec un exemple fictif, clairement signalé, pour essayer sans
   fichier.
 

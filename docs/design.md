@@ -93,8 +93,10 @@ Android. Rien à télécharger.
 
 ## Navigation
 
-- **Ordinateur et grande tablette** (1 024 px et plus) : barre latérale en verre, fixe, avec les
-  six sections et, en bas, le rappel que les fichiers restent dans le navigateur.
+- **Ordinateur et grande tablette** (1 024 px et plus) : barre de navigation en haut, en verre,
+  qui reste visible au défilement et devient plus opaque dès qu'on descend. La marque à gauche,
+  les six sections en libellés seuls (la section ouverte en pastille bleue), les paramètres en
+  icône à droite. Ses marges sont celles du contenu : elle s'aligne sur les cartes de la page.
 - **Téléphone et petite tablette** : barre d'onglets en verre en bas de l'écran, comme sur iOS,
   avec quatre onglets (Accueil, Opérations, Fiscalité, Simuler) et « Plus » pour le reste ; en
   haut, la marque et le rappel du mode démonstration. L'encoche et la barre d'accueil des iPhone

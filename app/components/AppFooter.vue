@@ -6,7 +6,7 @@
       <p class="max-w-prose">
         CryptoPlusValue est un outil indépendant, sans lien avec l'administration fiscale. Ses
         résultats sont indicatifs et ne remplacent pas un conseil fiscal : vérifiez-les avant de
-        déclarer.
+        déclarer. Vos fichiers restent dans ce navigateur.
       </p>
       <p class="flex flex-wrap gap-x-6 gap-y-2">
         <a :href="docUrl('regles-fiscales')" class="hover:text-label hover:underline">
