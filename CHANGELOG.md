@@ -4,6 +4,16 @@ Les changements notables, du plus récent au plus ancien. Chaque entrée renvoie
 
 ## 9 octobre 2026
 
+### Phase 4 (deuxième partie) : sauvegarde et paramètres
+
+- Données conservées dans le navigateur (IndexedDB) et relues à la visite suivante ; option
+  désactivable ; enregistrement immédiat après un import.
+- Page Paramètres : thème Système, Clair ou Sombre retenu sans éclair au chargement, conservation
+  des données, « Tout effacer » avec confirmation, ce qui transite par le réseau.
+- Quitter la démonstration rend vos propres données ; la démonstration n'est jamais enregistrée.
+- Couleurs déclarées une seule fois avec `light-dark()`.
+- Les tests de bout en bout échouent désormais sur toute erreur de page ou écart d'hydratation.
+
 ### Phase 4 (première partie) : application en plusieurs pages
 
 - Tableau de bord, Transactions, Fiscalité, Simulateur, Portefeuille, Plateformes : une page par

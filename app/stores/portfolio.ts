@@ -6,6 +6,7 @@ import { importFile, type Platform } from '#shared/importers/detect'
 import { checkDuplicates, type DuplicateCheck } from '#shared/portfolio/duplicates'
 import { assessQuality } from '#shared/portfolio/quality'
 import { replayPortfolio } from '#shared/portfolio/replay'
+import { fromPlain, toPlain, type Plain } from '#shared/persistence/serialize'
 import { buildTaxEvents, requiredPrices } from '#shared/portfolio/tax-events'
 import type { Transaction } from '#shared/portfolio/transaction'
 import { startOfMinute, type PriceQuote } from '#shared/prices'
@@ -61,6 +62,14 @@ export const usePortfolioStore = defineStore('portfolio', () => {
   /** Mode démonstration : les données affichées sont celles de l'exemple fictif. */
   const demo = ref(false)
 
+  /** Conserver les données dans ce navigateur (IndexedDB) : oui par défaut, désactivable. */
+  const keep = ref(true)
+  /** Dernier enregistrement réussi. */
+  const savedAt = ref<Date>()
+  const storageError = ref('')
+  /** Relecture en cours : rien n'est enregistré ni effacé pendant ce temps. */
+  const restoring = ref(false)
+
   /** Un fichier à importer : son nom, sa taille si elle est connue, et de quoi lire son contenu. */
   type FileSource = { name: string; size?: number; bytes: () => Promise<ArrayBuffer> }
 
@@ -70,7 +79,7 @@ export const usePortfolioStore = defineStore('portfolio', () => {
    */
   async function prepareImport(list: Iterable<FileSource>, forDemo = false) {
     // Un vrai fichier ne se mélange pas aux données fictives de la démonstration.
-    if (demo.value && !forDemo) exitDemo()
+    if (demo.value && !forDemo) await exitDemo()
     for (const file of list) {
       try {
         if ((file.size ?? 0) > MAX_FILE_BYTES) {
@@ -135,6 +144,8 @@ export const usePortfolioStore = defineStore('portfolio', () => {
       })
     }
     pending.value = index === undefined ? [] : pending.value.filter((_, at) => at !== index)
+    // Enregistré tout de suite : un onglet fermé juste après l'import ne perd rien.
+    await save()
     await fetchPrices()
   }
 
@@ -167,10 +178,99 @@ export const usePortfolioStore = defineStore('portfolio', () => {
     )
   }
 
-  /** Quitte la démonstration : les données fictives disparaissent. */
-  function exitDemo() {
+  /** Quitte la démonstration : les données fictives disparaissent, les vôtres reviennent. */
+  async function exitDemo() {
+    restoring.value = true
     reset()
     demo.value = false
+    await restore()
+  }
+
+  const STATE_KEY = 'etat'
+  const STATE_VERSION = 1
+  type StoredState = {
+    transactions: Transaction[]
+    files: ImportedFile[]
+    prices: [string, Price][]
+    savedAt: Date
+  }
+
+  /** Relit les données enregistrées dans ce navigateur, sauf démonstration en cours. */
+  async function restore() {
+    restoring.value = true
+    keep.value = readPreference('conserver') !== 'non'
+    try {
+      if (!keep.value || demo.value || transactions.value.length > 0) return
+      const stored = (await readStored(STATE_KEY)) as { version?: number; data?: Plain } | undefined
+      if (!stored || stored.version !== STATE_VERSION || !stored.data) return
+      const state = fromPlain<StoredState>(stored.data)
+      // L'exemple a pu être ouvert pendant la lecture : il garde la main.
+      if (demo.value || transactions.value.length > 0) return
+      transactions.value = state.transactions
+      files.value = state.files
+      prices.value = new Map(state.prices)
+      savedAt.value = state.savedAt
+    } catch {
+      storageError.value = 'Les données enregistrées dans ce navigateur n’ont pas pu être relues.'
+    } finally {
+      restoring.value = false
+    }
+    await fetchPrices()
+  }
+
+  async function save() {
+    if (!keep.value || demo.value || restoring.value) return
+    try {
+      if (transactions.value.length === 0 && files.value.length === 0) {
+        await deleteStored(STATE_KEY)
+        savedAt.value = undefined
+        return
+      }
+      const now = new Date()
+      const data = toPlain({
+        transactions: transactions.value,
+        files: files.value,
+        prices: [...prices.value],
+        savedAt: now,
+      })
+      await writeStored(STATE_KEY, { version: STATE_VERSION, data })
+      savedAt.value = now
+      storageError.value = ''
+    } catch {
+      storageError.value =
+        'Enregistrement impossible : le stockage du navigateur est plein ou désactivé.'
+    }
+  }
+
+  /** Active ou coupe l'enregistrement ; le couper efface ce qui était enregistré. */
+  async function setKeep(value: boolean) {
+    keep.value = value
+    writePreference('conserver', value ? null : 'non')
+    if (value) {
+      await save()
+    } else {
+      await deleteStored(STATE_KEY).catch(() => undefined)
+      savedAt.value = undefined
+    }
+  }
+
+  /** Efface tout : opérations, cours, fichiers, préférences, et ce qui était enregistré. */
+  async function clearAll() {
+    reset()
+    demo.value = false
+    savedAt.value = undefined
+    clearPreferences()
+    keep.value = true
+    await deleteStored(STATE_KEY).catch(() => undefined)
+  }
+
+  // Enregistrement automatique, regroupé : une modification toutes les 400 ms au plus.
+  if (import.meta.client) {
+    let timer: ReturnType<typeof setTimeout> | undefined
+    watch([transactions, files, prices], () => {
+      clearTimeout(timer)
+      timer = setTimeout(save, 400)
+    })
   }
 
   function reset() {
@@ -238,6 +338,7 @@ export const usePortfolioStore = defineStore('portfolio', () => {
     const price = new Dec(value.replace(',', '.'))
     if (price.lte(0)) throw new Error('Le cours doit être positif.')
     setPrice(key, { priceEur: price, source: 'Saisi par vous' })
+    void save()
     const errors = new Map(priceErrors.value)
     errors.delete(key)
     priceErrors.value = errors
@@ -300,6 +401,9 @@ export const usePortfolioStore = defineStore('portfolio', () => {
     files,
     pending,
     demo,
+    keep,
+    savedAt,
+    storageError,
     transactions,
     prices,
     priceErrors,
@@ -316,6 +420,9 @@ export const usePortfolioStore = defineStore('portfolio', () => {
     importFiles,
     loadExample,
     exitDemo,
+    restore,
+    setKeep,
+    clearAll,
     fetchPrices,
     fetchPricesFor,
     priceAt,

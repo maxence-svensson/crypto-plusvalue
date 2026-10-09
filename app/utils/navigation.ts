@@ -16,6 +16,7 @@ export const NAVIGATION: readonly NavItem[] = [
   { to: '/simulateur', label: 'Simulateur', short: 'Simuler', icon: 'calculator', tab: true },
   { to: '/portefeuille', label: 'Portefeuille', icon: 'wallet' },
   { to: '/plateformes', label: 'Plateformes', icon: 'layers' },
+  { to: '/parametres', label: 'Paramètres', icon: 'settings' },
 ]
 
 /** Liens vers la documentation du dépôt, en bas de la navigation. */
