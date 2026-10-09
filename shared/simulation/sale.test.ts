@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { buy, sell } from '../portfolio/fixtures'
 import type { PriceLookup } from '../portfolio/tax-events'
 import { Dec } from '../tax/decimal'
-import { FLAT_TAX_RATE, simulateSale, simulateSimpleSale } from './sale'
+import { simulateSale, simulateSimpleSale } from './sale'
 
 const d = (value: number | string) => new Dec(value)
 const NOW = new Date('2026-10-08T14:00:00Z')
@@ -34,8 +34,8 @@ describe('simulateSale', () => {
     // L'exemple de la notice : 450 € de vente sur un portefeuille de 1 200 €.
     expect(result.disposal.portfolioValue.toString()).toBe('1200')
     expect(result.disposal.gain.toString()).toBe('75')
-    expect(result.extraTax.toString()).toBe('23.55')
-    expect(result.netProceeds.toString()).toBe('426.45')
+    expect(result.extraTax?.toString()).toBe('23.55')
+    expect(result.netProceeds?.toString()).toBe('426.45')
   })
 
   it('compense avec une moins-value déjà réalisée dans l’année', () => {
@@ -53,7 +53,7 @@ describe('simulateSale', () => {
 
     expect(result.disposal.gain.toString()).toBe('150')
     expect(result.yearAfter.netGain.toString()).toBe('-50')
-    expect(result.extraTax.toString()).toBe('0')
+    expect(result.extraTax?.toString()).toBe('0')
   })
 
   it('rend imposables les ventes jusque-là exonérées quand le seuil de 305 € est franchi', () => {
@@ -75,7 +75,7 @@ describe('simulateSale', () => {
     expect(result.yearBefore.exempt).toBe(true)
     expect(result.yearAfter.exempt).toBe(false)
     // L'impôt porte sur les deux ventes (2 × 100 €), pas seulement sur la nouvelle.
-    expect(result.extraTax.toString()).toBe('62.8')
+    expect(result.extraTax?.toString()).toBe('62.8')
   })
 
   it('demande les cours des autres cryptos détenues', () => {
@@ -104,7 +104,8 @@ describe('simulateSimpleSale', () => {
     })
 
     expect(result.disposal.gain.toString()).toBe('75')
-    expect(result.extraTax.toString()).toBe(d(75).times(FLAT_TAX_RATE).toString())
+    // 31,4 % de 75 € pour une vente de 2026.
+    expect(result.extraTax?.toString()).toBe('23.55')
   })
 
   it('n’impose rien sous le seuil de 305 €', () => {
@@ -118,6 +119,29 @@ describe('simulateSimpleSale', () => {
 
     expect(result.disposal.gain.toString()).toBe('270')
     expect(result.yearAfter.exempt).toBe(true)
-    expect(result.extraTax.toString()).toBe('0')
+    expect(result.extraTax?.toString()).toBe('0')
+  })
+})
+
+describe('taux de l’année de la vente', () => {
+  const sale = (date: string) =>
+    simulateSimpleSale({
+      acquisitionCost: d(1000),
+      portfolioValue: d(1200),
+      saleAmount: d(450),
+      feeEur: d(0),
+      date: new Date(date),
+    })
+
+  it('applique 30 % à une vente de 2024', () => {
+    // 75 € de plus-value × 30 % (12,8 % + 17,2 %).
+    expect(sale('2024-06-01T10:00:00Z').extraTax?.toString()).toBe('22.5')
+  })
+
+  it('n’estime pas l’impôt d’une année dont les taux ne sont pas connus', () => {
+    const result = sale('2027-03-01T10:00:00Z')
+    expect(result.disposal.gain.toString()).toBe('75')
+    expect(result.extraTax).toBeUndefined()
+    expect(result.netProceeds).toBeUndefined()
   })
 })

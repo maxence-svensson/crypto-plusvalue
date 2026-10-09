@@ -54,3 +54,8 @@ export function formatDay(date: Date): string {
 export function formatLongDay(date: Date): string {
   return longDays.format(date)
 }
+
+/** 31,4 % : un taux exprimé en fraction (0.314). */
+export function formatPercent(rate: Dec): string {
+  return `${rate.times(100).toNumber().toLocaleString('fr-FR')} %`
+}

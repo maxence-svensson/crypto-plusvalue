@@ -22,6 +22,9 @@ test('calcule les montants à déclarer de l’exemple', async ({ page }) => {
   await expect(result.getByText('1 799,20 €').first()).toBeVisible()
   await expect(result.getByText('+315,46 €')).toBeVisible()
   await expect(result.getByText('+46,43 €')).toBeVisible()
+  // 12,8 % et 18,6 % de 361,88 €, arrondis au centime chacun : 46,32 € + 67,31 €.
+  await expect(result.getByText('Impôt estimé')).toBeVisible()
+  await expect(result.getByText('113,63 €').first()).toBeVisible()
 })
 
 test('compare prélèvement forfaitaire et barème', async ({ page }) => {

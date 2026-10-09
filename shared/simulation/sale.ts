@@ -6,7 +6,8 @@ import {
   type TaxOptions,
 } from '../portfolio/tax-events'
 import type { Sell, Transaction } from '../portfolio/transaction'
-import { Dec, ZERO } from '../tax/decimal'
+import { Dec } from '../tax/decimal'
+import { flatTax, taxRules, type TaxRules } from '../tax/rules'
 import {
   computeDisposals,
   summarizeYear,
@@ -15,19 +16,6 @@ import {
   type PortfolioEvent,
   type YearSummary,
 } from '../tax/form2086'
-
-/**
- * Prélèvement forfaitaire unique sur les plus-values crypto : 12,8 % d'impôt sur le revenu et
- * 18,6 % de prélèvements sociaux depuis la LFSS 2026 (voir docs/regles-fiscales.md). L'option
- * pour le barème progressif n'est pas simulée.
- */
-export const FLAT_TAX_RATE = new Dec('0.314')
-
-/** Impôt dû au titre des plus-values crypto d'une année, au prélèvement forfaitaire. */
-export function flatTax(summary: YearSummary): Dec {
-  if (summary.exempt || summary.netGain.lte(0)) return ZERO
-  return summary.netGain.times(FLAT_TAX_RATE)
-}
 
 export type SimulatedSale = {
   asset: string
@@ -43,10 +31,15 @@ export type SaleSimulation = {
   disposal: DisposalResult
   yearBefore: YearSummary
   yearAfter: YearSummary
-  /** Impôt que la vente ajoute à l'année : compensation et seuil de 305 € compris. */
-  extraTax: Dec
+  /** Règles de l'année de la vente ; absentes si ses taux ne sont pas connus. */
+  rules?: TaxRules
+  /**
+   * Impôt que la vente ajoute à l'année : compensation et seuil de 305 € compris. Absent quand
+   * les taux de l'année ne sont pas connus.
+   */
+  extraTax?: Dec
   /** Ce qu'il resterait en poche : prix de vente, moins les frais et l'impôt supplémentaire. */
-  netProceeds: Dec
+  netProceeds?: Dec
 }
 
 export type SimulationResult =
@@ -136,13 +129,18 @@ function compare(
 
   const yearBefore = summarizeYear(computeDisposals(before), year)
   const yearAfter = summarizeYear(disposalsAfter, year)
-  const extraTax = flatTax(yearAfter).minus(flatTax(yearBefore))
+  const taxAfter = flatTax(yearAfter)
+  const taxBefore = flatTax(yearBefore)
+  const extraTax = taxAfter && taxBefore ? taxAfter.minus(taxBefore) : undefined
+  const rules = taxRules(year)
 
   return {
     disposal,
     yearBefore,
     yearAfter,
-    extraTax,
-    netProceeds: sell.amountEur.minus(sell.feeEur).minus(extraTax),
+    ...(rules ? { rules } : {}),
+    ...(extraTax
+      ? { extraTax, netProceeds: sell.amountEur.minus(sell.feeEur).minus(extraTax) }
+      : {}),
   }
 }
