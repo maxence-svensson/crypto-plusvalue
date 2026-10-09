@@ -166,35 +166,38 @@
     );
 }
 
-/* Verre : quatre niveaux, du plus léger au plus flottant. */
+/*
+ * Verre : quatre niveaux, du plus léger au plus flottant. Le préfixe -webkit- vient avant la
+ * propriété standard : dans l'autre ordre, la minification du build la supprime.
+ */
 @utility glass-subtle {
   background: var(--glass-sheen), var(--surface-subtle);
-  backdrop-filter: blur(16px) saturate(160%);
   -webkit-backdrop-filter: blur(16px) saturate(160%);
+  backdrop-filter: blur(16px) saturate(160%);
   border: 1px solid var(--border);
   box-shadow: var(--glass-highlight);
 }
 
 @utility glass {
   background: var(--glass-sheen), var(--surface);
-  backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
   border: 1px solid var(--border);
   box-shadow: var(--glass-shadow), var(--glass-highlight);
 }
 
 @utility glass-strong {
   background: var(--glass-sheen), var(--surface-strong);
-  backdrop-filter: blur(28px) saturate(180%);
   -webkit-backdrop-filter: blur(28px) saturate(180%);
+  backdrop-filter: blur(28px) saturate(180%);
   border: 1px solid var(--border);
   box-shadow: var(--glass-shadow), var(--glass-highlight);
 }
 
 @utility glass-floating {
   background: var(--glass-sheen), var(--surface-strong);
-  backdrop-filter: blur(30px) saturate(190%);
   -webkit-backdrop-filter: blur(30px) saturate(190%);
+  backdrop-filter: blur(30px) saturate(190%);
   border: 1px solid var(--border);
   box-shadow: var(--glass-shadow-floating), var(--glass-highlight);
 }
