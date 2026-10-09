@@ -8,7 +8,10 @@ import type { Dec } from '../tax/decimal'
  * frais déjà déduits quand la plateforme les prélève sur la quantité.
  */
 
-export type Source = 'coinbase' | 'trade-republic' | 'manual'
+/** Plateformes dont l'export est importé. */
+export type Platform = 'trade-republic' | 'coinbase' | 'kraken' | 'crypto-com' | 'bitvavo'
+
+export type Source = Platform | 'manual'
 
 export type CryptoAmount = {
   /** Symbole de l'actif en majuscules (BTC, ETH, USDC…). */

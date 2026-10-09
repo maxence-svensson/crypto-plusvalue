@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PLATFORM_NAMES } from '#shared/importers/detect'
+import { IMPORTERS, PLATFORM_NAMES } from '#shared/importers/detect'
 
 const store = usePortfolioStore()
 const dragging = ref(false)
@@ -67,22 +67,32 @@ async function loadExample() {
         <span class="text-muted">
           ou <span class="font-semibold text-link">parcourez vos fichiers</span>
         </span>
-        <span class="mt-6 grid w-full max-w-2xl gap-2 text-left text-sm sm:grid-cols-2">
-          <span class="rounded-control bg-field px-4 py-3 text-muted"
-            ><strong class="font-semibold text-label">Trade Republic</strong> : Profil, Relevés,
-            Export de transactions.</span
+        <span
+          class="mt-6 grid w-full max-w-4xl gap-2 text-left text-sm sm:grid-cols-2 lg:grid-cols-3"
+        >
+          <span
+            v-for="importer in IMPORTERS"
+            :key="importer.platform"
+            class="rounded-control bg-field px-4 py-3 text-muted"
           >
-          <span class="rounded-control bg-field px-4 py-3 text-muted"
-            ><strong class="font-semibold text-label">Coinbase</strong> : Relevés, Générer un
-            relevé, format CSV.</span
-          >
+            <span class="flex flex-wrap items-center gap-x-2 gap-y-1">
+              <strong class="font-semibold text-label">{{ importer.name }}</strong>
+              <span
+                v-if="!importer.verified"
+                class="rounded-full bg-warning-tint px-2 py-0.5 text-xs font-semibold text-warning"
+                >expérimental</span
+              >
+            </span>
+            <span class="mt-1 block">{{ importer.howTo }}</span>
+          </span>
         </span>
       </span>
     </label>
 
     <p class="text-sm text-muted">
-      Importez l'historique complet, depuis l'ouverture de chaque compte. Pas de fichier sous la
-      main ?
+      Importez l'historique complet, depuis l'ouverture de chaque compte, et un fichier par
+      plateforme. « Expérimental » : format lu d'après la documentation de la plateforme, pas encore
+      vérifié sur un vrai export ; contrôlez le résultat. Pas de fichier sous la main ?
       <button
         type="button"
         class="btn btn-ghost min-h-8 px-1.5 text-sm"

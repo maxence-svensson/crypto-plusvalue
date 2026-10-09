@@ -121,3 +121,89 @@ Cas particuliers :
 projets open source qui lisent ce format, et l'extrait de relevé réel publié par
 [Export-To-Ghostfolio](https://github.com/dickwolff/Export-To-Ghostfolio) (staking, conversions,
 ETH2, achat en euros et en dollars).
+
+## Kraken (expérimental)
+
+Grand livre : History → Export → **Ledgers**, format CSV. Kraken livre une archive ZIP : importez
+le fichier `ledgers.csv` qu'elle contient. Une ligne par mouvement d'un actif, heures en UTC,
+montant signé et frais à part dans l'actif de la ligne (`solde = solde précédent + amount − fee`).
+Les quatre variantes de l'en-tête (9 à 12 colonnes, avec ou sans `subtype`, `wallet`,
+`subclass`) sont acceptées.
+
+| `type` / `subtype`                                        | Transaction                | Quantités                                             |
+| --------------------------------------------------------- | -------------------------- | ----------------------------------------------------- |
+| `trade`, `spend` / `receive` (deux lignes, même `refid`)  | achat, vente ou échange    | ce qui sort frais compris, ce qui entre frais déduits |
+| `deposit`, `withdrawal` de crypto                         | transfert entrant, sortant | frais de retrait comptés comme frais de réseau        |
+| `earn/reward`, `earn/airdrop`, `staking`, `invite bonus`  | récompense                 | frais déduits ; pas de valeur en euros dans l'export  |
+| `earn/allocation`, `transfer/spottostaking`…              | ignorée                    | mouvement entre portefeuilles Kraken                  |
+| dépôts et retraits d'euros, ligne sans `txid`, `KFEE`     | ignorée                    | ligne en attente doublée par sa version confirmée     |
+| `margin`, `rollover`, `settled`, `dividend`, `adjustment` | à vérifier                 | marge, dérivés, actifs tokenisés : autre régime       |
+| échange contre une autre monnaie que l'euro               | à vérifier                 |                                                       |
+
+- **Codes d'actifs** : table explicite pour les codes historiques (`XXBT` → BTC, `XETH` → ETH,
+  `ZEUR` → EUR…), sans retirer un X ou un Z initial au hasard (`XTZ` reste XTZ). Les suffixes de
+  solde (`.S`, `.M`, `.P`, `.B`, `.F`, `.T`, `.HOLD`) désignent le même actif.
+- **Doublons** : `txid` est unique ; un même ledger importé deux fois n'ajoute rien.
+
+## Crypto.com (expérimental)
+
+Application : Comptes → Historique → Export → **Token Wallet**, fichier
+`crypto_transactions_record_….csv` (trois ans au plus par export). N'importez pas l'export du
+portefeuille espèces (`fiat_transactions_record`) : les achats en euros figurent déjà dans le
+fichier crypto. Heures en UTC ; valeur en euros dans `Native Amount` quand la monnaie
+d'affichage de l'application est l'euro.
+
+| `Transaction Kind`                                          | Transaction                | Montants                                            |
+| ----------------------------------------------------------- | -------------------------- | --------------------------------------------------- |
+| `viban_purchase`, `recurring_buy_order`, `…purchase_commit` | achat                      | euros réellement débités (`Amount`), pas de frais   |
+| `crypto_purchase` (carte bancaire)                          | achat                      | `Native Amount`, si l'application affiche des euros |
+| `crypto_viban_exchange`, `…sell_commit`, `card_top_up`      | vente                      | `To Amount` en euros, ou `Native Amount`            |
+| `crypto_exchange`, `…crypto_wallet.exchange`                | échange entre cryptos      | `To Currency`, `To Amount`                          |
+| `crypto_deposit`, `crypto_withdrawal`, transferts Exchange  | transfert entrant, sortant |                                                     |
+| intérêts Earn, staking, parrainage, cashback                | récompense                 | valeur `Native Amount`                              |
+| `crypto_payment`                                            | paiement en crypto         | `Native Amount`                                     |
+| ordres limites `…_lock` / `…_unlock`, mouvements Earn       | ignorée                    | blocage de fonds, sans effet sur les avoirs         |
+| poussières, transferts entre utilisateurs, paniers, autres  | à vérifier                 | sur plusieurs lignes, ou qualification à décider    |
+
+- **Identifiant** : l'export n'en a pas. Il est tiré du contenu de la ligne (date, type,
+  montants), avec un numéro d'occurrence pour les lignes identiques : une opération présente dans
+  deux exports qui se chevauchent n'est comptée qu'une fois.
+- **Frais** : pas de colonne ; l'écart de cours est compris dans le prix.
+
+## Bitvavo (expérimental)
+
+Historique des transactions → **Exporter**, format CSV. Une ligne par opération, quantité signée.
+Date et heure sont lues dans le fuseau de la colonne `Timezone` (`Europe/Amsterdam`). Les lignes
+dont le statut n'est pas `Completed` ou `Distributed` (en attente, annulées) sont ignorées.
+Virgule ou point-virgule comme séparateur.
+
+| `Type`                                                   | Transaction                | Montants                                          |
+| -------------------------------------------------------- | -------------------------- | ------------------------------------------------- |
+| `buy`                                                    | achat                      | euros débités moins les frais, frais `Fee amount` |
+| `sell`                                                   | vente                      | euros crédités plus les frais (prix brut), frais  |
+| `deposit`, `withdrawal` de crypto                        | transfert entrant, sortant | frais de retrait dans la crypto retirée           |
+| `staking`, `fixed_staking`, `affiliate`, `rebate`, prime | récompense                 | pas de valeur en euros dans l'export              |
+| dépôts et retraits d'euros                               | ignorée                    |                                                   |
+| autres types (prêt…)                                     | à vérifier                 |                                                   |
+
+Incertitudes : l'heure est supposée locale au fuseau indiqué (la colonne n'aurait pas lieu
+d'être sinon), et l'on ne sait pas si la quantité d'un retrait inclut les frais de réseau.
+
+## Sources des formats expérimentaux
+
+Documentation des plateformes ([Kraken, champs du grand livre](https://support.kraken.com/articles/360001169383-how-to-interpret-ledger-history-fields),
+[Crypto.com, export de l'historique](https://help.crypto.com/en/articles/3438579-how-do-i-export-my-transaction-history-app)),
+et projets open source qui lisent ces formats : BittyTax et rotki (AGPL-3.0, lus pour comprendre
+le format, sans reprise de code), GhostfolioSidekick (MIT) et Export-To-Ghostfolio (Apache-2.0)
+pour Bitvavo. Les fichiers de test du dépôt sont inventés, dans la structure de ces formats.
+
+## Ajouter une plateforme
+
+1. Écrire l'importeur dans `shared/importers/` : `readCsv` pour lire le fichier, `eachRow` pour
+   écarter une ligne illisible sans bloquer les autres, `cryptoSymbol` pour valider les symboles.
+2. Traduire chaque type d'opération en transaction commune (`shared/portfolio/transaction.ts`) ;
+   ce qui n'est pas sûr va dans `unsupported`, jamais dans le calcul.
+3. L'ajouter au registre `IMPORTERS` (`shared/importers/detect.ts`), avec `verified: false`
+   tant qu'aucun export réel ne l'a confirmé.
+4. Des tests avec un fichier inventé dans la structure réelle, dont un calcul du 2086 de bout en
+   bout, et une section dans ce document.
