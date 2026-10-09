@@ -35,6 +35,7 @@ const PAGES = [
   },
   { path: '/portefeuille', title: 'Portefeuille', label: 'Portefeuille' },
   { path: '/plateformes', title: 'Plateformes', label: 'Plateformes' },
+  { path: '/parametres', title: 'Paramètres', label: 'Paramètres' },
 ]
 
 test('chaque section s’ouvre depuis la navigation, sans recharger la page', async ({
@@ -84,6 +85,7 @@ test('le menu « Plus » s’ouvre, se ferme avec Échap et rend le focus', asyn
   await expect(menu.getByRole('link')).toHaveText([
     'Portefeuille',
     'Plateformes',
+    'Paramètres',
     'Méthode et sources',
     'Code source',
   ])

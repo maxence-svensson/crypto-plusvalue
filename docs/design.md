@@ -98,7 +98,10 @@ Tout est désactivé si le système demande de réduire les animations (`prefers
 
 ## Mode sombre
 
-Il suit le réglage du système. Ce n'est pas une inversion : fond noir, surfaces gris foncé
+Il suit le réglage du système, ou le choix fait dans les paramètres (Système, Clair, Sombre).
+Chaque couleur est déclarée une fois avec `light-dark()` ; l'attribut `data-theme` de `<html>`
+fixe `color-scheme`, posé avant l'affichage par un court script pour éviter un éclair de l'autre
+thème. Ce n'est pas une inversion : fond noir, surfaces gris foncé
 translucides, bordures blanches à très faible opacité, halos un peu plus présents pour que le
 verre reste visible.
 

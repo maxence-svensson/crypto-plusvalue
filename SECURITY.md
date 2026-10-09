@@ -8,8 +8,13 @@
   et une minute, jamais une quantité, un montant ou un nom de fichier ([`docs/prix.md`](docs/prix.md)).
 - Les PDF (formulaire 2086, dossier justificatif) sont produits dans le navigateur.
 - Aucun outil d'analyse d'audience, aucun traceur, aucun compte.
-- Seule préférence enregistrée : les étapes cochées de « Et maintenant ? » (`localStorage`), sans
-  montant ni transaction.
+- **Conservation dans le navigateur**, activée par défaut et désactivable dans les paramètres :
+  opérations, cours et noms des fichiers importés sont enregistrés dans IndexedDB, sur l'appareil
+  seulement, pour les retrouver à la visite suivante. Couper l'option efface ce qui était
+  enregistré ; « Tout effacer » supprime données et préférences après confirmation. Les données
+  fictives de la démonstration ne sont jamais enregistrées.
+- **Préférences** (`localStorage`) : thème, étapes cochées de « Et maintenant ? », choix de
+  conservation. Aucun montant ni transaction.
 
 ## En-têtes HTTP
 

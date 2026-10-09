@@ -1,13 +1,19 @@
 <script setup lang="ts">
 /**
  * Mise en page de toutes les pages : barre latérale sur ordinateur, barre d'onglets sur
- * téléphone. `?exemple` ouvre n'importe quelle page en mode démonstration.
+ * téléphone. `?exemple` ouvre n'importe quelle page en mode démonstration ; sinon, les données
+ * enregistrées dans ce navigateur sont relues, une fois la page affichée (avant, elles
+ * différeraient de la page rendue par le serveur).
  */
 const store = usePortfolioStore()
 const route = useRoute()
 
 onMounted(() => {
-  if ('exemple' in route.query && !store.demo) store.loadExample()
+  if ('exemple' in route.query) {
+    if (!store.demo) store.loadExample()
+  } else {
+    store.restore()
+  }
 })
 </script>
 

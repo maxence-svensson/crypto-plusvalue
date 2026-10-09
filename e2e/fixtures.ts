@@ -7,7 +7,25 @@ import { test as base, expect, type Page } from '@playwright/test'
  */
 export const PRICES: Record<string, string> = { BTC: '100000', SOL: '150', ETH: '3000' }
 
-export const test = base.extend<{ mockPrices: undefined }>({
+export const test = base.extend<{ mockPrices: undefined; pageErrors: undefined }>({
+  /**
+   * Échoue sur toute erreur non rattrapée de la page et sur tout écart d'hydratation : la page
+   * rendue par le serveur doit être celle que le navigateur reprend.
+   */
+  pageErrors: [
+    async ({ page }, use) => {
+      const errors: string[] = []
+      page.on('pageerror', (error) => errors.push(error.message))
+      page.on('console', (message) => {
+        if (message.type() === 'error' && /hydrat/i.test(message.text())) {
+          errors.push(message.text())
+        }
+      })
+      await use(undefined)
+      expect(errors).toEqual([])
+    },
+    { auto: true },
+  ],
   mockPrices: [
     async ({ page }, use) => {
       await page.route('**/api/price?*', async (route) => {

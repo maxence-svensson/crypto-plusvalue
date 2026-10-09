@@ -29,6 +29,13 @@ export default defineNuxtConfig({
       // viewport-fit=cover : la barre de navigation tient compte de l'encoche des iPhone.
       viewport: 'width=device-width, initial-scale=1, viewport-fit=cover',
       title: 'CryptoPlusValue : vos plus-values crypto pour le formulaire 2086',
+      // Thème choisi dans les paramètres, appliqué avant l'affichage : pas d'éclair de l'autre thème.
+      script: [
+        {
+          innerHTML:
+            "try{var t=localStorage.getItem('cryptoplusvalue:theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}",
+        },
+      ],
       meta: [
         { name: 'theme-color', content: '#f5f5f7', media: '(prefers-color-scheme: light)' },
         { name: 'theme-color', content: '#000000', media: '(prefers-color-scheme: dark)' },

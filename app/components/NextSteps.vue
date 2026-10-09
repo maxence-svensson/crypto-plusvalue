@@ -87,11 +87,11 @@ const steps = computed<Step[]>(() => {
 
 // Étapes cochées : une préférence de ce navigateur, sans incidence sur le calcul.
 const done = ref(new Set<string>())
-const storageKey = computed(() => `cryptoplusvalue:etapes:${year.value}`)
+const storageKey = computed(() => `etapes:${year.value}`)
 
 function load() {
   try {
-    done.value = new Set(JSON.parse(localStorage.getItem(storageKey.value) ?? '[]'))
+    done.value = new Set(JSON.parse(readPreference(storageKey.value) ?? '[]'))
   } catch {
     done.value = new Set()
   }
@@ -102,11 +102,7 @@ function toggle(id: string) {
   if (next.has(id)) next.delete(id)
   else next.add(id)
   done.value = next
-  try {
-    localStorage.setItem(storageKey.value, JSON.stringify([...next]))
-  } catch {
-    // Stockage indisponible (navigation privée) : la case reste cochée jusqu'au rechargement.
-  }
+  writePreference(storageKey.value, JSON.stringify([...next]))
 }
 
 onMounted(load)
