@@ -58,6 +58,8 @@ export const usePortfolioStore = defineStore('portfolio', () => {
 
   /** Fichiers lus, en attente de confirmation. */
   const pending = ref<PendingImport[]>([])
+  /** Mode démonstration : les données affichées sont celles de l'exemple fictif. */
+  const demo = ref(false)
 
   /** Un fichier à importer : son nom, sa taille si elle est connue, et de quoi lire son contenu. */
   type FileSource = { name: string; size?: number; bytes: () => Promise<ArrayBuffer> }
@@ -66,7 +68,9 @@ export const usePortfolioStore = defineStore('portfolio', () => {
    * Lit les fichiers et prépare leur import, sans rien ajouter : chaque fichier est comparé aux
    * opérations déjà là et aux fichiers en attente avant lui, pour repérer les doublons.
    */
-  async function prepareImport(list: Iterable<FileSource>) {
+  async function prepareImport(list: Iterable<FileSource>, forDemo = false) {
+    // Un vrai fichier ne se mélange pas aux données fictives de la démonstration.
+    if (demo.value && !forDemo) exitDemo()
     for (const file of list) {
       try {
         if ((file.size ?? 0) > MAX_FILE_BYTES) {
@@ -139,23 +143,34 @@ export const usePortfolioStore = defineStore('portfolio', () => {
   }
 
   /** Lit et importe sans demander : pour l'exemple fictif. */
-  async function importFiles(list: Iterable<FileSource>) {
+  async function importFiles(list: Iterable<FileSource>, forDemo = false) {
     const start = pending.value.length
-    await prepareImport(list)
+    await prepareImport(list, forDemo)
     for (let index = pending.value.length - 1; index >= start; index--) {
       await confirmImport(index)
     }
   }
 
-  /** Exemple fictif au format Trade Republic, pour essayer sans fichier. */
+  /** Exemple fictif au format Trade Republic, pour essayer sans fichier : mode démonstration. */
   async function loadExample() {
-    await importFiles([
-      {
-        name: 'Exemple fictif (Trade Republic)',
-        bytes: () =>
-          $fetch<ArrayBuffer>('/exemples/trade-republic.csv', { responseType: 'arrayBuffer' }),
-      },
-    ])
+    reset()
+    demo.value = true
+    await importFiles(
+      [
+        {
+          name: 'Exemple fictif (Trade Republic)',
+          bytes: () =>
+            $fetch<ArrayBuffer>('/exemples/trade-republic.csv', { responseType: 'arrayBuffer' }),
+        },
+      ],
+      true,
+    )
+  }
+
+  /** Quitte la démonstration : les données fictives disparaissent. */
+  function exitDemo() {
+    reset()
+    demo.value = false
   }
 
   function reset() {
@@ -284,6 +299,7 @@ export const usePortfolioStore = defineStore('portfolio', () => {
   return {
     files,
     pending,
+    demo,
     transactions,
     prices,
     priceErrors,
@@ -299,6 +315,7 @@ export const usePortfolioStore = defineStore('portfolio', () => {
     toggleKeep,
     importFiles,
     loadExample,
+    exitDemo,
     fetchPrices,
     fetchPricesFor,
     priceAt,

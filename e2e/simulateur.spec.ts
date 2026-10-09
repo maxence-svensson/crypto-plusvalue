@@ -1,8 +1,8 @@
 import { expect, test } from './fixtures'
 
 test('simule une vente sans fichier, à partir de trois montants', async ({ page }) => {
-  await page.goto('/#simulation')
-  const simulation = page.locator('#simulation')
+  await page.goto('/simulateur')
+  const simulation = page.locator('#contenu')
   await simulation.getByLabel(/Somme investie en euros/).fill('5000')
   await simulation.getByLabel('Valeur actuelle de toutes vos cryptos').fill('8000')
   await simulation.getByLabel('Montant à vendre').fill('2000')
@@ -13,9 +13,9 @@ test('simule une vente sans fichier, à partir de trois montants', async ({ page
 })
 
 test('règle la quantité à vendre au curseur', async ({ page }) => {
-  await page.goto('/?exemple')
-  await expect(page.getByRole('img', { name: 'Case 3AN : 362 €' }).last()).toBeVisible()
-  const simulation = page.locator('#simulation')
+  await page.goto('/simulateur?exemple')
+  const simulation = page.locator('#contenu')
+  await expect(simulation.getByLabel('Crypto à vendre')).toBeVisible()
   await simulation.locator('#part-a-vendre').fill('60')
   // 60 % des 0,002833 BTC détenus, au cours simulé de 100 000 €.
   await expect(simulation.getByLabel('Quantité')).toHaveValue('0,0016998')

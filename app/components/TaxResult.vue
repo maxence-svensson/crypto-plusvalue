@@ -201,7 +201,7 @@ async function download(kind: 'form' | 'dossier') {
         <RegimeComparison v-if="summary.box3AN > 0" :gain="summary.netGain" :year="year" />
 
         <div>
-          <h3 class="headline text-2xl">Le formulaire 2086, cession par cession</h3>
+          <h2 class="headline text-2xl">Le formulaire 2086, cession par cession</h2>
           <p v-if="!hasForm2086(year)" class="mt-3 max-w-prose text-sm text-muted">
             {{
               year > FORM_2086.year

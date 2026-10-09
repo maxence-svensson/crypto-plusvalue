@@ -40,7 +40,7 @@ const TONES: Record<Severity, string> = {
 <template>
   <section aria-labelledby="diagnostic" class="glass space-y-4 rounded-card p-5 sm:p-6">
     <div class="flex flex-wrap items-center justify-between gap-3">
-      <h3 id="diagnostic" class="text-lg font-semibold tracking-tight">Diagnostic des données</h3>
+      <h2 id="diagnostic" class="text-lg font-semibold tracking-tight">Diagnostic des données</h2>
       <span
         class="rounded-full px-3 py-1 text-sm font-semibold"
         :class="LEVELS[store.quality.level].tone"

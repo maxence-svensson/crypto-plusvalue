@@ -4,6 +4,16 @@ Les changements notables, du plus récent au plus ancien. Chaque entrée renvoie
 
 ## 9 octobre 2026
 
+### Phase 4 (première partie) : application en plusieurs pages
+
+- Tableau de bord, Transactions, Fiscalité, Simulateur, Portefeuille, Plateformes : une page par
+  section, barre latérale sur ordinateur, barre d'onglets et menu « Plus » sur téléphone.
+- Accueil guidé pour un nouveau visiteur (ce que fait l'outil, comment ça marche, import) ;
+  tableau de bord avec les chiffres clés et le diagnostic une fois les données importées.
+- Mode démonstration signalé sur chaque page ; `?exemple` l'ouvre sur n'importe quelle page.
+- Accessibilité vérifiée sur chaque page ; liens trop petits de la barre latérale agrandis
+  (WCAG 2.2, taille des cibles).
+
 ### Phase 3 (deuxième partie) : aperçu, doublons, transferts, diagnostic
 
 - Aperçu avant import : période, opérations à importer, déjà présentes, lignes ignorées ou
