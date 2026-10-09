@@ -288,15 +288,39 @@ describe('importTradeRepublic', () => {
     expect(() => importTradeRepublic('Date,Montant\n2025-01-01,10\n')).toThrow(ImportError)
   })
 
-  it('indique la ligne fautive', () => {
-    expect(() => importTradeRepublic(csv({ ...savingsPlan, shares: 'abc' }))).toThrow(
-      "Ligne 2 : « abc » n'est pas un nombre (colonne shares).",
+  it('écarte une ligne illisible, la signale et importe les autres', () => {
+    const result = importTradeRepublic(
+      csv({ ...savingsPlan, shares: 'abc' }, { ...savingsPlan, id: 'a2' }),
     )
+
+    expect(result.transactions.map((transaction) => transaction.id)).toEqual(['trade-republic:a2'])
+    expect(result.anomalies).toEqual([
+      { line: 2, message: "« abc » n'est pas un nombre (colonne shares)." },
+    ])
   })
 
-  it('refuse une devise autre que l’euro', () => {
+  it('signale une devise autre que l’euro', () => {
     const text = csv(savingsPlan).replace('"EUR"', '"USD"')
-    expect(() => importTradeRepublic(text)).toThrow('seuls les euros')
+    const result = importTradeRepublic(text)
+
+    expect(result.transactions).toEqual([])
+    expect(result.anomalies[0]?.message).toContain('seuls les euros')
+  })
+
+  it('refuse un symbole qui n’en est pas un, formule de tableur comprise', () => {
+    const result = importTradeRepublic(csv({ ...savingsPlan, symbol: '=HYPERLINK(1)' }))
+
+    expect(result.transactions).toEqual([])
+    expect(result.anomalies[0]?.message).toContain("n'est pas un symbole de crypto valide")
+  })
+
+  it('signale une ligne mal formée sans rejeter tout le fichier', () => {
+    const good = csv(savingsPlan, { ...savingsPlan, id: 'a2' }, { ...savingsPlan, id: 'a3' })
+    const broken = good.replace(/\n$/, '') + '\n"2025-03-04T07:41:42.619Z","incomplète"\n'
+    const result = importTradeRepublic(broken)
+
+    expect(result.transactions).toHaveLength(3)
+    expect(result.anomalies.map((anomaly) => anomaly.line)).toEqual([5])
   })
 
   it('alimente le calcul du 2086 de bout en bout', () => {

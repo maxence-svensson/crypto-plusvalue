@@ -84,7 +84,12 @@ function euros(transaction: Transaction): string {
 
     <details class="disclosure solid-card overflow-hidden rounded-card">
       <summary>Les {{ store.transactions.length }} opérations importées</summary>
-      <div class="max-h-[28rem] overflow-auto border-t border-separator px-5 pb-3 sm:px-6">
+      <div
+        class="max-h-[28rem] overflow-auto border-t border-separator px-5 pb-3 sm:px-6"
+        tabindex="0"
+        role="region"
+        aria-label="Opérations importées"
+      >
         <table class="w-full text-left text-sm">
           <caption class="sr-only">
             Opérations crypto importées, de la plus récente à la plus ancienne

@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 
+import { MAX_FILE_BYTES, binaryFormat, decodeText } from '#shared/importers/decode'
 import { importFile, type Platform } from '#shared/importers/detect'
 import { replayPortfolio } from '#shared/portfolio/replay'
 import { buildTaxEvents, requiredPrices } from '#shared/portfolio/tax-events'
@@ -15,6 +16,7 @@ export type ImportedFile =
       transactions: number
       skipped: number
       unsupported: { line: number; label: string }[]
+      anomalies: { line: number; message: string }[]
     }
   | { name: string; error: string }
 
@@ -37,10 +39,19 @@ export const usePortfolioStore = defineStore('portfolio', () => {
   const priceErrors = shallowRef(new Map<string, string>())
   const fetchingPrices = ref(false)
 
-  async function importFiles(list: Iterable<{ name: string; text: () => Promise<string> }>) {
+  /** Un fichier à importer : son nom, sa taille si elle est connue, et de quoi lire son contenu. */
+  type FileSource = { name: string; size?: number; bytes: () => Promise<ArrayBuffer> }
+
+  async function importFiles(list: Iterable<FileSource>) {
     for (const file of list) {
       try {
-        const result = importFile(await file.text())
+        if ((file.size ?? 0) > MAX_FILE_BYTES) {
+          throw new Error('Fichier trop volumineux : 50 Mo au maximum.')
+        }
+        const bytes = new Uint8Array(await file.bytes())
+        const binary = binaryFormat(bytes)
+        if (binary) throw new Error(binary)
+        const result = importFile(decodeText(bytes))
         // Un même fichier importé deux fois ne double pas les transactions.
         const known = new Set(transactions.value.map((transaction) => transaction.id))
         const added = result.transactions.filter((transaction) => !known.has(transaction.id))
@@ -51,6 +62,7 @@ export const usePortfolioStore = defineStore('portfolio', () => {
           transactions: result.transactions.length,
           skipped: result.skipped,
           unsupported: result.unsupported,
+          anomalies: result.anomalies,
         })
       } catch (error) {
         files.value.push({ name: file.name, error: (error as Error).message })
@@ -61,8 +73,13 @@ export const usePortfolioStore = defineStore('portfolio', () => {
 
   /** Exemple fictif au format Trade Republic, pour essayer sans fichier. */
   async function loadExample() {
-    const text = await $fetch<string>('/exemples/trade-republic.csv', { responseType: 'text' })
-    await importFiles([{ name: 'Exemple fictif (Trade Republic)', text: async () => text }])
+    await importFiles([
+      {
+        name: 'Exemple fictif (Trade Republic)',
+        bytes: () =>
+          $fetch<ArrayBuffer>('/exemples/trade-republic.csv', { responseType: 'arrayBuffer' }),
+      },
+    ])
   }
 
   function reset() {

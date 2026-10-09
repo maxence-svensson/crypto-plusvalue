@@ -25,7 +25,13 @@ const LINES: { line: string; label: string; value: (disposal: DisposalResult) =>
 </script>
 
 <template>
-  <div class="overflow-x-auto">
+  <!-- Zone qui défile : atteignable au clavier, avec un nom pour les lecteurs d'écran. -->
+  <div
+    class="overflow-x-auto"
+    tabindex="0"
+    role="region"
+    aria-label="Formulaire 2086, colonnes des cessions"
+  >
     <table class="w-full border-separate border-spacing-y-1 text-sm">
       <caption class="sr-only">
         Formulaire 2086 : une colonne par cession de l'année

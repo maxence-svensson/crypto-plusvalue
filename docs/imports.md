@@ -10,7 +10,15 @@ Règles communes :
 - les colonnes sont repérées par leur nom, pas par leur position ;
 - une ligne crypto que l'importeur ne sait pas traiter n'est jamais perdue en silence : elle est
   listée pour que l'utilisateur la vérifie ;
-- en cas d'erreur, le message indique le numéro de ligne dans le fichier.
+- une ligne illisible (date, montant, symbole, devise autre que l'euro, ligne mal formée) est
+  écartée et signalée avec son numéro, les autres lignes sont importées ; un fichier dont la
+  majorité des lignes est mal formée est refusé en entier ;
+- le symbole d'une crypto ne contient que des lettres majuscules et des chiffres (15 au plus) :
+  une formule de tableur (`=…`) est refusée ;
+- encodages acceptés : UTF-8 avec ou sans BOM, UTF-16 (« texte Unicode » d'Excel) et
+  Windows-1252 (CSV réenregistré par Excel sous Windows) ;
+- un classeur Excel, une archive ZIP ou un PDF est refusé avec une explication, de même qu'un
+  fichier de plus de 50 Mo.
 
 ## Trade Republic
 
