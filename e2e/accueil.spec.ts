@@ -3,7 +3,7 @@ import { accessibilityViolations, expect, test } from './fixtures'
 test('présente l’outil et propose d’importer ou d’essayer l’exemple', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
-    'Vos plus-values crypto, prêtes à recopier sur le 2086.',
+    'Vos plus-values crypto, prêtes à déclarer.',
   )
   await expect(page.getByRole('button', { name: 'Importer mon export' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Voir un exemple' })).toBeVisible()
@@ -18,7 +18,7 @@ test('l’exemple ouvre le tableau de bord en mode démonstration, qu’on peut 
   await expect(page.getByText('Mode démonstration.')).toBeVisible()
   await page.getByRole('button', { name: 'Quitter la démonstration' }).click()
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
-    'Vos plus-values crypto, prêtes à recopier sur le 2086.',
+    'Vos plus-values crypto, prêtes à déclarer.',
   )
 })
 

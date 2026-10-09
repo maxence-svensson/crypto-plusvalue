@@ -58,7 +58,7 @@ test('efface tout après confirmation', async ({ page }) => {
   await expect(page.getByText('Tout a été effacé de ce navigateur.')).toBeVisible()
   await page.goto('/')
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
-    'Vos plus-values crypto, prêtes à recopier sur le 2086.',
+    'Vos plus-values crypto, prêtes à déclarer.',
   )
 })
 

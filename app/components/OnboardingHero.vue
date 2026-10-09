@@ -32,7 +32,7 @@ const STEPS = [
   <div>
     <section class="pt-6 pb-16 text-center sm:pt-12 lg:pt-16">
       <h1 class="enter text-hero mx-auto max-w-5xl text-balance">
-        Vos plus-values crypto, prêtes à recopier sur le 2086.
+        Vos plus-values crypto, prêtes à déclarer.
       </h1>
       <p
         class="enter mx-auto mt-8 max-w-2xl text-lg text-pretty text-muted sm:text-xl"
