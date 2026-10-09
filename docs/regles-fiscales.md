@@ -168,6 +168,24 @@ montant vendu) et la vente est supposée être la seule de l'année.
 - **ETF et ETN sur la crypto** : ce sont des titres, imposés comme des valeurs mobilières
   (formulaire 2074).
 
+## Où et quand déclarer
+
+L'encadré « Et maintenant ? » liste ce qu'il reste à faire après le calcul. Ses dates viennent de
+`shared/tax/calendar.ts`, à compléter chaque printemps quand la DGFiP publie le calendrier.
+
+- **En ligne** : l'annexe 2086 se trouve à l'étape 3, bouton « Déclarations annexes » ; son
+  résultat remplit automatiquement la case 3AN ou 3BN. Sur papier, le total se reporte sur la
+  2042 C ([impots.gouv.fr, actifs numériques][faq]).
+- **Revenus 2025** : en ligne jusqu'au 21 mai 2026 (départements 01 à 19 et non-résidents),
+  28 mai (20 à 54) ou 4 juin (55 à 974 et 976) ; sur papier jusqu'au 19 mai 2026
+  ([modalités 2026][modalites]).
+- **Correction en ligne** des revenus 2025 : jusqu'au 30 novembre 2026, pour les déclarations
+  faites en ligne ([service-public.fr, 3 juin 2026][correction]). Une page plus ancienne
+  d'impots.gouv.fr annonce « mi-décembre » ; la date la plus récente est retenue.
+- **Ensuite**, une réclamation reste possible jusqu'au 31 décembre de la deuxième année qui suit
+  la mise en recouvrement : fin 2028 pour les revenus 2025.
+- **Retard** : un dépôt tardif entraîne en principe une majoration de 10 % (CGI, art. 1758 A).
+
 ## Obligations à rappeler à l'utilisateur
 
 - **Formulaire 3916-bis** : déclarer chaque compte d'actifs numériques ouvert auprès d'une entité
@@ -183,3 +201,5 @@ montant vendu) et la vente est supposée être la seule de l'année.
 [2086]: https://www.impots.gouv.fr/sites/default/files/formulaires/2086/2026/2086_5515.pdf
 [bareme]: https://www.service-public.gouv.fr/particuliers/vosdroits/F1419
 [faq]: https://www.impots.gouv.fr/particulier/questions/comment-declarer-les-plus-ou-moins-values-sur-cessions-dactifs-numeriques
+[modalites]: https://www.impots.gouv.fr/les-modalites-de-la-declaration-de-revenus-en-2026
+[correction]: https://www.service-public.gouv.fr/particuliers/actualites/A17433

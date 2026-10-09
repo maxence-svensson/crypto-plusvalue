@@ -18,6 +18,7 @@ const dateTimes = new Intl.DateTimeFormat('fr-FR', {
   timeZone: 'Europe/Paris',
 })
 const days = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'short', timeZone: 'Europe/Paris' })
+const longDays = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeZone: 'Europe/Paris' })
 
 /** 1 845,90 € */
 export function formatEuros(value: Dec | number): string {
@@ -47,4 +48,9 @@ export function formatDateTime(date: Date): string {
 /** 14/08/2025, heure de Paris. */
 export function formatDay(date: Date): string {
   return days.format(date)
+}
+
+/** 21 mai 2026, heure de Paris. */
+export function formatLongDay(date: Date): string {
+  return longDays.format(date)
 }

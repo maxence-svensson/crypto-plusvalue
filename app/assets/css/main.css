@@ -362,6 +362,27 @@
     height: auto;
   }
 
+  /* Case à cocher ronde, comme les rappels d'iOS. */
+  .check {
+    @apply size-6 shrink-0 cursor-pointer appearance-none rounded-full border-[1.5px] border-muted bg-elevated;
+    transition:
+      background-color 200ms var(--ease-ios),
+      border-color 200ms var(--ease-ios),
+      transform 200ms var(--ease-ios);
+  }
+
+  .check:checked {
+    @apply border-accent bg-accent;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 0.875rem;
+  }
+
+  .check:active {
+    transform: scale(0.9);
+  }
+
   /* Curseur : piste fine remplie en bleu jusqu'à la valeur (--fill), poignée blanche en relief. */
   .range {
     appearance: none;

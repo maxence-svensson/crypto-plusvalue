@@ -51,7 +51,7 @@ const columns = computed(() => {
 </script>
 
 <template>
-  <div class="glass space-y-6 rounded-card p-6 sm:p-8">
+  <div id="regime" class="glass scroll-mt-28 space-y-6 rounded-card p-6 sm:p-8">
     <div>
       <h3 class="headline text-2xl">Prélèvement forfaitaire ou barème ?</h3>
       <p class="mt-2 max-w-prose text-muted">
