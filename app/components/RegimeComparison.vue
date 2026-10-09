@@ -67,7 +67,7 @@ const columns = computed(() => {
 <template>
   <div id="regime" class="glass scroll-mt-28 space-y-6 rounded-card p-6 sm:p-8">
     <div>
-      <h3 class="headline text-2xl">Prélèvement forfaitaire ou barème ?</h3>
+      <h2 class="headline text-2xl">Prélèvement forfaitaire ou barème ?</h2>
       <p v-if="!rules" class="mt-2 max-w-prose text-muted">
         {{
           year < FIRST_YEAR

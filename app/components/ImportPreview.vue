@@ -40,9 +40,9 @@ async function confirm(index?: number) {
 <template>
   <section v-if="store.pending.length > 0" aria-labelledby="apercu-import" class="space-y-4">
     <div class="flex flex-wrap items-center justify-between gap-3">
-      <h3 id="apercu-import" class="text-lg font-semibold tracking-tight">
+      <h2 id="apercu-import" class="text-lg font-semibold tracking-tight">
         Vérifiez avant d’importer
-      </h3>
+      </h2>
       <button
         v-if="store.pending.length > 1"
         type="button"

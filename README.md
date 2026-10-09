@@ -4,7 +4,7 @@ Calcul des plus-values sur cryptomonnaies pour la déclaration d'impôts frança
 Importez l'historique de vos plateformes, obtenez les montants à reporter, cession par cession.
 
 **Démo :** https://crypto-plusvalue.vercel.app, ou directement
-[le résultat de l'exemple fictif](https://crypto-plusvalue.vercel.app/?exemple).
+[l'exemple fictif en mode démonstration](https://crypto-plusvalue.vercel.app/fiscalite?exemple).
 
 ![Accueil : la case 3AN de l'exemple, remplie au surligneur](docs/captures/accueil.jpg)
 
@@ -17,8 +17,12 @@ Importez l'historique de vos plateformes, obtenez les montants à reporter, cess
   en version expérimentale, reconnus automatiquement : seules les opérations crypto sont lues, le
   reste (espèces, actions, fonds) est ignoré, et une ligne illisible est signalée sans bloquer
   les autres.
-- **Reconstitution du portefeuille** à chaque vente, avec une alerte quand l'historique est
-  incomplet (achats faits sur une autre plateforme).
+- **Aperçu avant import, doublons et diagnostic** : rien n'entre dans le calcul sans
+  confirmation ; une opération déjà importée est ignorée, un doublon probable est soumis à
+  l'utilisateur ; le diagnostic signale achats manquants, transferts sans contrepartie et cours
+  introuvables, et un résultat incomplet est déclaré provisoire.
+- **Reconstitution du portefeuille** à chaque vente, toutes plateformes confondues, avec le
+  rapprochement des transferts entre plateformes.
 - **Cours historiques à la minute** pour la valeur globale du portefeuille, avec leur source
   ([`docs/prix.md`](docs/prix.md)), et saisie manuelle quand aucune source ne connaît l'actif.
 - **Le formulaire 2086 officiel, rempli, en PDF** : toutes les cases calculées, généré dans le
@@ -34,9 +38,15 @@ Importez l'historique de vos plateformes, obtenez les montants à reporter, cess
 - **« Et si je vendais aujourd'hui ? »** : la plus-value et l'impôt d'une vente aux cours du
   moment, compte tenu des ventes déjà faites dans l'année et du seuil de 305 €. Fonctionne aussi
   sans fichier, à partir de trois montants.
-- **Un exemple fictif** pour essayer sans fichier.
+- **Une application en plusieurs pages** (tableau de bord, transactions, fiscalité,
+  simulateur, portefeuille, plateformes), avec une barre latérale sur ordinateur et une barre
+  d'onglets sur téléphone.
+- **Un mode démonstration** avec un exemple fictif, clairement signalé, pour essayer sans
+  fichier.
 
-![Le résultat : case 3AN, lignes 224 et 51, puis le formulaire 2086 colonne par colonne](docs/captures/resultat.jpg)
+![Le tableau de bord : opérations, cryptos détenues, plus-value et impôt de l'année, diagnostic](docs/captures/tableau-de-bord.jpg)
+
+![La page Fiscalité : case 3AN, comparaison des régimes, formulaire 2086 et étapes de la déclaration](docs/captures/resultat.jpg)
 
 ![Le formulaire 2086 officiel, rempli par le site avec l'exemple fictif](docs/captures/formulaire-2086.jpg)
 

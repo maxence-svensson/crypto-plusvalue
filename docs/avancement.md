@@ -2,7 +2,7 @@
 
 Ce fichier suit la transformation de CryptoPlusValue en plateforme complète de préparation de la
 fiscalité crypto. Il est mis à jour à chaque phase, pour pouvoir reprendre le travail à tout
-moment. Dernière mise à jour : 9 octobre 2026, après la phase 3.
+moment. Dernière mise à jour : 9 octobre 2026, après la phase 4 (première partie).
 
 ## 1. Diagnostic initial (9 octobre 2026)
 
@@ -77,7 +77,7 @@ CI est verte, puis vérifiées en production.
 | 1. Stabilisation           | Vulnérabilités, en-têtes de sécurité, import ligne par ligne avec anomalies, validation des symboles, tests de bout en bout (Playwright)                                                     | fait (9 octobre)                                                          |
 | 2. Moteur fiscal versionné | Taux et barèmes par année vérifiés aux sources, option 3CN selon l'année, blocage des estimations sans règles connues                                                                        | fait (9 octobre)                                                          |
 | 3. Imports                 | Registre d'importeurs, aperçu et confirmation, doublons multicritères, qualité des données, cours groupés, lecture dans un Web Worker, nouvelles plateformes validées sur formats documentés | fait, sauf cours groupés et Web Worker (reportés en phase 6, performance) |
-| 4. Interface               | Navigation multi-pages, persistance IndexedDB, page des transactions (recherche, filtres, ajout, modification, suppression, annulation, journal), tableau de bord                            | à faire                                                                   |
+| 4. Interface               | Navigation multi-pages, persistance IndexedDB, page des transactions (recherche, filtres, ajout, modification, suppression, annulation, journal), tableau de bord                            | en cours : navigation, pages et mode démonstration faits                  |
 | 5. Fonctions avancées      | Portefeuille et performances, scénarios comparés, rapports CSV et Excel, sauvegarde chiffrée, centre d'aide, glossaire, FAQ, pages de contenu, thème manuel, PWA                             | à faire                                                                   |
 | 6. Sécurité et performance | CSP stricte, injection CSV, limites de taille, tests de charge, Lighthouse                                                                                                                   | à faire                                                                   |
 | 7. Validation finale       | Tests multi-navigateurs et multi-résolutions, documentation, rapport final                                                                                                                   | à faire                                                                   |
@@ -112,7 +112,7 @@ Statuts : TERMINÉ ET TESTÉ, TERMINÉ MAIS NON TESTÉ, PARTIEL, BLOQUÉ, NON IM
 | « Et maintenant ? »                 | TERMINÉ ET TESTÉ                | oui (calendrier)       | non                    | oui          |                                                                     |
 | Persistance locale                  | NON IMPLÉMENTÉ                  |                        |                        |              |                                                                     |
 | Gestion des transactions            | NON IMPLÉMENTÉ                  |                        |                        |              |                                                                     |
-| Tableau de bord                     | NON IMPLÉMENTÉ                  |                        |                        |              |                                                                     |
+| Tableau de bord                     | PARTIEL                         |                        |                        | oui          | chiffres clés et diagnostic ; graphiques à venir                    |
 | Sauvegarde chiffrée                 | NON IMPLÉMENTÉ                  |                        |                        |              |                                                                     |
 | Rapports CSV et Excel               | NON IMPLÉMENTÉ                  |                        |                        |              |                                                                     |
 | Tests de bout en bout               | TERMINÉ ET TESTÉ                |                        |                        | oui          | 5 projets en CI, axe-core ; en-têtes de sécurité vérifiés avec curl |

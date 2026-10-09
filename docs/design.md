@@ -69,6 +69,19 @@ Android. Rien à télécharger.
 - **Volets dépliables** (`.disclosure`) : chevron qui pivote, hauteur animée.
 - **Icônes** (`AppIcon.vue`) : trait fin, redessinées d'après Lucide (licence ISC).
 
+## Navigation
+
+- **Ordinateur et grande tablette** (1 024 px et plus) : barre latérale en verre, fixe, avec les
+  six sections et, en bas, le rappel que les fichiers restent dans le navigateur.
+- **Téléphone et petite tablette** : barre d'onglets en verre en bas de l'écran, comme sur iOS,
+  avec quatre onglets (Accueil, Opérations, Fiscalité, Simuler) et « Plus » pour le reste ; en
+  haut, la marque et le rappel du mode démonstration. L'encoche et la barre d'accueil des iPhone
+  sont respectées (`env(safe-area-inset-*)`).
+- Une section n'apparaît dans la navigation que si elle a un contenu réel. Une page qui a besoin
+  de données propose d'importer ou d'essayer l'exemple.
+- **Mode démonstration** : bandeau en haut de chaque page, « Quitter la démonstration » ; un vrai
+  fichier importé remplace les données fictives.
+
 ## Mouvement
 
 Des animations courtes, sur l'opacité, la position et le flou, avec la courbe

@@ -86,12 +86,6 @@ async function open(path, { width, height, scale, wait, theme = 'light' }) {
   await sleep(wait)
 }
 
-/** Fait défiler jusqu'à un bloc, pour qu'il finisse d'apparaître (directive v-reveal). */
-async function reach(selector) {
-  await evaluate(`document.querySelector(${JSON.stringify(selector)}).scrollIntoView()`)
-  await sleep(1200)
-}
-
 /** Rectangle d'un élément dans la page, avec une marge autour. */
 async function areaOf(selector, margin = 24) {
   return evaluate(`(() => {
@@ -114,30 +108,33 @@ async function capture(name, clip) {
 await mkdir(OUT, { recursive: true })
 await send('Page.enable')
 
-await open('/', { width: 1280, height: 800, scale: 2, wait: 3500 })
+await open('/', { width: 1440, height: 900, scale: 2, wait: 3500 })
 await capture('accueil')
+
+await open('/?exemple', { width: 1440, height: 900, scale: 2, wait: 8000 })
+await capture('tableau-de-bord')
 
 // Fenêtre haute : les halos du fond sont fixes et ne couvrent que la fenêtre, une capture
 // au-delà laisserait une coupure.
-await open('/?exemple', { width: 1280, height: 3600, scale: 2, wait: 10000 })
+await open('/fiscalite?exemple', { width: 1440, height: 4200, scale: 2, wait: 10000 })
 // Tranche à 11 % : la comparaison des deux régimes s'affiche.
 await evaluate(`document.querySelector('input[name="tranche"][value="0.11"]').click()`)
 await sleep(800)
-await capture('resultat', await areaOf('section[aria-labelledby="etape-resultat"]'))
+await capture('resultat', await areaOf('#contenu', 0))
 
+await open('/simulateur?exemple', { width: 1440, height: 1100, scale: 2, wait: 8000 })
 await evaluate(`(() => {
   const slider = document.querySelector('#part-a-vendre')
   slider.value = 60
   slider.dispatchEvent(new Event('input', { bubbles: true }))
 })()`)
-await reach('#simulation')
 await sleep(800)
-await capture('simulateur', await areaOf('#simulation > div', 0))
+await capture('simulateur', await areaOf('#contenu', 0))
 
 await open('/', { width: 390, height: 844, scale: 3, wait: 3500 })
 await capture('mobile')
 
-await open('/?exemple', { width: 1280, height: 800, scale: 2, wait: 10000, theme: 'dark' })
+await open('/fiscalite?exemple', { width: 1440, height: 900, scale: 2, wait: 10000, theme: 'dark' })
 await capture('sombre')
 
 socket.close()

@@ -126,7 +126,7 @@ const onlineDeadlines = computed(() =>
 <template>
   <section aria-labelledby="et-maintenant" class="space-y-5">
     <div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-      <h3 id="et-maintenant" class="headline text-2xl">Et maintenant ?</h3>
+      <h2 id="et-maintenant" class="headline text-2xl">Et maintenant ?</h2>
       <p class="text-sm text-muted" aria-live="polite">
         {{ doneCount }} {{ doneCount > 1 ? 'étapes faites' : 'étape faite' }} sur {{ steps.length }}
       </p>
