@@ -4,11 +4,13 @@ import { expect, test } from './fixtures'
 
 const EXAMPLE = 'public/exemples/trade-republic.csv'
 
-async function importExample(page: Page) {
+async function importExample(page: Page, { saved = true } = {}) {
   await page.goto('/plateformes')
   await page.setInputFiles('#fichier-import', EXAMPLE)
   await page.getByRole('button', { name: 'Importer', exact: true }).click()
   await expect(page.getByText('14 opérations crypto lues')).toBeVisible()
+  // Quitter la page avant la fin de l'écriture dans IndexedDB l'interromprait.
+  if (saved) await expect(page.getByText(/Enregistré dans ce navigateur le/)).toBeVisible()
 }
 
 test('retrouve les données importées après un rechargement', async ({ page }) => {
@@ -63,7 +65,8 @@ test('efface tout après confirmation', async ({ page }) => {
 test('n’enregistre rien quand la conservation est coupée', async ({ page }) => {
   await page.goto('/parametres')
   await page.getByRole('switch', { name: /Conserver mes données/ }).uncheck()
-  await importExample(page)
+  await importExample(page, { saved: false })
+  await expect(page.getByText(/Enregistré dans ce navigateur/)).toBeHidden()
   await page.goto('/transactions')
   await expect(page.getByText('Aucune opération pour l’instant')).toBeVisible()
 })

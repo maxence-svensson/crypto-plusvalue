@@ -168,6 +168,15 @@ async function loadExample() {
       </li>
     </ul>
 
+    <p
+      v-if="store.files.length > 0 && store.savedAt && !store.demo"
+      class="flex items-center gap-2 text-sm text-muted"
+      role="status"
+    >
+      <AppIcon name="check" class="text-gain" />
+      Enregistré dans ce navigateur le {{ formatDateTime(store.savedAt) }}.
+    </p>
+
     <p v-if="busy" class="flex items-center gap-2 text-sm text-muted" role="status">
       <span class="spinner" aria-hidden="true"></span>
       Lecture en cours…
