@@ -13,7 +13,15 @@ const query = z.object({
  * Un cours passé ne change plus : la réponse est mise en cache par le CDN pour un an.
  */
 export default defineEventHandler(async (event) => {
-  const { asset, at } = await getValidatedQuery(event, query.parse)
+  const parsed = query.safeParse(getQuery(event))
+  if (!parsed.success) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Bad Request',
+      message: 'Paramètres attendus : asset (symbole en majuscules) et at (date ISO 8601).',
+    })
+  }
+  const { asset, at } = parsed.data
 
   // La bougie de la minute en cours n'est pas encore close.
   if (at.getTime() > Date.now() - 2 * 60_000) {

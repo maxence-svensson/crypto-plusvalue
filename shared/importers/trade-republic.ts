@@ -1,5 +1,16 @@
 import type { Transaction } from '../portfolio/transaction'
-import { ImportError, amount, cell, isoDate, readCsv, type CsvRow, type ImportResult } from './csv'
+import {
+  ImportError,
+  amount,
+  cell,
+  cryptoSymbol,
+  eachRow,
+  emptyResult,
+  isoDate,
+  readCsv,
+  type CsvRow,
+  type ImportResult,
+} from './csv'
 
 /**
  * Export officiel de Trade Republic (application mobile, Profil → Relevés → Export de
@@ -24,23 +35,23 @@ const COLUMNS = [
 ]
 
 export function importTradeRepublic(text: string): ImportResult {
-  const result: ImportResult = { transactions: [], skipped: 0, unsupported: [] }
+  const result = emptyResult()
 
-  for (const row of readCsv(text, COLUMNS)) {
+  eachRow(readCsv(text, COLUMNS), result, (row) => {
     if (cell(row, 'asset_class') !== 'CRYPTO') {
       result.skipped++
-      continue
+      return
     }
 
     const transaction = toTransaction(row)
-    if (transaction === 'ignored') continue
+    if (transaction === 'ignored') return
     if (transaction) {
       result.transactions.push(transaction)
     } else {
       const kind = `${cell(row, 'category')} ${cell(row, 'type')}`
       result.unsupported.push({ line: row.line, label: `${kind} : ${cell(row, 'description')}` })
     }
-  }
+  })
 
   return result
 }
@@ -59,7 +70,10 @@ function toTransaction(row: CsvRow): Transaction | 'ignored' | undefined {
     date: isoDate(row, 'datetime'),
     label: cell(row, 'description'),
   }
-  const crypto = { asset: ticker(cell(row, 'symbol')), quantity: amount(row, 'shares') }
+  const crypto = {
+    asset: cryptoSymbol(row, ticker(cell(row, 'symbol'))),
+    quantity: amount(row, 'shares'),
+  }
 
   // `amount` est le montant brut (quantité × prix), `fee` les frais d'ordre, tous deux signés.
   switch (`${cell(row, 'category')}/${cell(row, 'type')}`) {

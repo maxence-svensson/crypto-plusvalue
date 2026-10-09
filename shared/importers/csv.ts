@@ -12,12 +12,20 @@ export type ImportResult = {
   skipped: number
   /** Lignes crypto que l'import ne sait pas encore traiter : à vérifier par l'utilisateur. */
   unsupported: { line: number; label: string }[]
+  /** Lignes illisibles (date, montant, symbole, devise) : écartées, les autres sont importées. */
+  anomalies: { line: number; message: string }[]
+}
+
+export function emptyResult(): ImportResult {
+  return { transactions: [], skipped: 0, unsupported: [], anomalies: [] }
 }
 
 export type CsvRow = {
   /** Numéro de ligne dans le fichier (l'en-tête est la ligne 1), pour retrouver une erreur. */
   line: number
   cells: Record<string, string>
+  /** Ligne mal formée (guillemets, nombre de colonnes) : elle sera signalée et écartée. */
+  error?: string
 }
 
 /** Nom d'une colonne, ou ses variantes selon les versions de l'export (la première présente compte). */
@@ -46,14 +54,56 @@ export function readCsv(
     throw new ImportError(`Colonnes absentes du fichier : ${missing.join(', ')}.`)
   }
 
-  const error = parsed.errors[0]
-  if (error) {
+  const errors = new Map(
+    parsed.errors.flatMap((error) => (error.row === undefined ? [] : [[error.row, error.message]])),
+  )
+  // Un fichier dont la majorité des lignes est mal formée n'est pas du bon format.
+  const first = parsed.errors[0]
+  if (first && (first.row === undefined || errors.size > parsed.data.length / 2)) {
     throw new ImportError(
-      `Ligne ${(error.row ?? 0) + headerLine + 1} illisible : ${error.message}.`,
+      `Ligne ${(first.row ?? 0) + headerLine + 1} illisible : ${first.message}.`,
     )
   }
 
-  return parsed.data.map((cells, index) => ({ line: index + headerLine + 1, cells }))
+  return parsed.data.map((cells, index) => {
+    const error = errors.get(index)
+    return {
+      line: index + headerLine + 1,
+      cells,
+      ...(error ? { error: `ligne mal formée (${error})` } : {}),
+    }
+  })
+}
+
+/**
+ * Traite chaque ligne. Une ligne illisible est signalée dans `anomalies` et écartée ; les autres
+ * sont importées, pour que l'utilisateur voie tout de suite ce qui est à corriger.
+ */
+export function eachRow(rows: CsvRow[], result: ImportResult, handle: (row: CsvRow) => void) {
+  for (const row of rows) {
+    if (row.error) {
+      result.anomalies.push({ line: row.line, message: row.error })
+      continue
+    }
+    try {
+      handle(row)
+    } catch (error) {
+      if (!(error instanceof ImportError)) throw error
+      result.anomalies.push({
+        line: row.line,
+        message: error.message.replace(/^Ligne \d+ : /, ''),
+      })
+    }
+  }
+}
+
+/** Symbole d'une crypto en majuscules (BTC, RENDER, 1INCH) ; tout autre texte est refusé. */
+export function cryptoSymbol(row: CsvRow, raw: string): string {
+  const symbol = raw.trim().toUpperCase()
+  if (!/^[A-Z0-9]{1,15}$/.test(symbol)) {
+    throw new ImportError(`Ligne ${row.line} : « ${raw} » n'est pas un symbole de crypto valide.`)
+  }
+  return symbol
 }
 
 function variants(column: Column): readonly string[] {
