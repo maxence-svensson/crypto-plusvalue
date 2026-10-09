@@ -4,6 +4,10 @@ Les changements notables, du plus récent au plus ancien. Chaque entrée renvoie
 
 ## 9 octobre 2026
 
+### Titre de l'accueil
+
+- « Vos plus-values crypto, prêtes à déclarer. » remplace « prêtes à recopier sur le 2086 ».
+
 ### Navigation en haut sur ordinateur
 
 - La barre latérale laisse place à une barre de navigation en haut, en verre, alignée sur le
